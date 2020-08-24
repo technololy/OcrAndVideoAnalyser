@@ -36,5 +36,17 @@ namespace ReadTextFromImageConsole.Models
         public string Issuedate { get; set; }
         public string Iexpirydate { get; set; }
         public string Response { get; set; }
+        public bool? IsIdentificationImageChecked { get; set; }
+        public DateTime? DateIdentificationImageIsChecked { get; set; }
+        public string IdentificationImageExtractedTextFromImage { get; set; }
+        public string IdentificationImageCheckResponse { get; set; }
+        public string IdentificationImageCheckResponseJson { get; set; }
+        public bool? IsFacialImageChecked { get; set; }
+        public DateTime? DateFacialImageIsChecked { get; set; }
+        public string FacialImageExtractedTextFromImage { get; set; }
+        public string FacialImageCheckResponse { get; set; }
+        public string FacialImageCheckResponseJson { get; set; }
+        public string Landmark { get; set; }
+        public string NearestBusStop { get; set; }
     }
 }

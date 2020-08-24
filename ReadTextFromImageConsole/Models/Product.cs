@@ -15,5 +15,8 @@ namespace ReadTextFromImageConsole.Models
         public string Currency { get; set; }
         public string Description { get; set; }
         public string FriendlyName { get; set; }
+        public string Features { get; set; }
+        public string Requirements { get; set; }
+        public string ImageUrl { get; set; }
     }
 }

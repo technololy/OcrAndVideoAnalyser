@@ -93,5 +93,6 @@ namespace ReadTextFromImageConsole.Models
         public string SignatoryPhoneNumber { get; set; }
         public string Tin { get; set; }
         public string Dao { get; set; }
+        public string StateOfRegistration { get; set; }
     }
 }

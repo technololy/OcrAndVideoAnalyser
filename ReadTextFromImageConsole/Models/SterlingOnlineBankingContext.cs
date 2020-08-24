@@ -15,9 +15,11 @@ namespace ReadTextFromImageConsole.Models
         {
         }
 
+        public virtual DbSet<CamuCorpData> CamuCorpData { get; set; }
         public virtual DbSet<CamuDocument> CamuDocument { get; set; }
         public virtual DbSet<CamuRepush> CamuRepush { get; set; }
         public virtual DbSet<Camudatafield> Camudatafield { get; set; }
+        public virtual DbSet<Camudatafield1> Camudatafield1 { get; set; }
         public virtual DbSet<CardRequest> CardRequest { get; set; }
         public virtual DbSet<Ereference> Ereference { get; set; }
         public virtual DbSet<EreferenceResponse> EreferenceResponse { get; set; }
@@ -34,12 +36,19 @@ namespace ReadTextFromImageConsole.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=10.0.41.101;Database=SterlingOnlineBanking;Integrated Security=False;User ID=sa;Password=tylent;MultipleActiveResultSets=True;Trusted_Connection=False;");
+                optionsBuilder.UseSqlServer("Server=10.0.41.101;Database=SterlingOnlineBanking;user id=sa;password=tylent;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<CamuCorpData>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Chequerequired).HasColumnName("chequerequired");
+            });
+
             modelBuilder.Entity<CamuDocument>(entity =>
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
@@ -78,9 +87,66 @@ namespace ReadTextFromImageConsole.Models
 
                 entity.Property(e => e.Bvn).HasColumnName("BVN");
 
+                entity.Property(e => e.DateFacialImageIsChecked).HasColumnType("datetime");
+
+                entity.Property(e => e.DateIdentificationImageIsChecked).HasColumnType("datetime");
+
                 entity.Property(e => e.Dob).HasColumnName("DOB");
 
+                entity.Property(e => e.FacialImageCheckResponse).HasMaxLength(50);
+
+                entity.Property(e => e.FacialImageCheckResponseJson).HasColumnName("FacialImageCheckResponseJSON");
+
                 entity.Property(e => e.Folio).HasColumnName("folio");
+
+                entity.Property(e => e.IdentificationImageCheckResponse).HasMaxLength(50);
+
+                entity.Property(e => e.IdentificationImageCheckResponseJson).HasColumnName("IdentificationImageCheckResponseJSON");
+
+                entity.Property(e => e.Idno).HasColumnName("idno");
+
+                entity.Property(e => e.Idtype).HasColumnName("idtype");
+
+                entity.Property(e => e.Iexpirydate).HasColumnName("iexpirydate");
+
+                entity.Property(e => e.Issuedate).HasColumnName("issuedate");
+
+                entity.Property(e => e.Urlmandate).HasColumnName("URLMandate");
+
+                entity.Property(e => e.UrlmeansOfId).HasColumnName("URLMeansOfID");
+
+                entity.Property(e => e.Urlother).HasColumnName("URLOther");
+
+                entity.Property(e => e.UrlphotoId).HasColumnName("URLPhotoID");
+
+                entity.Property(e => e.Urlreference1).HasColumnName("URLReference1");
+
+                entity.Property(e => e.Urlreference2).HasColumnName("URLReference2");
+            });
+
+            modelBuilder.Entity<Camudatafield1>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("CAMUDatafield_1");
+
+                entity.Property(e => e.Bvn).HasColumnName("BVN");
+
+                entity.Property(e => e.DateFacialImageIsChecked).HasColumnType("datetime");
+
+                entity.Property(e => e.DateIdentificationImageIsChecked).HasColumnType("datetime");
+
+                entity.Property(e => e.Dob).HasColumnName("DOB");
+
+                entity.Property(e => e.FacialImageCheckResponse).HasMaxLength(50);
+
+                entity.Property(e => e.FacialImageCheckResponseJson).HasColumnName("FacialImageCheckResponseJSON");
+
+                entity.Property(e => e.Folio).HasColumnName("folio");
+
+                entity.Property(e => e.IdentificationImageCheckResponse).HasMaxLength(50);
+
+                entity.Property(e => e.IdentificationImageCheckResponseJson).HasColumnName("IdentificationImageCheckResponseJSON");
 
                 entity.Property(e => e.Idno).HasColumnName("idno");
 

@@ -1,10 +1,23 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+
 namespace ReadTextFromImageConsole
 {
-    public class AppDbContext
+    public class AppDbContext : DbContext
     {
-        public AppDbContext()
+        private IConfiguration configuration;
+
+
+        public virtual DbSet<Models.Camudatafield> Camudatafield { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            if (!optionsBuilder.IsConfigured)
+            {
+
+                optionsBuilder.UseSqlServer(@"Server=10.0.41.101;Initial Catalog=SterlingOnlineBanking;Integrated Security=False;User ID=sa;Password=tylent;MultipleActiveResultSets=True;");
+            }
         }
     }
 }
