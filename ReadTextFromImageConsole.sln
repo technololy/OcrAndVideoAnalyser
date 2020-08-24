@@ -1,0 +1,17 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadTextFromImageConsole", "ReadTextFromImageConsole\ReadTextFromImageConsole.csproj", "{66CF547C-3FFC-4749-A9F6-ED24565A4D22}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{66CF547C-3FFC-4749-A9F6-ED24565A4D22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66CF547C-3FFC-4749-A9F6-ED24565A4D22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66CF547C-3FFC-4749-A9F6-ED24565A4D22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66CF547C-3FFC-4749-A9F6-ED24565A4D22}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
