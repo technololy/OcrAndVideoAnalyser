@@ -1,0 +1,184 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using log4net;
+using ReadTextFromImageConsole;
+using SendImageToOneExpress.Models;
+
+namespace SendImageToOneExpress
+{
+    class Program
+    {
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        static int count;
+        static string acctOpenBaseURL = "https://pass.sterling.ng/cams";
+        static API accountOpeningApi = new API(acctOpening: true);
+        static AccountsWithoutPicturesContext context = new AccountsWithoutPicturesContext();
+
+        static void Main(string[] args)
+        {
+            try
+            {
+                WriteToConsole("statrting job....");
+                List<Models.MandatePictureMgt> all = GetAllFromDatabase();
+                if (all?.Count > 0)
+                {
+                    count = 0;
+                    foreach (var item in all)
+                    {
+                        count++;
+                        WriteToConsole($"getting bvn image for record {count} and account {item.Nuban}");
+                        string img = GetImageFromBVN(item.Bvn);
+                        if (!string.IsNullOrEmpty(img))
+                        {
+                            WriteToConsole($"getting azure url for image for record {count} and account {item.Nuban}");
+
+                            string url = SendImageToAzureAndGetURL(img, item.Bvn);
+                            if (!string.IsNullOrEmpty(url))
+                            {
+                                WriteToConsole($"sending to one express azure url {url} for image for record {count} and account {item.Nuban}");
+                                SendToOneExpress
+                        (url, item.AccountName, item.Nuban, item);
+                            }
+                            else
+                            {
+                                //exit
+                                log.Info("nothing from sendimagetoazureurl");
+                            }
+                        }
+                        else
+                        {
+                            //exit
+                            log.Info("nothing from getimagefrom bvn");
+                        }
+                    }
+                }
+                else
+                {
+                    //exit
+                    log.Info("nothing");
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+        }
+
+        private static void SendToOneExpress(string url, string accName, string accNum, MandatePictureMgt pictureMgt)
+        {
+            string urlEnd = "http://hq-k2app-dev/api/workflow/preview/workflows/1401";
+            API aPI = new API();
+            OneExpressSubmitImage oneExpress = new OneExpressSubmitImage()
+            {
+                dataFields = new DataFields()
+                {
+                    AccountName = accName,
+                    AccountNumber = accNum,
+                    CustomerID = "",
+                    MandateURL = url,
+                    Source = "MandatePictureJob"
+                }
+            };
+            var response = aPI.PostAny<dynamic>(oneExpress, urlEnd).Result;
+            SaveToDBAsDone(pictureMgt, url);
+
+
+        }
+
+        private static void SaveToDBAsDone(MandatePictureMgt pictureMgt, string url)
+        {
+            MandatePictureMgtDone mgt = new MandatePictureMgtDone()
+            {
+                AccountName = pictureMgt.AccountName,
+                Bvn = pictureMgt.Bvn,
+                DateOpen = pictureMgt.DateOpen,
+                Email = pictureMgt.Email,
+                Nuban = pictureMgt.Nuban,
+                PhoneNumber = pictureMgt.PhoneNumber,
+                Restriction = pictureMgt.Restriction,
+                RestrictionCode = pictureMgt.RestrictionCode,
+                WorkingBalance = pictureMgt.WorkingBalance,
+                ImageSentToOneExpress = url
+            };
+
+            context.MandatePictureMgtDone.Add(mgt);
+            context.SaveChanges();
+        }
+
+        private static string SendImageToAzureAndGetURL(string img, string bvn)
+        {
+            // API aPI = new API(true);
+            CamuAzureImageRequest model = new CamuAzureImageRequest()
+            {
+
+                appId = "4",
+                folderName = $"MandatePictureJob/ValidateImage/{bvn}",
+                fileName = $"{DateTime.Now.Ticks}_{bvn}.jpg",
+                base64String = img
+
+            };
+            var response = accountOpeningApi.PostAny<CamuAzureResponse>(model, $"{acctOpenBaseURL}/api/User/UploadImageToAzureWithResponseCode").Result;
+            if (response.isSuccess)
+            {
+                return response.SuccessObj?.responseCode == "00" ? response.SuccessObj?.url : "";
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        private static string GetImageFromBVN(string bvn)
+        {
+            BvnRequest request = new BvnRequest()
+            {
+                bvn = bvn
+            };
+            //API accountOpeningApi = new API(acctOpening: true);
+            var resp = accountOpeningApi.PostAny<BVNResponse>(request, $"{acctOpenBaseURL}/api/User/VerifyBVNForMobile").Result;
+            if (resp.isSuccess)
+            {
+
+                return resp.SuccessObj?.Base64Image;
+            }
+            else
+            {
+                return "";
+            }
+
+        }
+
+        private static List<MandatePictureMgt> GetAllFromDatabase()
+        {
+
+
+            try
+            {
+                var query =
+                (from c in context.MandatePictureMgt
+                 where !(from o in context.MandatePictureMgtDone
+                         select o.Nuban)
+                        .Contains(c.Nuban)
+                 select c).ToList();
+                return query;
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+
+            return new List<MandatePictureMgt>();
+        }
+
+        static void WriteToConsole(string msg)
+        {
+            Console.WriteLine(msg);
+            Console.WriteLine("");
+            log.Info(msg);
+
+        }
+    }
+}

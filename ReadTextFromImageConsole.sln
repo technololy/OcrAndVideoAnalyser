@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadAttributesFromFacialIma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlertsAndRestriction", "AlertsAndRestriction\AlertsAndRestriction.csproj", "{38F9DBDF-86E3-49A8-9DBA-0275363824CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SendImageToOneExpress", "SendImageToOneExpress\SendImageToOneExpress.csproj", "{11F36EC7-25DA-4EF5-9637-7F0FF9D4FC5D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,5 +27,9 @@ Global
 		{38F9DBDF-86E3-49A8-9DBA-0275363824CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38F9DBDF-86E3-49A8-9DBA-0275363824CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38F9DBDF-86E3-49A8-9DBA-0275363824CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11F36EC7-25DA-4EF5-9637-7F0FF9D4FC5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11F36EC7-25DA-4EF5-9637-7F0FF9D4FC5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11F36EC7-25DA-4EF5-9637-7F0FF9D4FC5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11F36EC7-25DA-4EF5-9637-7F0FF9D4FC5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
