@@ -15,8 +15,9 @@ namespace ReadTextFromImageConsole
         {
             if (!optionsBuilder.IsConfigured)
             {
-
-                optionsBuilder.UseSqlServer(@"Server=10.0.41.101;Initial Catalog=SterlingOnlineBanking;Integrated Security=False;User ID=sa;Password=tylent;MultipleActiveResultSets=True;");
+                var conString = Program.config.GetConnectionString("SterlingOnlineBankingDbContext");
+                //optionsBuilder.UseSqlServer(@"Server=10.0.41.101;Initial Catalog=SterlingOnlineBanking;Integrated Security=False;User ID=sa;Password=tylent;MultipleActiveResultSets=True;");
+                optionsBuilder.UseSqlServer(conString);
             }
         }
     }

@@ -14,14 +14,14 @@ namespace SendImageToOneExpress
         static int count;
         static string acctOpenBaseURL = "https://pass.sterling.ng/cams";
         static API accountOpeningApi = new API(acctOpening: true);
-        static AccountsWithoutPicturesContext context = new AccountsWithoutPicturesContext();
+        static MandateMgtReqContext context = new MandateMgtReqContext();
 
         static void Main(string[] args)
         {
             try
             {
                 WriteToConsole("statrting job....");
-                List<Models.MandatePictureMgt> all = GetAllFromDatabase();
+                List<Models.TblRecords> all = GetAllFromDatabase();
                 if (all?.Count > 0)
                 {
                     count = 0;
@@ -39,7 +39,7 @@ namespace SendImageToOneExpress
                             {
                                 WriteToConsole($"sending to one express azure url {url} for image for record {count} and account {item.Nuban}");
                                 SendToOneExpress
-                        (url, item.AccountName, item.Nuban, item);
+                        (url, item.AccountName, item.Nuban.ToString(), item);
                             }
                             else
                             {
@@ -66,7 +66,7 @@ namespace SendImageToOneExpress
             }
         }
 
-        private static void SendToOneExpress(string url, string accName, string accNum, MandatePictureMgt pictureMgt)
+        private static void SendToOneExpress(string url, string accName, string accNum, TblRecords pictureMgt)
         {
             string urlEnd = "http://hq-k2app-dev/api/workflow/preview/workflows/1401";
             API aPI = new API();
@@ -87,9 +87,9 @@ namespace SendImageToOneExpress
 
         }
 
-        private static void SaveToDBAsDone(MandatePictureMgt pictureMgt, string url)
+        private static void SaveToDBAsDone(TblRecords pictureMgt, string url)
         {
-            MandatePictureMgtDone mgt = new MandatePictureMgtDone()
+            TblRecordsDone mgt = new TblRecordsDone()
             {
                 AccountName = pictureMgt.AccountName,
                 Bvn = pictureMgt.Bvn,
@@ -100,11 +100,14 @@ namespace SendImageToOneExpress
                 Restriction = pictureMgt.Restriction,
                 RestrictionCode = pictureMgt.RestrictionCode,
                 WorkingBalance = pictureMgt.WorkingBalance,
-                ImageSentToOneExpress = url
+                UrlOfImageUploaded = url
             };
+            using (var context2 = new MandateMgtReqContext())
+            {
+                context2.TblRecordsDone.Add(mgt);
+                context2.SaveChanges();
+            }
 
-            context.MandatePictureMgtDone.Add(mgt);
-            context.SaveChanges();
         }
 
         private static string SendImageToAzureAndGetURL(string img, string bvn)
@@ -150,15 +153,15 @@ namespace SendImageToOneExpress
 
         }
 
-        private static List<MandatePictureMgt> GetAllFromDatabase()
+        private static List<TblRecords> GetAllFromDatabase()
         {
 
 
             try
             {
                 var query =
-                (from c in context.MandatePictureMgt
-                 where !(from o in context.MandatePictureMgtDone
+                (from c in context.TblRecords
+                 where !(from o in context.TblRecordsDone
                          select o.Nuban)
                         .Contains(c.Nuban)
                  select c).ToList();
@@ -170,7 +173,7 @@ namespace SendImageToOneExpress
             }
 
 
-            return new List<MandatePictureMgt>();
+            return new List<TblRecords>();
         }
 
         static void WriteToConsole(string msg)

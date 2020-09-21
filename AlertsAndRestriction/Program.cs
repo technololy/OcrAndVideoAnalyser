@@ -12,10 +12,12 @@ namespace AlertsAndRestriction
     class Program
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        static string acctOpenBaseURL = "https://pass.sterling.ng/cams";
+        static string acctOpenBaseURL = "";
         static void Main(string[] args)
         {
+            acctOpenBaseURL = ReadTextFromImageConsole.Program.config.GetSection("AppSettings").GetSection("CamsURL").Value;
             GetDataFromTable();
+
 
         }
 
@@ -38,7 +40,7 @@ namespace AlertsAndRestriction
                         {
                             string body = ComposeSuccessEmail(item);
 #if DEBUG
-                            item.EmailAddress = "loladeking@yahoo.com";
+                            //     item.EmailAddress = "loladeking@yahoo.com";
 #endif
                             SendEmail(true, body, item.EmailAddress, item.FirstName + " " + item.LastName);
                             log.Info($"restriction lifted for {item.AccountNumber}");
@@ -55,7 +57,7 @@ namespace AlertsAndRestriction
 
                         string body = ComposeFailedEmail(item);
 #if DEBUG
-                        item.EmailAddress = "loladeking@yahoo.com";
+                        // item.EmailAddress = "loladeking@yahoo.com";
 #endif
                         SendEmail(false, body, item.EmailAddress, item.FirstName + " " + item.LastName);
                     }
@@ -163,7 +165,7 @@ namespace AlertsAndRestriction
 
             }
 
-            return resp;
+            return Task.FromResult(resp);
         }
 
 

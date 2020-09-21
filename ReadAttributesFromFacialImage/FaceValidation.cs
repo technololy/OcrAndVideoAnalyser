@@ -8,9 +8,10 @@ namespace ReadAttributesFromFacialImage
     public class FaceValidation
     {
         // Add your Face subscription key to your environment variables.
-        private const string subscriptionKey = "e8ef40efa4704769860e661c210a0fc5";
+        private static string subscriptionKey = ReadTextFromImageConsole.Program.config.GetSection("AppSettings").GetSection("subscriptionKey").Value;
         // Add your Face endpoint to your environment variables.
-        private const string faceEndpoint = "https://eastus.api.cognitive.microsoft.com/";
+        static string fURL = ReadTextFromImageConsole.Program.config.GetSection("AppSettings").GetSection("FaceBaseURL").Value;
+        private string faceEndpoint = fURL;
 
         private readonly IFaceClient faceClient = new FaceClient(
             new ApiKeyServiceClientCredentials(subscriptionKey),
@@ -43,7 +44,7 @@ namespace ReadAttributesFromFacialImage
 
 
                 faceClient.Endpoint = faceEndpoint;
-                imageUrl = "https://sbnk2storage.blob.core.windows.net/k2container/OneBank/14864679/0074721460/Passport.jpg";
+                //imageUrl = "https://sbnk2storage.blob.core.windows.net/k2container/OneBank/14864679/0074721460/Passport.jpg";
                 IList<DetectedFace> faces = await faceClient.Face.DetectWithUrlAsync(imageUrl, true, true, faceAttributes);
                 if (faces != null && faces.Count > 0)
                 {

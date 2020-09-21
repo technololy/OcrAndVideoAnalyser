@@ -28,16 +28,17 @@ namespace ReadTextFromImageConsole
 
         // An endpoint should have a format like "https://westus.api.cognitive.microsoft.com"
         //static string endpoint = Environment.GetEnvironmentVariable("COMPUTER_VISION_ENDPOINT");
-        static string endpoint = "https://eastus.api.cognitive.microsoft.com";
+        static string endpoint = "";
 
         // the Batch Read method endpoint
-        static string uriBase = endpoint + "/vision/v3.0//read/analyze";
+        static string uriBase = "";
 
         // Add a local image with text here (png or jpg is OK)
         //static string imageFilePath = @"damilola_oyebanji_international_passport.jpg";
         //static string imageFilePath = @"passport_renewal_Page_1.pdf";
         //static string imageFilePath = @"Identification.jpg";
         static string imageFilePath = @"IMG_20200719_021151.jpg";
+        public static IConfigurationRoot config;
 
         static void Main(string[] args)
         {
@@ -46,8 +47,10 @@ namespace ReadTextFromImageConsole
           .SetBasePath(Directory.GetCurrentDirectory())
           .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
-            var config = builder.Build();
-
+            config = builder.Build();
+            endpoint = config.GetSection("AppSettings").GetSection("AzureFacialBaseUrl").Value;
+            uriBase = endpoint + config.GetSection("AppSettings").GetSection("AzureFacialFaceEndPoint").Value;
+            //var token = config.GetSection("AppSettings").GetSection("AppruveToken").Value;
 
             var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
@@ -208,7 +211,7 @@ namespace ReadTextFromImageConsole
             }
             catch (Exception e)
             {
-                Console.WriteLine("\n" + e.Message);
+                Console.WriteLine("\n" + e.InnerException);
             }
         }
 
@@ -242,26 +245,26 @@ namespace ReadTextFromImageConsole
             string url = GetURLByDocType(v.docType);
             var model = new { id = v.idNumber, first_name = v.firstName, last_name = v.lastName, date_of_birth = v.dateOfBirth };
 #if DEBUG
-            if (v.docType == Validation.DocumentType.DriversLicense)
-            {
-                model = new { id = "ABC00578AA2", first_name = "Henry", last_name = "Nwandicne", date_of_birth = "1976-04-15" };
+            //if (v.docType == Validation.DocumentType.DriversLicense)
+            //{
+            //    model = new { id = "ABC00578AA2", first_name = "Henry", last_name = "Nwandicne", date_of_birth = "1976-04-15" };
 
-            }
-            else if (v.docType == Validation.DocumentType.VotersCard)
-            {
-                model = new { id = "90F5B0407E2960502637", first_name = "Nwabia", last_name = "Chidozie", date_of_birth = "1998-01-10" };
+            //}
+            //else if (v.docType == Validation.DocumentType.VotersCard)
+            //{
+            //    model = new { id = "90F5B0407E2960502637", first_name = "Nwabia", last_name = "Chidozie", date_of_birth = "1998-01-10" };
 
-            }
-            else if (v.docType == Validation.DocumentType.InternationalPassport)
-            {
-                model = new { id = "A50013320", first_name = "Sunday", last_name = "Obafemi", date_of_birth = "1975-04-25" };
+            //}
+            //else if (v.docType == Validation.DocumentType.InternationalPassport)
+            //{
+            //    model = new { id = "A50013320", first_name = "Sunday", last_name = "Obafemi", date_of_birth = "1975-04-25" };
 
-            }
-            else if (v.docType == Validation.DocumentType.nationalId)
-            {
-                model = new { id = "AKW06968AA2", first_name = "Michael", last_name = "Olugbenga", date_of_birth = "1982-05-20" };
+            //}
+            //else if (v.docType == Validation.DocumentType.nationalId)
+            //{
+            //    model = new { id = "AKW06968AA2", first_name = "Michael", last_name = "Olugbenga", date_of_birth = "1982-05-20" };
 
-            }
+            //}
 #endif
 
 
@@ -304,7 +307,6 @@ namespace ReadTextFromImageConsole
 
         private static string GetURLByDocType(Validation.DocumentType docType)
         {
-            string url = "";
             string categoryEndPoint = "";
             switch (docType)
             {
@@ -323,7 +325,8 @@ namespace ReadTextFromImageConsole
                 default:
                     break;
             }
-            return url = $"https://api.appruve.co/v1/verifications/ng/{categoryEndPoint}";
+            string url = $"{config.GetSection("AppSettings").GetSection("AppruveBaseURL").Value}/{categoryEndPoint}";
+            return url;
         }
 
         public class AppruveCurl
