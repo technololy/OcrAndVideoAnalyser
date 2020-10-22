@@ -41,10 +41,11 @@ namespace AcctOpeningImageValidationAPI.Controllers
         [HttpPost]
         [Route("ValidateIdentificationImage")]
 
-        public async Task<IActionResult> ValidateImage([Required] string ImageURL, IdentificationValidationLib.Models.Camudatafield camudatafield)
+        public async Task<IActionResult> ValidateImage([Required] string ImageURL, [FromBody] IdentificationValidationLib.Models.Camudatafield camudatafield)
         {
             // var test = Configuration.GetSection("AppSettings").GetSection("subscriptionKey").Value;
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(camudatafield);
+
             var response = await computerVision.ReadText(ImageURL);
             if (!response.isSuccess)
             {
@@ -78,9 +79,17 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
             }
 
-            await this.externalImageValidationService.ValidateDoc(v, camudatafield);
+            var appruv = await this.externalImageValidationService.ValidateDoc(v, camudatafield);
+            if (appruv.isSuccess)
+            {
+                return new OkObjectResult(appruv.msg);
 
-            return new OkResult();
+            }
+            else
+            {
+                return new UnprocessableEntityObjectResult(appruv.msg);
+
+            }
 
         }
 

@@ -43,7 +43,7 @@ namespace IdentificationValidationLib
 
         public static bool Compare(Validation v, Camudatafield camudatafield)
         {
-            throw new NotImplementedException();
+            return true;
         }
     }
 }
