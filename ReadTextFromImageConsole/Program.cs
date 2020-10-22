@@ -85,12 +85,13 @@ namespace ReadTextFromImageConsole
         /// the Computer Vision REST API.
         /// </summary>
         /// <param name="imageFilePath">The image file with text.</param>
-        static async Task ReadText(string imageFilePath, Models.Camudatafield camudatafield = null)
+        static async Task<(bool isSuccess, string message)> ReadText(string imageFilePath, Models.Camudatafield camudatafield = null)
         {
             try
             {
                 //HttpClient client = new HttpClient();
-
+                bool isSuccess = false;
+                string responseMessage = "";
                 // Request headers.
                 client.DefaultRequestHeaders.Add(
                     "Ocp-Apim-Subscription-Key", subscriptionKey);
@@ -113,8 +114,8 @@ namespace ReadTextFromImageConsole
 
                 if (byteData?.Length <= 0)
                 {
-                    UpdateResponseOnTable(false, "Invalid Image. Byte length is zero", camudatafield);
-                    return;
+                    UpdateResponseOnTable(isSuccess = false, responseMessage = "Invalid Image. Byte length is zero", camudatafield);
+                    return (isSuccess, responseMessage);
                 }
 
                 // Adds the byte array as an octet stream to the request body.
@@ -144,7 +145,7 @@ namespace ReadTextFromImageConsole
                     string errorString = await response.Content.ReadAsStringAsync();
                     Console.WriteLine("\n\nResponse:\n{0}\n",
                         JToken.Parse(errorString).ToString());
-                    return;
+                    return (isSuccess = false, errorString);
                 }
 
                 // If the first REST API method completes successfully, the second 
@@ -170,7 +171,7 @@ namespace ReadTextFromImageConsole
                 if (i == 60 && contentString.IndexOf("\"status\":\"succeeded\"") == -1)
                 {
                     Console.WriteLine("\nTimeout error.\n");
-                    return;
+                    return (false, responseMessage = "Timeout error");
                 }
 
                 // Display the JSON response.
@@ -184,8 +185,8 @@ namespace ReadTextFromImageConsole
                 if (returnedExtractedTextFromImages == null || !returnedExtractedTextFromImages.Any())
                 {
                     //can not extract text from image. exit
-                    UpdateResponseOnTable(true, "can not see/extract text from image", camudatafield);
-                    return;
+                    UpdateResponseOnTable(true, responseMessage = "can not see/extract text from image", camudatafield);
+                    return (isSuccess = false, responseMessage);
 
                 }
                 //go to extract the biodata from the images 
@@ -197,7 +198,7 @@ namespace ReadTextFromImageConsole
                     //something made impossible extracting the preferred biodata from the list of text sent for analysis
                     log.Info($"error. something made impossible extracting the preferred biodata from the list of text sent for analysis. {v.exception} for customer {camudatafield.EmailAddress} and account {camudatafield.AccountNumber} and row id {camudatafield.Id} ");
                     UpdateResponseOnTable(true, $"{v.exception}", camudatafield, contentString);
-                    return;
+                    return (v.IsExtractionOk, v.exception);
                 }
                 else
                 {
@@ -206,12 +207,15 @@ namespace ReadTextFromImageConsole
 
                 //send to appruve API to validate the details of the identification document
 
-                ValidateDoc(v, camudatafield);
+                var validationResult = ValidateDoc(v, camudatafield);
+                return (validationResult, "successful");
 
             }
             catch (Exception e)
             {
                 Console.WriteLine("\n" + e.InnerException);
+                return (false, e.InnerException.ToString());
+
             }
         }
 
@@ -240,7 +244,7 @@ namespace ReadTextFromImageConsole
 
         }
 
-        private static void ValidateDoc(Validation v, Models.Camudatafield camudatafield)
+        private static bool ValidateDoc(Validation v, Models.Camudatafield camudatafield)
         {
             string url = GetURLByDocType(v.docType);
             var model = new { id = v.idNumber, first_name = v.firstName, last_name = v.lastName, date_of_birth = v.dateOfBirth };
@@ -285,7 +289,7 @@ namespace ReadTextFromImageConsole
                 Console.WriteLine(result.returnedStringContent);
 
             }
-
+            return result.isSuccess;
 
         }
 

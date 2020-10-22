@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration;
 
 namespace SendImageToOneExpress.Models
 {
@@ -22,8 +23,9 @@ namespace SendImageToOneExpress.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=10.0.41.101;Database=MandateMgtReq;user id=sa;password=tylent;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;");
+                var conString = Program.config.GetConnectionString("DbConn");
+
+                optionsBuilder.UseSqlServer(conString);
             }
         }
 

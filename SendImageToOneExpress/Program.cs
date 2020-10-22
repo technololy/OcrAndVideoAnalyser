@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using log4net;
+using Microsoft.Extensions.Configuration;
 using ReadTextFromImageConsole;
 using SendImageToOneExpress.Models;
 
@@ -12,14 +14,25 @@ namespace SendImageToOneExpress
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         static int count;
-        static string acctOpenBaseURL = "https://pass.sterling.ng/cams";
+        static string acctOpenBaseURL = "";
         static API accountOpeningApi = new API(acctOpening: true);
         static MandateMgtReqContext context = new MandateMgtReqContext();
+        public static IConfigurationRoot config;
 
         static void Main(string[] args)
         {
             try
             {
+
+
+                // Load configuration
+                var builder = new ConfigurationBuilder()
+              .SetBasePath(Directory.GetCurrentDirectory())
+              .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+                config = builder.Build();
+                acctOpenBaseURL = config.GetSection("AppSettings").GetSection("CamsURL").Value;
+
                 WriteToConsole("statrting job....");
                 List<Models.TblRecords> all = GetAllFromDatabase();
                 if (all?.Count > 0)
@@ -68,7 +81,8 @@ namespace SendImageToOneExpress
 
         private static void SendToOneExpress(string url, string accName, string accNum, TblRecords pictureMgt)
         {
-            string urlEnd = "http://hq-k2app-dev/api/workflow/preview/workflows/1401";
+            string urlEnd = config.GetSection("AppSettings").GetSection("OneExpressAPI").Value;
+            ;
             API aPI = new API();
             OneExpressSubmitImage oneExpress = new OneExpressSubmitImage()
             {
