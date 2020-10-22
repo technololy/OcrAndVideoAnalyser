@@ -16,6 +16,9 @@
     <ProjectReference Include="..\LoggingLib\LoggingLib.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
+    <ProjectReference Include="..\ReadAttributesFromFacialImage\ReadAttributesFromFacialImage.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />

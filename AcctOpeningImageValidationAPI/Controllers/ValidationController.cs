@@ -8,6 +8,7 @@ using IdentificationValidationLib;
 using log4net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using ReadAttributesFromFacialImage;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -19,22 +20,31 @@ namespace AcctOpeningImageValidationAPI.Controllers
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly IComputerVision computerVision;
         private readonly IExternalImageValidationService externalImageValidationService;
+        private readonly IFaceValidation faceValidation;
 
         private IConfiguration Configuration { get; set; }
 
 
-        public ValidationController(IConfiguration configuration, IComputerVision _computerVision, IExternalImageValidationService externalImageValidationService)
+        public ValidationController(IConfiguration configuration,
+            IComputerVision _computerVision,
+            IExternalImageValidationService externalImageValidationService,
+            ReadAttributesFromFacialImage.IFaceValidation faceValidation
+
+
+            )
         {
             Configuration = configuration;
             this.computerVision = _computerVision;
             this.externalImageValidationService = externalImageValidationService;
+            this.faceValidation = faceValidation;
         }
         [HttpPost]
-        [Route("ValidateImage")]
+        [Route("ValidateIdentificationImage")]
 
         public async Task<IActionResult> ValidateImage([Required] string ImageURL, IdentificationValidationLib.Models.Camudatafield camudatafield)
         {
             // var test = Configuration.GetSection("AppSettings").GetSection("subscriptionKey").Value;
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(camudatafield);
             var response = await computerVision.ReadText(ImageURL);
             if (!response.isSuccess)
             {
@@ -74,7 +84,31 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         }
 
+        [HttpGet]
+        [Route("ValidateFaceImage")]
 
+        public async Task<IActionResult> ValidateFaceImage([Required] string ImageURL)
+        {
+            try
+            {
+                var result = await faceValidation.PerformFaceValidationAsync(ImageURL);
+                log.Info($"source:{ImageURL}, result:{result.faces}");
+                if (result.IsSuccess)
+                {
+                    return new OkObjectResult(result.faces);
+                }
+                else
+                {
+                    return new UnprocessableEntityObjectResult(result.faces);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error($"source:{ImageURL}, error {ex}");
+                return new BadRequestObjectResult(ex);
+            }
+        }
 
 
 

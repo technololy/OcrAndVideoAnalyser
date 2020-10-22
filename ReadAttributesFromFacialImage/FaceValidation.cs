@@ -1,21 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace ReadAttributesFromFacialImage
 {
-    public class FaceValidation
+
+    public interface IFaceValidation
+    {
+        public Task<(bool IsSuccess, IList<DetectedFace> faces)> PerformFaceValidationAsync(string imageUrl);
+    }
+
+
+    public class FaceValidation : IFaceValidation
     {
         // Add your Face subscription key to your environment variables.
-        private static string subscriptionKey = ReadTextFromImageConsole.Program.config.GetSection("AppSettings").GetSection("subscriptionKey").Value;
+        private static string subscriptionKey = "";
         // Add your Face endpoint to your environment variables.
-        static string fURL = ReadTextFromImageConsole.Program.config.GetSection("AppSettings").GetSection("FaceBaseURL").Value;
-        private string faceEndpoint = fURL;
+        static string fURL = "";
+        private string faceEndpoint = "";
 
-        private readonly IFaceClient faceClient = new FaceClient(
-            new ApiKeyServiceClientCredentials(subscriptionKey),
-            new System.Net.Http.DelegatingHandler[] { });
+        private readonly IFaceClient faceClient = null;
+        private readonly IConfiguration configuration;
 
         // The list of detected faces.
         private IList<DetectedFace> faceList;
@@ -26,9 +34,27 @@ namespace ReadAttributesFromFacialImage
         private double resizeFactor;
         public FaceValidation()
         {
+            subscriptionKey = ReadTextFromImageConsole.Program.config.GetSection("AppSettings").GetSection("subscriptionKey").Value;
+            fURL = ReadTextFromImageConsole.Program.config.GetSection("AppSettings").GetSection("FaceBaseURL").Value;
+            faceEndpoint = fURL;
+            faceClient = new FaceClient(
+            new ApiKeyServiceClientCredentials(subscriptionKey),
+            new System.Net.Http.DelegatingHandler[] { });
+
         }
 
-        public async System.Threading.Tasks.Task<(bool IsSuccess, IList<DetectedFace> faces)> PerformFaceValidationAsync(string imageUrl)
+        public FaceValidation(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+            subscriptionKey = configuration.GetSection("AppSettings").GetSection("subscriptionKey").Value;
+            fURL = configuration.GetSection("AppSettings").GetSection("FaceBaseURL").Value;
+            faceEndpoint = fURL;
+            faceClient = new FaceClient(
+            new ApiKeyServiceClientCredentials(subscriptionKey),
+            new System.Net.Http.DelegatingHandler[] { });
+        }
+
+        public async Task<(bool IsSuccess, IList<DetectedFace> faces)> PerformFaceValidationAsync(string imageUrl)
         {
 
             try

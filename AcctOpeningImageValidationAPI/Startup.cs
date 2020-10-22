@@ -31,6 +31,7 @@ namespace AcctOpeningImageValidationAPI
             services.AddScoped<IComputerVision, ComputerVision>();
             services.AddScoped<IAPI, API>();
             services.AddScoped<IExternalImageValidationService, ExternalImageValidationService>();
+            services.AddScoped<ReadAttributesFromFacialImage.IFaceValidation, ReadAttributesFromFacialImage.FaceValidation>();
 
         }
 
