@@ -335,6 +335,10 @@ namespace IdentificationValidationLib
             var id = this.returnedExtractedTextFromImages.Where(x => x.ToLower().Contains("vin:")).FirstOrDefault();
             idNumber = id?.Split(':')?[1];
             IsExtractionOk = string.IsNullOrEmpty(idNumber) ? false : true;
+            if (!IsExtractionOk)
+            {
+                exception = "can not get id from voters card";
+            }
 
         }
 
