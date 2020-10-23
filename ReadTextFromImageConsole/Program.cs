@@ -15,6 +15,24 @@ using Newtonsoft.Json.Linq;
 namespace ReadTextFromImageConsole
 {
 
+
+
+
+    //private readonly IServiceProvider serviceProvider;
+
+    //public Program(IApplicationEnvironment env, IServiceManifest serviceManifest)
+    //{
+    //    var services = new ServiceCollection();
+    //    ConfigureServices(services);
+    //    serviceProvider = services.BuildServiceProvider();
+    //}
+
+    //private void ConfigureServices(IServiceCollection services)
+    //{
+    //}
+
+
+
     public class Program
     {
         static HttpClient client = new HttpClient();
