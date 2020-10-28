@@ -396,8 +396,8 @@ namespace IdentificationValidationLib
 
         private void GetIssueAndExpiryDateFromPassport()
         {
-            issueDate = ReturnDate("issue");
-            expiryDate = ReturnDate("expiry");
+            issueDate = ReturnDate("issue", 1);
+            expiryDate = ReturnDateFromEnd("expiry", 2);//2 for start position from the end, 1 for start position from the middle, 0 for start from top
         }
 
 
@@ -407,7 +407,7 @@ namespace IdentificationValidationLib
             try
             {
                 var searchKey = "date of birth";
-                var dobCalculated = ReturnDate(searchKey);
+                var dobCalculated = ReturnDate(searchKey, 0);
                 if (!string.IsNullOrEmpty(dobCalculated))
                 {
                     dateOfBirth = dobCalculated;
@@ -421,15 +421,126 @@ namespace IdentificationValidationLib
             }
         }
 
-        private string ReturnDate(string searchKey)
+        private string ReturnDate(string searchKey, int pos = 0)
         {
             //start from where the search key is found. to reduce the loop
             var position1 = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().Contains(searchKey));
+            if (position1 <= pos)
+            {
+                if (pos == 0)
+                {
+                    position1 = 1;//means the key wasnt seen so start from beginning
+
+                }
+                else if (pos == 1)
+                {
+                    position1 = returnedExtractedTextFromImages.Count();//means the key wasnt seen so start from end
+                }
+                else if (pos == 2)
+                {
+                    position1 = returnedExtractedTextFromImages.Count();//means the key wasnt seen so start from end
+
+                }
+            }
             //loop from this position till the end
             for (int i = position1; i < returnedExtractedTextFromImages.Count; i++)
             {
                 //if it contains any of the summarized months in monthsSummarized
-                if (monthsSummarized.Any(d => returnedExtractedTextFromImages[i].ToLower().Contains(d)) || returnedExtractedTextFromImages[i].Contains("/"))
+                if (monthsSummarized.Any(d => returnedExtractedTextFromImages[i].ToLower().Contains(d)) && returnedExtractedTextFromImages[i].Contains("/"))
+                {
+                    int year = 0;
+                    int day = 0;
+                    string mth = "";
+                    var word = returnedExtractedTextFromImages[i];
+
+                    var possibleDate = word.Split('/');
+                    //get the first array. this array has month and year i.e jul 09
+                    var mthAndyear = possibleDate?[1];//get year
+                    //split it into individual string, by space
+                    var mthAndyearArray = mthAndyear.Split(' ');
+                    bool isDay = false;
+                    bool isYear = false;
+                    //loop through the split to pick out the number. the number represents the year
+                    for (int nd = 0; nd < mthAndyearArray.Length; nd++)
+                    {
+                        var key = mthAndyearArray[nd];
+                        //check if its a valid number
+                        isYear = int.TryParse(key, out year);
+                        if (isYear)
+                        {
+                            //if yes, stop processing
+                            break;
+                        }
+
+                    }
+                    if (!isYear)
+                    {
+                        //if its not, continue the loop
+                        continue;
+                    }
+                    //get day by doing similar thing done above here
+                    var dayAndMth = possibleDate?[0];
+                    var dayAndMthArray = dayAndMth.Split(' ');
+                    for (int nd = 0; nd < dayAndMthArray.Length; nd++)
+                    {
+                        var key = dayAndMthArray[nd];
+                        isDay = int.TryParse(key, out day);
+                        if (isDay)
+                        {
+                            //get the actual month
+                            mth = dayAndMthArray[1];
+                            break;
+                        }
+
+                    }
+                    if (!isDay)
+                    {
+                        continue;
+                    }
+                    var dob = $"{day}/{mth}/{year}";
+                    DateTime dateTime;
+                    if (DateTime.TryParseExact(dob, dateFormats, new CultureInfo("en-US"),
+                                  DateTimeStyles.None, out dateTime))
+                    {
+                        IsExtractionOk = true;
+                        return dateTime.ToString("yyyy-MM-dd");
+                        ;
+                    }
+
+                }
+
+                //extractiong date not successful
+                SetExtractionFailed("extractiong date of birth from passport not successful");
+
+            }
+            return "";
+        }
+        private string ReturnDateFromEnd(string searchKey, int pos = 0)
+        {
+            //start from where the search key is found. to reduce the loop
+            var position1 = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().Contains(searchKey));
+            if (position1 <= pos)
+            {
+                if (pos == 0)
+                {
+                    position1 = 1;//means the key wasnt seen so start from beginning
+
+                }
+                else if (pos == 1)
+                {
+                    position1 = returnedExtractedTextFromImages.Count();//means the key wasnt seen so start from end
+                }
+                else if (pos == 2)
+                {
+                    position1 = returnedExtractedTextFromImages.Count() - 1;//means the key wasnt seen so start from end
+
+                }
+            }
+            //loop from this position till the end
+            for (int i = position1; i > 0; i--)
+            {
+                //if it contains any of the summarized months in monthsSummarized
+                if (monthsSummarized.Any(d => returnedExtractedTextFromImages[i].ToLower().Contains(d)) && returnedExtractedTextFromImages[i].Contains("/"))
                 {
                     int year = 0;
                     int day = 0;

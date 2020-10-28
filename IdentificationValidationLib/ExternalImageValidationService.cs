@@ -32,7 +32,7 @@ namespace IdentificationValidationLib
         public async Task<(bool isSuccess, string msg)> ValidateDoc(Validation v, Models.Camudatafield camudatafield)
         {
             string url = GetURLByDocType(v.docType);
-            var model = new { id = v.idNumber, first_name = v.firstName, last_name = v.lastName, date_of_birth = v.dateOfBirth };
+            var model = new { id = v.idNumber, first_name = v.firstName ?? camudatafield.FirstName, last_name = v.lastName ?? camudatafield.LastName, date_of_birth = v.dateOfBirth ?? Convert.ToDateTime(camudatafield.Dob).ToString("yyyy-MM-dd") };
 #if DEBUG
             //if (v.docType == Validation.DocumentType.DriversLicense)
             //{
