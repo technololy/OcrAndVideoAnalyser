@@ -46,6 +46,14 @@ namespace AcctOpeningImageValidationAPI.Controllers
             // var test = Configuration.GetSection("AppSettings").GetSection("subscriptionKey").Value;
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(camudatafield);
 
+            var bypass = Configuration.GetSection("AppSettings").GetSection("ByPass").Value;
+            if (bypass.ToLower() == "true")
+            {
+                log.Info($"bypass set to true for {json}");
+                return new OkObjectResult("success");
+
+            }
+
             var response = await computerVision.ReadText(ImageURL);
             if (!response.isSuccess)
             {
@@ -82,7 +90,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
             var appruv = await this.externalImageValidationService.ValidateDoc(v, camudatafield);
             if (appruv.isSuccess)
             {
-                return new OkObjectResult(appruv.msg);
+                // return new OkObjectResult(appruv.msg);
+                return new OkObjectResult("success");
 
             }
             else
@@ -98,13 +107,25 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         public async Task<IActionResult> ValidateFaceImage([Required] string ImageURL)
         {
+
+
+            var bypass = Configuration.GetSection("AppSettings").GetSection("ByPass").Value;
+            if (bypass.ToLower() == "true")
+            {
+                log.Info($"bypass set to true for {ImageURL}");
+                return new OkObjectResult("success");
+
+            }
+
             try
             {
                 var result = await faceValidation.PerformFaceValidationAsync(ImageURL);
                 log.Info($"source:{ImageURL}, result:{result.faces}");
                 if (result.IsSuccess)
                 {
-                    return new OkObjectResult(result.faces);
+                    //return new OkObjectResult(result.faces);
+                    return new OkObjectResult("success");
+
                 }
                 else
                 {
