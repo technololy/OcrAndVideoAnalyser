@@ -71,8 +71,8 @@ namespace IdentificationValidationLib
                 //failure from appruve
                 Console.WriteLine(result.failedObj.message);
                 //UpdateCamuDataOfAppruveResponse(result, camudatafield);
-                log.Info(result.failedObj);
-                return (result.isSuccess, result.failedObj.message);
+                log.Info($"{result.failedObj} for {Newtonsoft.Json.JsonConvert.SerializeObject(v)} and {Newtonsoft.Json.JsonConvert.SerializeObject(camudatafield)} ");
+                return (result.isSuccess, result.failedObj.message + $"{Environment.NewLine}Our partners at the validation agency were not able to validate the identification document with the ID:{v.idNumber},First Name:{camudatafield.FirstName},Last Name:{camudatafield.LastName}, and Date of Birth:{camudatafield.Dob}");
                 // Console.WriteLine(result.returnedStringContent);
 
             }

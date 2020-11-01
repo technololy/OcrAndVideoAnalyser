@@ -67,7 +67,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
             {
                 //can not extract text from image. exit
 
-                return new UnprocessableEntityObjectResult("can not see/extract text from image");
+                return new UnprocessableEntityObjectResult("can not see/extract any text from image submitted");
 
             }
 
@@ -83,7 +83,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
             var compare = HelperServices.Compare(v, camudatafield);
             if (!compare)
             {
-                return new UnprocessableEntityObjectResult("image details does not match submitted details");
+                return new UnprocessableEntityObjectResult($"ID Number extracted from image submitted does not match submitted ID details. The extracted ID number is {v.idNumber} and the submitted one is {camudatafield.Idno}");
 
             }
 

@@ -43,7 +43,16 @@ namespace IdentificationValidationLib
 
         public static bool Compare(Validation v, Camudatafield camudatafield)
         {
-            return true;
+            if (v.idNumber.ToLower() == camudatafield.Idno.ToLower())
+            {
+                return true;
+
+            }
+            else
+            {
+                return false;
+
+            }
         }
     }
 }

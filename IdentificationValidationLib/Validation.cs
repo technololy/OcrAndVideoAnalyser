@@ -19,7 +19,6 @@ namespace IdentificationValidationLib
         public string firstName;
         public string lastName;
         public string dateOfBirth;
-        public string ExpiryDate;
         public string exception;
         public string issueDate;
         private string expiryDate;
@@ -100,6 +99,10 @@ namespace IdentificationValidationLib
                 GetIdNumberFromDriversLicense();
                 if (!IsExtractionOk)
                     return;
+                GetDatesFromDriversLicenseClearVersion();
+
+                return;
+                //will use names from details submitted by user
                 GetNamesFromDriversLicense();
                 if (!IsExtractionOk)
                     UseNamesFromDb();
@@ -225,6 +228,68 @@ namespace IdentificationValidationLib
             }
         }
 
+
+        private void GetDatesFromDriversLicenseClearVersion()
+        {
+
+            try
+            {
+                var positionIssue = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().StartsWith("iss"));
+                var positionExp = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().StartsWith("exp"));
+                var positionDOB = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().StartsWith("d o b"));
+                if (positionExp > 0)
+                {
+                    expiryDate = returnedExtractedTextFromImages[positionIssue]?.Split(' ')?.LastOrDefault();
+
+                    IsExtractionOk = CheckIfDate(expiryDate, out _) ? false : true;
+
+                }
+                else
+                {
+                    IsExtractionOk = false;
+                    exception = "Can not read the expiry date from the image submitted";
+                }
+
+
+
+                //if (positionIssue > 0)
+                //{
+                //    issueDate = returnedExtractedTextFromImages[positionIssue].Split(' ')?[1];
+                //    DateTime dateTime;
+                //    if (DateTime.TryParseExact(issueDate, dateFormats, new CultureInfo("en-US"),
+                //                  DateTimeStyles.None, out dateTime))
+                //    {
+                //        issueDate = dateTime.ToString("yyyy-MM-dd");
+                //    }
+                //}
+                //if (positionExp > 0)
+                //{
+                //    expiryDate = returnedExtractedTextFromImages[positionExp].Split(' ')?[1];
+                //    DateTime dateTime;
+                //    if (DateTime.TryParseExact(expiryDate, dateFormats, new CultureInfo("en-US"),
+                //                  DateTimeStyles.None, out dateTime))
+                //    {
+                //        expiryDate = dateTime.ToString("yyyy-MM-dd");
+                //    }
+                //}
+                //if (positionDOB > 0)
+                //{
+                //    dateOfBirth = returnedExtractedTextFromImages[positionDOB].Split(' ')?[1];
+                //    DateTime dateTime;
+                //    if (DateTime.TryParseExact(dateOfBirth, dateFormats, new CultureInfo("en-US"),
+                //                  DateTimeStyles.None, out dateTime))
+                //    {
+                //        dateOfBirth = dateTime.ToString("yyyy-mm-dd");
+                //    }
+                //}
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+                SetExtractionFailed("can not extract expiry date from the image submitted");
+            }
+        }
+
         private bool CheckIfDate(string last, out DateTime iss)
         {
             var check = DateTime.TryParseExact(last, dateFormats, new CultureInfo("en-US"),
@@ -238,6 +303,19 @@ namespace IdentificationValidationLib
             try
             {
                 var position = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().Contains("l/no"));
+
+                if (position > 0)
+                {
+                    idNumber = returnedExtractedTextFromImages[position].Split(' ')?[1];
+                }
+                else
+                {
+                    IsExtractionOk = false;
+                    exception = "can not read identification number from drivers license";
+                    return;
+                }
+                //not bothered with the below imlentaion anymore
+
                 log.Info($"drivers license: position containing l/no is {position}");
                 var position2 = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().StartsWith("l") && x.ToLower().Contains("no "));
                 log.Info($"drivers license: position starting with L and contains no is {position2}");
@@ -287,13 +365,22 @@ namespace IdentificationValidationLib
         {
             try
             {
+
+
+                GetIdNumberFromVotersCard();
+                return;
+
+                //no more interested in using other details. will only get the id and use the others supplied during account opening
                 var positionOfDateofBirthText = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().Equals("date of birth"));//this number is key to finding others
+
+
+
+
                 GetNameFromVotersCard(positionOfDateofBirthText);
                 if (!IsExtractionOk)
                 {
                     UseNamesFromDb();
                 }
-                GetIdNumberFromVotersCard();
                 if (!IsExtractionOk)
                     return;
                 GetDateOfBirthFromVotersCard(positionOfDateofBirthText);
@@ -337,7 +424,7 @@ namespace IdentificationValidationLib
             IsExtractionOk = string.IsNullOrEmpty(idNumber) ? false : true;
             if (!IsExtractionOk)
             {
-                exception = "can not get id from voters card";
+                exception = "can not read the VIN line in order to get the id from voters card";
             }
 
         }

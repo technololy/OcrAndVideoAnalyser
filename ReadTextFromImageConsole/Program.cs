@@ -336,10 +336,10 @@ namespace ReadTextFromImageConsole
                     categoryEndPoint = AppruveCurl.driver_license;
                     break;
                 case Validation.DocumentType.InternationalPassport:
-                    categoryEndPoint = AppruveCurl.driver_license;
+                    categoryEndPoint = AppruveCurl.passport;
                     break;
                 case Validation.DocumentType.VotersCard:
-                    categoryEndPoint = AppruveCurl.driver_license;
+                    categoryEndPoint = AppruveCurl.voter;
                     break;
                 case Validation.DocumentType.nationalId:
                     categoryEndPoint = AppruveCurl.national_id;
