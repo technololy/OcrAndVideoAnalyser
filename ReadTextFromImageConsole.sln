@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggingLib", "LoggingLib\Lo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcctOpeningImageValidationAPI", "AcctOpeningImageValidationAPI\AcctOpeningImageValidationAPI.csproj", "{B2A3FD62-9C28-43AB-AC09-3103EC3853BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlDataClientLib", "SqlDataClientLib\SqlDataClientLib.csproj", "{5EF84AC5-CDCD-4666-8D46-345F1EC31966}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,5 +51,9 @@ Global
 		{B2A3FD62-9C28-43AB-AC09-3103EC3853BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2A3FD62-9C28-43AB-AC09-3103EC3853BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2A3FD62-9C28-43AB-AC09-3103EC3853BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EF84AC5-CDCD-4666-8D46-345F1EC31966}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EF84AC5-CDCD-4666-8D46-345F1EC31966}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EF84AC5-CDCD-4666-8D46-345F1EC31966}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EF84AC5-CDCD-4666-8D46-345F1EC31966}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

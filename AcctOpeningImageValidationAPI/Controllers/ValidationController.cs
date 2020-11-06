@@ -142,5 +142,109 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
 
 
+
+
+        [HttpGet]
+        [Route("QaWork")]
+
+        public async Task<IActionResult> QaWork([Required] string identifier)
+        {
+
+
+            var connString = Configuration.GetConnectionString("OneBankConn");
+            connString = "";
+            connString = "Server=localhost;Initial Catalog=KMNDB; Integrated Security=false;user id=sa;password=reallyStrongPwd123";
+
+            try
+            {
+                SqlDataClientLib.Class1 c = new SqlDataClientLib.Class1();
+                var code = c.ReturnSingle(connString, "SELECT [Code] FROM [KMNDB].[dbo].[OTP_table] where id=1");
+                if (!string.IsNullOrEmpty(code))
+                {
+                    var query = $"update [KMNDB].[dbo].[OTP_table] set userid=2 where code={code}";
+                    var num = c.ExecuteDbAction(connString, query);
+                    //return new OkObjectResult(result.faces);
+                    if (num > 0)
+                    {
+                        return new OkObjectResult("success");
+
+                    }
+                    else
+                    {
+                        return new UnprocessableEntityObjectResult("");
+
+                    }
+
+                }
+                else
+                {
+                    return new UnprocessableEntityObjectResult("");
+
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error($"source:{identifier}, error {ex}");
+                return new BadRequestObjectResult(ex);
+            }
+        }
+
+        [HttpGet]
+        [Route("NewToWorkWork")]
+
+        public async Task<IActionResult> NewToWorkWork(string identifier, string name)
+        {
+
+
+            var connString = Configuration.GetConnectionString("OneBankConn");
+            //connString = "";
+            //connString = "Server=localhost;Initial Catalog=KMNDB; Integrated Security=false;user id=sa;password=reallyStrongPwd123";
+
+            try
+            {
+                SqlDataClientLib.Class1 c = new SqlDataClientLib.Class1();
+                var getuserid = $"select userid FROM[SterlingMobile].[dbo].[User] where username = {name}";
+                var id = c.ReturnSingle(connString, getuserid);
+                if (string.IsNullOrEmpty(id))
+                {
+
+                    return new UnprocessableEntityObjectResult("cant get id");
+                }
+
+
+                var query = $"delete  from [SterlingMobile].[dbo].userdeviceinfo where UserId ={id};";
+                var num = c.ExecuteDbAction(connString, query);
+
+                var query2 = $"delete  from [SterlingMobile].[dbo].Beneficiary where UserId ={id};";
+                var num2 = c.ExecuteDbAction(connString, query2);
+
+                var query3 = $"delete  from [SterlingMobile].[dbo].[User] where username ={name};";
+                var num3 = c.ExecuteDbAction(connString, query3);
+                //return new OkObjectResult(result.faces);
+                if (num > 0 && num2 > 0 && num3 > 0)
+                {
+                    return new OkObjectResult("success");
+
+                }
+                else
+                {
+                    return new UnprocessableEntityObjectResult("cant delete");
+
+                }
+
+
+
+
+            }
+            catch (Exception ex)
+            {
+                log.Error($"source:{identifier}, error {ex}");
+                return new BadRequestObjectResult(ex);
+            }
+        }
+
+
+
+
     }
 }
