@@ -198,7 +198,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
             var connString = Configuration.GetConnectionString("OneBankConn");
             //connString = "";
-            //connString = "Server=localhost;Initial Catalog=KMNDB; Integrated Security=false;user id=sa;password=reallyStrongPwd123";
+            connString = "Server=10.0.41.101;Initial Catalog=SterlingMobile;Integrated Security=False;User ID=sa;Password=tylent;MultipleActiveResultSets=True;pooling=true;Max Pool Size=200;";
 
             try
             {
