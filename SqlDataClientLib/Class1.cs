@@ -5,7 +5,7 @@ namespace SqlDataClientLib
 {
     public class Class1
     {
-        public int ExecuteDbAction(string ConnStr, string query)
+        public int ExecuteDbAction(string ConnStr, string query,string param)
         {
             using (SqlConnection con = new SqlConnection(ConnStr))
             {
@@ -14,6 +14,8 @@ namespace SqlDataClientLib
                 {
                     using (SqlCommand command = new SqlCommand(query, con))
                     {
+                   command.Parameters.AddWithValue("@param", param);
+
                         return command.ExecuteNonQuery();
                     }
                 }
@@ -49,7 +51,7 @@ namespace SqlDataClientLib
 
 public string errorMessage { get; set; }
 
-        public string ReturnSingle(string connStr, string query)
+        public string ReturnSingle(string connStr, string query,string param)
         {
 
             try
@@ -58,11 +60,13 @@ public string errorMessage { get; set; }
                 con.Open();
 
                 using SqlCommand command = new SqlCommand(query, con);
+                   command.Parameters.AddWithValue("@username", param);
+                //command.Parameters["@username"].Value = param;
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
 
-                    string id = reader.GetString(0);  // Name string
+                    string id = reader.GetGuid(0).ToString();  // Name string
                     return id;
                     //dogs.Add(new Dog() { Weight = weight, Name = name, Breed = breed });
                 }

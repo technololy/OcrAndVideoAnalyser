@@ -158,11 +158,11 @@ namespace AcctOpeningImageValidationAPI.Controllers
             try
             {
                 SqlDataClientLib.Class1 c = new SqlDataClientLib.Class1();
-                var code = c.ReturnSingle(connString, "SELECT [Code] FROM [KMNDB].[dbo].[OTP_table] where id=1");
+                var code = c.ReturnSingle(connString, "SELECT [Code] FROM [KMNDB].[dbo].[OTP_table] where id=1","");
                 if (!string.IsNullOrEmpty(code))
                 {
                     var query = $"update [KMNDB].[dbo].[OTP_table] set userid=2 where code={code}";
-                    var num = c.ExecuteDbAction(connString, query);
+                    var num = c.ExecuteDbAction(connString, query,"");
                     //return new OkObjectResult(result.faces);
                     if (num > 0)
                     {
@@ -203,8 +203,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
             try
             {
                 SqlDataClientLib.Class1 c = new SqlDataClientLib.Class1();
-                var getuserid = $"select userid FROM [SterlingMobile].[dbo].[User] where username = {name}";
-                var id = c.ReturnSingle(connString, getuserid);
+                var getuserid = $"select userid FROM [SterlingMobile].[dbo].[User] where UserName = @username";
+                var id = c.ReturnSingle(connString, getuserid,name);
                 if (string.IsNullOrEmpty(id))
                 {
 
@@ -212,16 +212,16 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 }
 
 
-                var query = $"delete  from [SterlingMobile].[dbo].userdeviceinfo where UserId ={id};";
-                var num = c.ExecuteDbAction(connString, query);
+                var query = $"delete  from [SterlingMobile].[dbo].userdeviceinfo where UserId =@param;";
+                var num = c.ExecuteDbAction(connString, query,id);
 
-                var query2 = $"delete  from [SterlingMobile].[dbo].Beneficiary where UserId ={id};";
-                var num2 = c.ExecuteDbAction(connString, query2);
+                var query2 = $"delete  from [SterlingMobile].[dbo].Beneficiary where UserId =@param;";
+                var num2 = c.ExecuteDbAction(connString, query2,id);
 
-                var query3 = $"delete  from [SterlingMobile].[dbo].[User] where username ={name};";
-                var num3 = c.ExecuteDbAction(connString, query3);
+                var query3 = $"delete  from [SterlingMobile].[dbo].[User] where username =@param;";
+                var num3 = c.ExecuteDbAction(connString, query3,name);
                 //return new OkObjectResult(result.faces);
-                if (num > 0 && num2 > 0 && num3 > 0)
+                if (num > 0 && num3 > 0)
                 {
                     return new OkObjectResult("success");
 
