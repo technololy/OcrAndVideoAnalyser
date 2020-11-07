@@ -203,7 +203,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
             try
             {
                 SqlDataClientLib.Class1 c = new SqlDataClientLib.Class1();
-                var getuserid = $"select userid FROM[SterlingMobile].[dbo].[User] where username = {name}";
+                var getuserid = $"select userid FROM [SterlingMobile].[dbo].[User] where username = {name}";
                 var id = c.ReturnSingle(connString, getuserid);
                 if (string.IsNullOrEmpty(id))
                 {
