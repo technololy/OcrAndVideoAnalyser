@@ -208,7 +208,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 if (string.IsNullOrEmpty(id))
                 {
 
-                    return new UnprocessableEntityObjectResult("cant get id");
+                    return new UnprocessableEntityObjectResult($"cant get id because {c.errorMessage}");
                 }
 
 

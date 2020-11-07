@@ -47,7 +47,7 @@ namespace SqlDataClientLib
         }
 
 
-
+public string errorMessage { get; set; }
 
         public string ReturnSingle(string connStr, string query)
         {
@@ -70,6 +70,7 @@ namespace SqlDataClientLib
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex);
+                errorMessage = ex.ToString();
                 return "";
             }
             return "";
