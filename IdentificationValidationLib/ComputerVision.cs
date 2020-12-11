@@ -146,14 +146,14 @@ namespace IdentificationValidationLib
 
 
             //static string imageFilePath = @"damilola_oyebanji_international_passport.jpg";
-            string imageFilePath2 = "voters_card_sterling_customer.png";
-            imageFilePath2 = @"lolades_drivers_license.jpg";
-            //static string imageFilePath = @"Identification.jpg";
-#if DEBUG
-            var img2 = System.IO.File.ReadAllBytesAsync(imageFilePath2);
-            var img = System.IO.File.ReadAllBytes(imageFilePath2);
-            return img;
-#endif
+            //            string imageFilePath2 = "voters_card_sterling_customer.png";
+            //            imageFilePath2 = @"lolades_drivers_license.jpg";
+            //            //static string imageFilePath = @"Identification.jpg";
+            //#if DEBUG
+            //            var img2 = System.IO.File.ReadAllBytesAsync(imageFilePath2);
+            //            var img = System.IO.File.ReadAllBytes(imageFilePath2);
+            //            return img;
+            //#endif
 
             var response = client.GetAsync(imageFilePath).Result;
             var bytes = response.Content.ReadAsByteArrayAsync().Result;

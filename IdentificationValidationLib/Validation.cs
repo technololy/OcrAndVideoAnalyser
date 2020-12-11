@@ -33,7 +33,8 @@ namespace IdentificationValidationLib
         public void ExtractDocKeyDetails(List<string> returnedExtractedTextFromImages, Models.Camudatafield camu)
         {
             //get the type of identification and extract biodetails from the doc
-            this.returnedExtractedTextFromImages = returnedExtractedTextFromImages;
+            this.textFromImg = returnedExtractedTextFromImages;
+            stringifiedExtractedText = Newtonsoft.Json.JsonConvert.SerializeObject(this.textFromImg);
             IsExtractionOk = false;
             this.camudata = camu;
             GetMoreDateFormats();
@@ -122,12 +123,12 @@ namespace IdentificationValidationLib
 
         private void GetNamesFromDriversLicense()
         {
-            var positionIssue = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().StartsWith("iss"));
+            var positionIssue = textFromImg.FindIndex(x => x.ToLower().StartsWith("iss"));
             for (int i = positionIssue; i < positionIssue + 3; i++)
             {
-                if (returnedExtractedTextFromImages[i].Contains(","))
+                if (textFromImg[i].Contains(","))
                 {
-                    var name = returnedExtractedTextFromImages[i].Split(',');
+                    var name = textFromImg[i].Split(',');
                     lastName = name?[0];
                     var fn = name?[0].Split(' ');
                     firstName = fn?[1] ?? fn?[0];
@@ -144,12 +145,12 @@ namespace IdentificationValidationLib
             try
             {
                 int whereIStopped = 0;
-                var positionIssue = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().StartsWith("iss"));
-                var positionExp = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().StartsWith("exp"));
-                var positionDOB = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().StartsWith("d o b"));
-                for (int index = 0; index < returnedExtractedTextFromImages.Count - 1; index++)
+                var positionIssue = textFromImg.FindIndex(x => x.ToLower().StartsWith("iss"));
+                var positionExp = textFromImg.FindIndex(x => x.ToLower().StartsWith("exp"));
+                var positionDOB = textFromImg.FindIndex(x => x.ToLower().StartsWith("d o b"));
+                for (int index = 0; index < textFromImg.Count - 1; index++)
                 {
-                    var wordarray = returnedExtractedTextFromImages[index].Trim().Split(' ');
+                    var wordarray = textFromImg[index].Trim().Split(' ');
                     var last = wordarray.LastOrDefault().ToString();
                     if (last.Contains('-') && CheckIfDate(last, out DateTime iss))
                     {
@@ -159,9 +160,9 @@ namespace IdentificationValidationLib
                     }
                 }
 
-                for (int index = whereIStopped + 1; index < returnedExtractedTextFromImages.Count - 1; index++)
+                for (int index = whereIStopped + 1; index < textFromImg.Count - 1; index++)
                 {
-                    var wordarray = returnedExtractedTextFromImages[index].Trim().Split(' ');
+                    var wordarray = textFromImg[index].Trim().Split(' ');
                     var last = wordarray.LastOrDefault().ToString();
                     if (last.Contains('-') && CheckIfDate(last, out DateTime dob))
                     {
@@ -171,9 +172,9 @@ namespace IdentificationValidationLib
                     }
                 }
 
-                for (int index = whereIStopped + 1; index < returnedExtractedTextFromImages.Count - 1; index++)
+                for (int index = whereIStopped + 1; index < textFromImg.Count - 1; index++)
                 {
-                    var wordarray = returnedExtractedTextFromImages[index].Trim().Split(' ');
+                    var wordarray = textFromImg[index].Trim().Split(' ');
                     var last = wordarray.LastOrDefault().ToString();
                     if (last.Contains('-') && CheckIfDate(last, out DateTime exp))
                     {
@@ -234,21 +235,21 @@ namespace IdentificationValidationLib
 
             try
             {
-                var positionIssue = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().StartsWith("iss"));
-                var positionExp = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().StartsWith("exp"));
-                var positionDOB = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().StartsWith("d o b"));
+                var positionIssue = textFromImg.FindIndex(x => x.ToLower().StartsWith("iss"));
+                var positionExp = textFromImg.FindIndex(x => x.ToLower().StartsWith("exp"));
+                var positionDOB = textFromImg.FindIndex(x => x.ToLower().StartsWith("d o b"));
                 if (positionExp > 0)
                 {
-                    expiryDate = returnedExtractedTextFromImages[positionIssue]?.Split(' ')?.LastOrDefault();
+                    expiryDate = textFromImg[positionIssue]?.Split(' ')?.LastOrDefault();
 
-                    IsExtractionOk = CheckIfDate(expiryDate, out _) ? false : true;
+                    IsExtractionOk = CheckIfDate(expiryDate, out _);
+                    if (IsExtractionOk)
+                        return;
+                }
 
-                }
-                else
-                {
-                    IsExtractionOk = false;
-                    exception = "Can not read the expiry date from the image submitted";
-                }
+                IsExtractionOk = false;
+                exception = "Can not read the expiry date from the image submitted";
+
 
 
 
@@ -302,44 +303,55 @@ namespace IdentificationValidationLib
             IsExtractionOk = true;
             try
             {
-                var position = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().Contains("l/no"));
+                var position = textFromImg.FindIndex(x => x.ToLower().Contains("l/no"));
 
                 if (position > 0)
                 {
-                    idNumber = returnedExtractedTextFromImages[position].Split(' ')?[1];
-                }
-                else
-                {
-                    IsExtractionOk = false;
-                    exception = "can not read identification number from drivers license";
+                    idNumber = textFromImg[position].Split(' ')?[1];
                     return;
                 }
+                if (textFromImg.Count == 23)
+                {
+                    //take the 4th field as the id field. research has placed it here
+                    var idField = textFromImg[3]?.Length >= 17 ? textFromImg[3] : "";
+                    var idValue = !string.IsNullOrEmpty(idField) ? idField?.Substring(Math.Max(0, idField.Length - 12)) : "";
+                    if (!string.IsNullOrEmpty(idValue))
+                    {
+                        idNumber = idValue;
+                        return;
+                    }
+                }
+
+                IsExtractionOk = false;
+                exception = "can not read identification number from drivers license. Check out the extracted text from the image here " + stringifiedExtractedText;
+                return;
+
                 //not bothered with the below imlentaion anymore
 
                 log.Info($"drivers license: position containing l/no is {position}");
-                var position2 = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().StartsWith("l") && x.ToLower().Contains("no "));
+                var position2 = textFromImg.FindIndex(x => x.ToLower().StartsWith("l") && x.ToLower().Contains("no "));
                 log.Info($"drivers license: position starting with L and contains no is {position2}");
 
-                var position3 = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().Contains("driver"));
+                var position3 = textFromImg.FindIndex(x => x.ToLower().Contains("driver"));
                 log.Info($"drivers license: position containing driver is {position3}");
 
-                var position4 = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().Contains("class"));
+                var position4 = textFromImg.FindIndex(x => x.ToLower().Contains("class"));
                 log.Info($"drivers license: position containing class is {position4}");
 
                 if (position > 0)
                 {
-                    idNumber = returnedExtractedTextFromImages[position].Split(' ')?[1];
+                    idNumber = textFromImg[position].Split(' ')?[1];
                 }
                 else if (position2 > 0)
                 {
-                    idNumber = returnedExtractedTextFromImages[position2].Split(' ')?[1];
+                    idNumber = textFromImg[position2].Split(' ')?[1];
 
                 }
                 else if (position3 > 0 && position4 > 0)
                 {
                     for (int index = position3; index < position4; index++)
                     {
-                        var word = returnedExtractedTextFromImages[index];
+                        var word = textFromImg[index];
                         var split = word.Split(' ');
                         if (split.LastOrDefault().ToString().Length == 12)
                         {
@@ -357,7 +369,7 @@ namespace IdentificationValidationLib
             catch (Exception ex)
             {
                 log.Error(ex);
-                SetExtractionFailed("cant get id from drivers license");
+                SetExtractionFailed("exception. cant get id from drivers license");
             }
         }
 
@@ -402,10 +414,10 @@ namespace IdentificationValidationLib
 
         private void GetDateOfBirthFromVotersCard(int positionofDateOfBirth)
         {
-            for (int i = positionofDateOfBirth; i < returnedExtractedTextFromImages.Count; i++)
+            for (int i = positionofDateOfBirth; i < textFromImg.Count; i++)
             {
                 DateTime dateTime;
-                if (DateTime.TryParseExact(returnedExtractedTextFromImages[i], dateFormats, new CultureInfo("en-US"),
+                if (DateTime.TryParseExact(textFromImg[i], dateFormats, new CultureInfo("en-US"),
                               DateTimeStyles.None, out dateTime))
                 {
                     dateOfBirth = dateTime.ToString("yyyy-MM-dd");
@@ -419,7 +431,7 @@ namespace IdentificationValidationLib
 
         private void GetIdNumberFromVotersCard()
         {
-            var id = this.returnedExtractedTextFromImages.Where(x => x.ToLower().Contains("vin:")).FirstOrDefault();
+            var id = this.textFromImg.Where(x => x.ToLower().Contains("vin:")).FirstOrDefault();
             idNumber = id?.Split(':')?[1];
             IsExtractionOk = string.IsNullOrEmpty(idNumber) ? false : true;
             if (!IsExtractionOk)
@@ -433,9 +445,9 @@ namespace IdentificationValidationLib
         {
             for (int i = positionOfDateofBirthText - 3; i < positionOfDateofBirthText; i++)
             {
-                if (returnedExtractedTextFromImages[i].Contains(','))//means its the name field
+                if (textFromImg[i].Contains(','))//means its the name field
                 {
-                    var sp = returnedExtractedTextFromImages[i].Split(',');
+                    var sp = textFromImg[i].Split(',');
                     lastName = sp?[0];
                     firstName = sp?[1].Split(' ')?[1];
                     IsExtractionOk = true;
@@ -476,7 +488,7 @@ namespace IdentificationValidationLib
 
         private void SetExtractionFailed(string msg)
         {
-            exception = msg;
+            exception = msg + ". Please check the extracted string here==> " + Environment.NewLine + stringifiedExtractedText;
             IsExtractionOk = false;
             log.Info(msg);
         }
@@ -511,7 +523,7 @@ namespace IdentificationValidationLib
         private string ReturnDate(string searchKey, int pos = 0)
         {
             //start from where the search key is found. to reduce the loop
-            var position1 = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().Contains(searchKey));
+            var position1 = textFromImg.FindIndex(x => x.ToLower().Contains(searchKey));
             if (position1 <= pos)
             {
                 if (pos == 0)
@@ -521,24 +533,24 @@ namespace IdentificationValidationLib
                 }
                 else if (pos == 1)
                 {
-                    position1 = returnedExtractedTextFromImages.Count();//means the key wasnt seen so start from end
+                    position1 = textFromImg.Count();//means the key wasnt seen so start from end
                 }
                 else if (pos == 2)
                 {
-                    position1 = returnedExtractedTextFromImages.Count();//means the key wasnt seen so start from end
+                    position1 = textFromImg.Count();//means the key wasnt seen so start from end
 
                 }
             }
             //loop from this position till the end
-            for (int i = position1; i < returnedExtractedTextFromImages.Count; i++)
+            for (int i = position1; i < textFromImg.Count; i++)
             {
                 //if it contains any of the summarized months in monthsSummarized
-                if (monthsSummarized.Any(d => returnedExtractedTextFromImages[i].ToLower().Contains(d)) && returnedExtractedTextFromImages[i].Contains("/"))
+                if (monthsSummarized.Any(d => textFromImg[i].ToLower().Contains(d)) && textFromImg[i].Contains("/"))
                 {
                     int year = 0;
                     int day = 0;
                     string mth = "";
-                    var word = returnedExtractedTextFromImages[i];
+                    var word = textFromImg[i];
 
                     var possibleDate = word.Split('/');
                     //get the first array. this array has month and year i.e jul 09
@@ -605,7 +617,7 @@ namespace IdentificationValidationLib
         private string ReturnDateFromEnd(string searchKey, int pos = 0)
         {
             //start from where the search key is found. to reduce the loop
-            var position1 = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().Contains(searchKey));
+            var position1 = textFromImg.FindIndex(x => x.ToLower().Contains(searchKey));
             if (position1 <= pos)
             {
                 if (pos == 0)
@@ -615,11 +627,11 @@ namespace IdentificationValidationLib
                 }
                 else if (pos == 1)
                 {
-                    position1 = returnedExtractedTextFromImages.Count();//means the key wasnt seen so start from end
+                    position1 = textFromImg.Count();//means the key wasnt seen so start from end
                 }
                 else if (pos == 2)
                 {
-                    position1 = returnedExtractedTextFromImages.Count() - 1;//means the key wasnt seen so start from end
+                    position1 = textFromImg.Count() - 1;//means the key wasnt seen so start from end
 
                 }
             }
@@ -627,12 +639,12 @@ namespace IdentificationValidationLib
             for (int i = position1; i > 0; i--)
             {
                 //if it contains any of the summarized months in monthsSummarized
-                if (monthsSummarized.Any(d => returnedExtractedTextFromImages[i].ToLower().Contains(d)) && returnedExtractedTextFromImages[i].Contains("/"))
+                if (monthsSummarized.Any(d => textFromImg[i].ToLower().Contains(d)) && textFromImg[i].Contains("/"))
                 {
                     int year = 0;
                     int day = 0;
                     string mth = "";
-                    var word = returnedExtractedTextFromImages[i];
+                    var word = textFromImg[i];
 
                     var possibleDate = word.Split('/');
                     //get the first array. this array has month and year i.e jul 09
@@ -709,11 +721,11 @@ namespace IdentificationValidationLib
         {
             try
             {
-                var position1 = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().Contains("surname"));
-                var position2 = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().Contains("given name"));
+                var position1 = textFromImg.FindIndex(x => x.ToLower().Contains("surname"));
+                var position2 = textFromImg.FindIndex(x => x.ToLower().Contains("given name"));
                 if ((position2 - position1) == 2)//then pick whats between
                 {
-                    lastName = returnedExtractedTextFromImages[position1 + 1];
+                    lastName = textFromImg[position1 + 1];
                     IsExtractionOk = true;
 
                 }
@@ -723,18 +735,18 @@ namespace IdentificationValidationLib
                     //SetExtractionFailed("cant get last name");
                     return;
                 }
-                var position3 = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().Contains("nationality"));
+                var position3 = textFromImg.FindIndex(x => x.ToLower().Contains("nationality"));
                 if ((position3 - position2) == 2)//then pick whats between
                 {
-                    if (returnedExtractedTextFromImages[position2 + 1].Contains(" "))
+                    if (textFromImg[position2 + 1].Contains(" "))
                     {
-                        firstName = returnedExtractedTextFromImages[position2 + 1].Split(' ')[0];
+                        firstName = textFromImg[position2 + 1].Split(' ')[0];
                         IsExtractionOk = true;
 
                     }
                     else
                     {
-                        firstName = returnedExtractedTextFromImages[position2 + 1];
+                        firstName = textFromImg[position2 + 1];
                         IsExtractionOk = true;
 
                     }
@@ -772,15 +784,15 @@ namespace IdentificationValidationLib
 
         private void GetIdFromPassport()
         {
-            var position1 = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().Contains("nga"));
-            var position2 = returnedExtractedTextFromImages.FindIndex(x => x.ToLower().Contains("passeport"));
+            var position1 = textFromImg.FindIndex(x => x.ToLower().Contains("nga"));
+            var position2 = textFromImg.FindIndex(x => x.ToLower().Contains("passeport"));
             //passport is between these two
-            for (int i = 0; i < returnedExtractedTextFromImages.Count - 1; i++)
+            for (int i = 0; i < textFromImg.Count - 1; i++)
             {
-                var _word = returnedExtractedTextFromImages[i];
+                var _word = textFromImg[i];
                 if (_word.StartsWith("A") && _word.Length == 9)//means its passport. should i add the length?
                 {
-                    idNumber = returnedExtractedTextFromImages[i];
+                    idNumber = textFromImg[i];
                     IsExtractionOk = true;
                     break;
                 }
@@ -826,6 +838,7 @@ namespace IdentificationValidationLib
 
             }
         }
-        private List<string> returnedExtractedTextFromImages;
+        private List<string> textFromImg;
+        private string stringifiedExtractedText;
     }
 }
