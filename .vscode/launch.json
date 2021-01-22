@@ -29,6 +29,18 @@
             "type": "coreclr",
             "request": "attach",
             "processId": "${command:pickProcess}"
-        }
+        },
+
+        {
+            "name": ".NET Core Launch SendImageToOneExpress",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceRoot}/SendImageToOneExpress/bin/Debug/netcoreapp3.1/SendImageToOneExpress.dll",
+            "args": [],
+            "cwd": "${workspaceRoot}/SendImageToOneExpress",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
     ]
 }

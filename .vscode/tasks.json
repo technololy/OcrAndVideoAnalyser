@@ -14,6 +14,17 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "label": "build",
+            "command":"dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceRoot}/SendImageToOneExpress/SendImageToOneExpress.csproj"
+            ],
+            
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "publish",
             "command": "dotnet",
             "type": "process",
@@ -37,6 +48,7 @@
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
-        }
+        },
+
     ]
 }

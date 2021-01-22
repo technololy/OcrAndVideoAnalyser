@@ -15,7 +15,7 @@ namespace SendImageToOneExpress
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         static int count;
         static string acctOpenBaseURL = "";
-        static API accountOpeningApi = new API(acctOpening: true);
+        static API accountOpeningApi;
         static MandateMgtReqContext context = new MandateMgtReqContext();
         public static IConfigurationRoot config;
 
@@ -32,11 +32,12 @@ namespace SendImageToOneExpress
 
                 config = builder.Build();
                 acctOpenBaseURL = config.GetSection("AppSettings").GetSection("CamsURL").Value;
-
+LoggingLib.GlobalConfig.CamsKey = config.GetSection("AppSettings").GetSection("CamsKey").Value;
                 WriteToConsole("statrting job....");
                 List<Models.TblRecords> all = GetAllFromDatabase();
                 if (all?.Count > 0)
                 {
+                    accountOpeningApi = new API(acctOpening: true);
                     count = 0;
                     foreach (var item in all)
                     {
@@ -83,7 +84,7 @@ namespace SendImageToOneExpress
         {
             string urlEnd = config.GetSection("AppSettings").GetSection("OneExpressAPI").Value;
             ;
-            API aPI = new API();
+            API aPI = new API(isOneExpress: true, useIt:"Yes");//meaningless parameter
             OneExpressSubmitImage oneExpress = new OneExpressSubmitImage()
             {
                 dataFields = new DataFields()

@@ -13,12 +13,22 @@ namespace ReadTextFromImageConsole
         public API()
         {
             client = new HttpClient();
-            //string accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI5YTZkZDc3NS0zODc4LTQ1M2UtYmM4Ny1lZjU4MTA3YjRhYjEiLCJhdWQiOiI3ZmRmNTVmNC1hNTRhLTQ1ZWItOWRjZS00ZThlM2IwMWRmNmEiLCJzdWIiOiJjZjRiYWMxNi0zOTA3LTQ4MDAtYTY5Mi04YTQzZDhjMzkwYjAiLCJuYmYiOjAsInNjb3BlcyI6WyJ2ZXJpZmljYXRpb25fdmlldyIsInZlcmlmaWNhdGlvbl9saXN0IiwidmVyaWZpY2F0aW9uX2RvY3VtZW50IiwidmVyaWZpY2F0aW9uX2lkZW50aXR5Il0sImV4cCI6MzE3Mjk1NTMyMCwiaWF0IjoxNTk1MTE4NTIwfQ.5qGsVsB35RJPl3UsgCvdfWOlBqRP28YEMjrO43Up3tM";
+     
             string accessToken = Program.config.GetSection("AppSettings").GetSection("AppruveToken").Value; ;
 
             //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer ", accessToken);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             client.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
+        }
+         public API(bool isOneExpress,string useIt)
+        {
+            client = new HttpClient();
+     
+          
+
+            //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer ", accessToken);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+       
         }
 
         public API(bool acctOpening)
@@ -29,7 +39,7 @@ namespace ReadTextFromImageConsole
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             if (acctOpening)
             {
-                var key = Program.config.GetSection("AppSettings").GetSection("CamsKey").Value;
+                var key = Program.config?.GetSection("AppSettings").GetSection("CamsKey").Value ?? LoggingLib.GlobalConfig.CamsKey;
                 //client.DefaultRequestHeaders.Add("ApiKey", "wrqewtreyrutyterewrtretre");
                 client.DefaultRequestHeaders.Add("ApiKey", key);
 
@@ -79,8 +89,10 @@ namespace ReadTextFromImageConsole
 
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(model);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
+                Console.WriteLine($" url requested is {endPoint}");
                 response = client.PostAsync(endPoint, content).Result;
                 var result = response.Content.ReadAsStringAsync().Result;
+                Console.WriteLine($" response received is {result}");
 
                 if (response.IsSuccessStatusCode)
                 {
