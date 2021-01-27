@@ -98,7 +98,12 @@ LoggingLib.GlobalConfig.CamsKey = config.GetSection("AppSettings").GetSection("C
             };
             var response = aPI.PostAny<dynamic>(oneExpress, urlEnd).Result;
             if  (response.isSuccess)
+            {
+                Console.WriteLine("successfully called k2");
+
                 SaveToDBAsDone(pictureMgt, url);
+
+            }
             else
                 Console.WriteLine(response.returnedStringContent);
 
