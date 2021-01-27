@@ -97,8 +97,10 @@ LoggingLib.GlobalConfig.CamsKey = config.GetSection("AppSettings").GetSection("C
                 }
             };
             var response = aPI.PostAny<dynamic>(oneExpress, urlEnd).Result;
-            SaveToDBAsDone(pictureMgt, url);
-
+            if  (response.isSuccess)
+                SaveToDBAsDone(pictureMgt, url);
+            else
+                Console.WriteLine(response.returnedStringContent);
 
         }
 

@@ -25,9 +25,16 @@ namespace ReadTextFromImageConsole
             client = new HttpClient();
      
           
+            var username = @"sterlingbank\k2_admin";
+            var password = "K2processing";
+
+             var byteArray = Encoding.ASCII.GetBytes($"{username}:{password}");
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
             //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer ", accessToken);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            // client.DefaultRequestHeaders.Add("username",username);
+            // client.DefaultRequestHeaders.Add("password","K2processing");
        
         }
 
@@ -88,6 +95,8 @@ namespace ReadTextFromImageConsole
                 HttpResponseMessage response;
 
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(model);
+                Console.WriteLine($" json is {json}");
+
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
                 Console.WriteLine($" url requested is {endPoint}");
                 response = client.PostAsync(endPoint, content).Result;
