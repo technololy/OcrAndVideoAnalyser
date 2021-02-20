@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
+using static ModelLib.Passport;
 
 namespace IdentificationValidationLib
 {
     public interface IComputerVision
     {
         Task<(bool isSuccess, string message)> ReadText(string imageFilePath, Models.Camudatafield camudatafield = null);
+
+        Task<(bool isSuccess, string message)> PerformOcrWithAzureAI(string imageFilePath, Models.Camudatafield camudatafield = null);
     }
 
 
@@ -23,6 +28,8 @@ namespace IdentificationValidationLib
         public ComputerVision(IConfiguration _configuration)
         {
             client = new HttpClient();
+
+            //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             Configuration = _configuration;
         }
 
@@ -160,6 +167,96 @@ namespace IdentificationValidationLib
             return bytes;
         }
 
+        public async Task<(bool isSuccess, string message)> PerformOcrWithAzureAI(string imageFilePath, Models.Camudatafield camudatafield = null)
+        {
 
+
+
+            bool isSuccess = false;
+            string responseMessage = "";
+
+            var blobTokenResponse = await HelperLib.Function.GetBlobStorageBearerToken();
+            if (!blobTokenResponse.isSuccess)
+            {
+                isSuccess = false;
+                responseMessage = "";
+                return (isSuccess, responseMessage);
+            }
+
+            var imageStream = await HelperLib.Function.GetImageStream(blobTokenResponse.message, imageFilePath);
+
+            if (!imageStream.isSuccess)
+            {
+                isSuccess = false;
+                responseMessage = "can not get image after using beaere token";
+                return (isSuccess, responseMessage);
+            }
+
+
+            string subscriptionKey = Configuration.GetSection("AppSettings").GetSection("formRecognizerSubscriptionKey").Value;
+
+            string modelID = Configuration.GetSection("AppSettings").GetSection("modelID").Value;
+
+            //HttpClient client = new HttpClient();
+            // Request headers.
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
+            string endpoint = Configuration.GetSection("AppSettings").GetSection("formRecognizerBaseUrl").Value;
+            string v21 = Configuration.GetSection("AppSettings").GetSection("previewVersion").Value;
+
+
+            string url = $"{endpoint}formrecognizer/{v21}/custom/models/{modelID}/analyze"; // + queryString;
+            Debug.WriteLine($"form recognizer is {url}");
+
+            var content = new ByteArrayContent(imageStream.message);
+            if (imageFilePath.ToLower().EndsWith(".jpg"))
+            {
+                content.Headers.ContentType = new MediaTypeHeaderValue("image/jpg");
+            }
+            else if (imageFilePath.ToLower().EndsWith(".png"))
+            {
+                content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
+            }
+            else if (imageFilePath.ToLower().EndsWith(".pdf"))
+            {
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+            }
+            else
+            {
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            }
+
+            var response = await client.PostAsync(url, content);
+            if (!response.IsSuccessStatusCode)
+            {
+                return (isSuccess, responseMessage);
+
+            }
+
+            System.Threading.Thread.Sleep(5000);
+            var jsonString = response.Headers.GetValues("Operation-Location").ToArray();
+            var client2 = new HttpClient();
+            client2.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);
+
+            var uri_2 = jsonString[0].ToString();
+            var response_2 = await client2.GetAsync(uri_2);
+            if (!response_2.IsSuccessStatusCode)
+            {
+                return (isSuccess, responseMessage);
+
+            }
+
+
+            responseMessage = await response_2.Content.ReadAsStringAsync();
+            isSuccess = true;
+            // rTxtBoxForm.Text = JsonConvert.SerializeObject(replyText);  use this to create a json representation of string response
+
+
+
+            return (isSuccess, responseMessage);
+
+
+
+
+        }
     }
 }

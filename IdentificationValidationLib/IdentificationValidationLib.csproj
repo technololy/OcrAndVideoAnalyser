@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LoggingLib\LoggingLib.csproj" />
+    <ProjectReference Include="..\HelperLib\HelperLib.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />

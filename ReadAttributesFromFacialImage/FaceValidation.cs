@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
@@ -83,6 +84,7 @@ namespace ReadAttributesFromFacialImage
             }
             catch (Exception ex)
             {
+                Debug.WriteLine(ex);
                 return (false, null);
             }
         }
