@@ -7,8 +7,8 @@ using Microsoft.Extensions.Logging;
 
 namespace AcctOpeningImageValidationAPI.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
+    //[ApiController]
+    //[Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
@@ -24,7 +24,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         }
 
         [HttpGet]
-        [Route("WeatherForecast")]
+        [Route("MyWeatherForecast")]
 
         public IEnumerable<WeatherForecast> Get()
         {
