@@ -24,6 +24,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
         }
 
         [HttpGet]
+        [Route("WeatherForecast")]
+
         public IEnumerable<WeatherForecast> Get()
         {
             var rng = new Random();
