@@ -300,11 +300,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     IssuingAuthority = details.Authority.text,
                     Gender = details.Sex.text,
                     Email = validate.Email
-
-
-
                 };
-
             }
 
 
@@ -338,6 +334,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
             //};
             await context.ScannedIDCardDetail.AddAsync(scannedIDCardDetails);
             await context.SaveChangesAsync();
+
+            return Ok(scannedIDCardDetails);
 
             appruv = await this.externalImageValidationService.ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType);
             if (appruv.isSuccess)

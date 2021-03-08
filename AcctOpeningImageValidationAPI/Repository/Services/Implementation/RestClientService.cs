@@ -31,6 +31,7 @@ namespace AcctOpeningImageValidationAPI.Repository.Services.Implementation
         {
             try
             {
+                document.FileName = $"{document.FileName}.jpg";
                 var result = await _restClientService.UplodDocument(document).ConfigureAwait(true);
 
                 return result;

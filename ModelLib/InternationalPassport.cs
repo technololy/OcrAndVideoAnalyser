@@ -9,7 +9,7 @@ namespace QuickType.Passport
     public class ReadResult
     {
         public int page { get; set; }
-        public int angle { get; set; }
+        public double angle { get; set; }
         public int width { get; set; }
         public int height { get; set; }
         public string unit { get; set; }
@@ -205,6 +205,4 @@ namespace QuickType.Passport
         public DateTime lastUpdatedDateTime { get; set; }
         public AnalyzeResult analyzeResult { get; set; }
     }
-
-
 }
