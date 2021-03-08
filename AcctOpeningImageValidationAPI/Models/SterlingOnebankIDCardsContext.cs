@@ -14,8 +14,8 @@ namespace AcctOpeningImageValidationAPI.Models
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=.;Database=SterlingOnebankIDCards;Persist Security Info=False;User ID=sa;Password=Password2;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;ConnectRetryCount=0");
-            //optionsBuilder.UseSqlServer(@"Server=localhost;Database=SterlingOnebankIDCards;Persist Security Info=False;User ID=sa;Password=reallyStrongPwd123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;ConnectRetryCount=0");
+            //optionsBuilder.UseSqlServer(@"Server=.;Database=SterlingOnebankIDCards;Persist Security Info=False;User ID=sa;Password=Password2;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;ConnectRetryCount=0");
+            optionsBuilder.UseSqlServer(@"Server=localhost;Database=SterlingOnebankIDCards;Persist Security Info=False;User ID=sa;Password=reallyStrongPwd123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;ConnectRetryCount=0");
         }
         public DbSet<AppruvResponse> AppruvResponses { get; set; }
         public DbSet<OCRResponse> OCRResponses { get; set; }
