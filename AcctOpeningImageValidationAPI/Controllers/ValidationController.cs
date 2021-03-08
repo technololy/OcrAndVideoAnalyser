@@ -327,10 +327,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
             //    IDClass = IdClass,
             //    Gender = gender
 
-
-
-
-
             //};
             await context.ScannedIDCardDetail.AddAsync(scannedIDCardDetails);
             await context.SaveChangesAsync();
