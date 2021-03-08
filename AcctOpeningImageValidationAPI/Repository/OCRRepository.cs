@@ -37,7 +37,7 @@ namespace AcctOpeningImageValidationAPI.Repository
         {
             var usage = GetAll().Where(x => x.EmailAddress == email);
 
-            if(usage == null)
+            if(usage.FirstOrDefault() == null)
             {
                 var entity = new OCRUsage { Count = 1, EmailAddress = email };
 
