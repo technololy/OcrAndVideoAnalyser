@@ -75,6 +75,8 @@ namespace AcctOpeningImageValidationAPI
 
             app.UseAuthorization();
 
+            app.UseDeveloperExceptionPage();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
