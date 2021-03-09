@@ -293,7 +293,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     MiddleName = middleName,
                     LastName = lastName,
 
-                    ExpiryDate = details.DateOfExpiry.text,
+                    ExpiryDate = details.DateOfExpiry.text, 
                     FormerIDNumber = details.FormerPassportNo.text,
                     FullName = details.Surname.text + " " + details.GivenNames.text,
                     Address = details.Authority.text,
