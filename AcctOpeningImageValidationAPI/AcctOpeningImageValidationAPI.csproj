@@ -45,6 +45,7 @@
     <Folder Include="Repository\Services\Implementation\" />
     <Folder Include="Repository\Services\Response\" />
     <Folder Include="Repository\Services\Request\" />
+    <Folder Include="Repository\ViewModel\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Models\ExtracteTextModel.cs" />
