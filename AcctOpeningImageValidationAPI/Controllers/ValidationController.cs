@@ -859,7 +859,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         [HttpGet]
         [Route("QaWork")]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> QaWork([Required] string identifier)
+        public  IActionResult QaWork([Required] string identifier)
         {
 
 
@@ -904,7 +904,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         [HttpGet]
         [Route("NewToWorkWork")]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> NewToWorkWork(string identifier, string name)
+        public  IActionResult NewToWorkWork(string identifier, string name)
         {
 
 
