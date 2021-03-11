@@ -89,5 +89,23 @@ namespace AcctOpeningImageValidationAPI.Repository.Response
         {
             return new ResponseViewModel<T>(true, message, data);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static ResponseViewModel<T> Failed(string message)
+        {
+            return new ResponseViewModel<T>(false, message);
+        }
+    }
+
+    public static class ResponseMessageViewModel
+    {
+        public static readonly string OK = "Successful";
+        public static readonly string UNSUCCESSFUL = "Unsuccessful";
+
+
     }
 }
