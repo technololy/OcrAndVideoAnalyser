@@ -17,9 +17,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcctOpeningImageValidationA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlDataClientLib", "SqlDataClientLib\SqlDataClientLib.csproj", "{5EF84AC5-CDCD-4666-8D46-345F1EC31966}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperLib", "HelperLib\HelperLib.csproj", "{0F5E8356-ACAC-488A-BFB4-626165810622}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelLib", "ModelLib\ModelLib.csproj", "{36C98A7E-0BE2-4B46-BC84-9DCD9C873E03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperLib", "HelperLib\HelperLib.csproj", "{1849A843-3AA9-4A82-9464-90951DEE9E42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,13 +59,13 @@ Global
 		{5EF84AC5-CDCD-4666-8D46-345F1EC31966}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5EF84AC5-CDCD-4666-8D46-345F1EC31966}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5EF84AC5-CDCD-4666-8D46-345F1EC31966}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0F5E8356-ACAC-488A-BFB4-626165810622}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0F5E8356-ACAC-488A-BFB4-626165810622}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0F5E8356-ACAC-488A-BFB4-626165810622}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0F5E8356-ACAC-488A-BFB4-626165810622}.Release|Any CPU.Build.0 = Release|Any CPU
 		{36C98A7E-0BE2-4B46-BC84-9DCD9C873E03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{36C98A7E-0BE2-4B46-BC84-9DCD9C873E03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36C98A7E-0BE2-4B46-BC84-9DCD9C873E03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36C98A7E-0BE2-4B46-BC84-9DCD9C873E03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1849A843-3AA9-4A82-9464-90951DEE9E42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1849A843-3AA9-4A82-9464-90951DEE9E42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1849A843-3AA9-4A82-9464-90951DEE9E42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1849A843-3AA9-4A82-9464-90951DEE9E42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
