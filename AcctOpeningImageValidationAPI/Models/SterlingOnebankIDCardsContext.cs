@@ -22,6 +22,7 @@ namespace AcctOpeningImageValidationAPI.Models
         public DbSet<ScannedIDCardDetails> ScannedIDCardDetail { get; set; }
         public DbSet<FacialValidation> FacialValidations { get; set; }
         public DbSet<OCRUsage> OCRUsages { get; set; }
+        public DbSet<RequestLogs> RequestLog { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -69,6 +70,17 @@ namespace AcctOpeningImageValidationAPI.Models
 
                 entity.Property(e => e.BVN)
               .HasMaxLength(11);
+
+
+            });
+
+            modelBuilder.Entity<RequestLogs>(entity =>
+            {
+                entity.Property(e => e.DateCreated)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getdate())");
+
+
 
 
             });

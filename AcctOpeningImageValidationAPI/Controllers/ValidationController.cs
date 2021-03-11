@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
@@ -130,6 +131,10 @@ namespace AcctOpeningImageValidationAPI.Controllers
         [Route("ValidateIDCard")]
         public async Task<IActionResult> ValidateIDCard([FromBody] ValidateInputModel validate)
         {
+
+            context.RequestLog.Add(new RequestLogs { Email = validate.Email, Description = validate.Base64Encoded.Substring(0, 10), FileName = "Image validation" });
+            context.SaveChanges();
+
             var result = await _restClientService.UploadDocument(new DocumentUploadRequest
             {
                 FolderName = _appSettings.AzureContentFolderName,
@@ -339,6 +344,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
             //TODO: 1 Call Core Banking Content Server, Content Server return absolute url path
             //TODO: 2 Returned Scanned Document Object
             //TODO: 3
+            context.RequestLog.Add(new RequestLogs { Email = UserEmail, Description = ImageURL, FileName = "Image validation" });
+            context.SaveChanges();
 
             try
             {
@@ -347,7 +354,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
             }
             catch (MaximumOCRUsageException e)
             {
-
+                Debug.WriteLine(e);
                 //TODO: Return a base response from here
             }
 
@@ -511,28 +518,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
             }
 
 
-            //Models.ScannedIDCardDetails scannedIDCardDetails = new Models.ScannedIDCardDetails()
-            //{
-            //    FullName = Fullname,
-            //    FirstName = firstName,
-            //    LastName = lastName,
-            //    MiddleName = middleName,
-            //    ExpiryDate = ExpiryDate,
-            //    IssueDate = IssueDate,
-            //    DateOfBirth = dateOfBirth.ToLongDateString(),
-            //    Address = AddressOnCard,
-            //    BloodGroup = bloodGroup,
-            //    Height = Height,
-            //    Delim = Delim,
-            //    IDNumber = idNumber,
-            //    NextOfKin = nextOfKin,
-            //    Occupation = occupation,
-            //    IssuingAuthority = IssuingAuth,
-            //    IDType = IDType,
-            //    FormerIDNumber = formerID,
-            //    FirstIssueState = firstIssueState,
-            //    IDClass = IdClass,
-            //    Gender = gender
+
 
 
 
@@ -565,6 +551,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
         {
             // var test = Configuration.GetSection("AppSettings").GetSection("subscriptionKey").Value;
 
+            context.RequestLog.Add(new RequestLogs { Email = UserEmail, Description = ImageURL, FileName = "Image validation" });
+            context.SaveChanges();
 
             var bypass = Configuration.GetSection("AppSettings").GetSection("ByPassIdCards").Value;
             if (bypass.ToLower() == "true")
@@ -744,7 +732,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
             await context.ScannedIDCardDetail.AddAsync(scannedIDCardDetails);
             await context.SaveChangesAsync();
-
+            return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<ScannedIDCardDetails>("Successful", scannedIDCardDetails, true));
             appruv = await this.externalImageValidationService.ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType);
             if (appruv.isSuccess)
             {
