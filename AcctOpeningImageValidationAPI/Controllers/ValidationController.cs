@@ -163,6 +163,10 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 return new UnprocessableEntityObjectResult(response.message);
             }
 
+            //log json
+            await context.OCRResponses.AddAsync(new OCRResponse { BVN = validate.Email, JsonResponse = response.message });
+            await context.SaveChangesAsync();
+
             Root documentRoot = JsonSerializer.Deserialize<Root>(response.message);
             //QuickType.VotersCard.Root votersCard = new QuickType.VotersCard.Root();
             //QuickType.Passport.InternationalPassportRoot internationalPassport = new QuickType.Passport.InternationalPassportRoot();
@@ -293,7 +297,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     MiddleName = middleName,
                     LastName = lastName,
 
-                    ExpiryDate = details.DateOfExpiry.text, 
+                    ExpiryDate = details.DateOfExpiry.text,
                     FormerIDNumber = details.FormerPassportNo.text,
                     FullName = details.Surname.text + " " + details.GivenNames.text,
                     Address = details.Authority.text,
@@ -304,48 +308,26 @@ namespace AcctOpeningImageValidationAPI.Controllers
             }
 
 
-            //Models.ScannedIDCardDetails scannedIDCardDetails = new Models.ScannedIDCardDetails()
-            //{
-            //    FullName = Fullname,
-            //    FirstName = firstName,
-            //    LastName = lastName,
-            //    MiddleName = middleName,
-            //    ExpiryDate = ExpiryDate,
-            //    IssueDate = IssueDate,
-            //    DateOfBirth = dateOfBirth.ToLongDateString(),
-            //    Address = AddressOnCard,
-            //    BloodGroup = bloodGroup,
-            //    Height = Height,
-            //    Delim = Delim,
-            //    IDNumber = idNumber,
-            //    NextOfKin = nextOfKin,
-            //    Occupation = occupation,
-            //    IssuingAuthority = IssuingAuth,
-            //    IDType = IDType,
-            //    FormerIDNumber = formerID,
-            //    FirstIssueState = firstIssueState,
-            //    IDClass = IdClass,
-            //    Gender = gender
 
-            //};
+
             await context.ScannedIDCardDetail.AddAsync(scannedIDCardDetails);
             await context.SaveChangesAsync();
 
             return Ok(scannedIDCardDetails);
 
-            appruv = await this.externalImageValidationService.ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType);
-            if (appruv.isSuccess)
-            {
-                await context.AppruvResponses.AddAsync(new Models.AppruvResponse { StatusOfRequest = "success", Email = validate.Email });
-                await context.SaveChangesAsync();
-                return new OkObjectResult("success");
+            //appruv = await this.externalImageValidationService.ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType);
+            //if (appruv.isSuccess)
+            //{
+            //    await context.AppruvResponses.AddAsync(new Models.AppruvResponse { StatusOfRequest = "success", Email = validate.Email });
+            //    await context.SaveChangesAsync();
+            //    return new OkObjectResult("success");
 
-            }
-            else
-            {
-                return new UnprocessableEntityObjectResult(appruv.msg);
+            //}
+            //else
+            //{
+            //    return new UnprocessableEntityObjectResult(appruv.msg);
 
-            }
+            //}
         }
 
         [HttpPost]
@@ -362,7 +344,9 @@ namespace AcctOpeningImageValidationAPI.Controllers
             {
                 _ocrRepository.ValidateUsage(UserEmail);
 
-            } catch (MaximumOCRUsageException e) {
+            }
+            catch (MaximumOCRUsageException e)
+            {
 
                 //TODO: Return a base response from here
             }
@@ -596,6 +580,10 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 return new UnprocessableEntityObjectResult(response.message);
             }
 
+            //log json
+            await context.OCRResponses.AddAsync(new OCRResponse { BVN = UserEmail, JsonResponse = response.message });
+            await context.SaveChangesAsync();
+
             Root documentRoot = JsonSerializer.Deserialize<Root>(response.message);
             //QuickType.VotersCard.Root votersCard = new QuickType.VotersCard.Root();
             //QuickType.Passport.InternationalPassportRoot internationalPassport = new QuickType.Passport.InternationalPassportRoot();
@@ -747,34 +735,13 @@ namespace AcctOpeningImageValidationAPI.Controllers
             }
 
 
-            //Models.ScannedIDCardDetails scannedIDCardDetails = new Models.ScannedIDCardDetails()
-            //{
-            //    FullName = Fullname,
-            //    FirstName = firstName,
-            //    LastName = lastName,
-            //    MiddleName = middleName,
-            //    ExpiryDate = ExpiryDate,
-            //    IssueDate = IssueDate,
-            //    DateOfBirth = dateOfBirth.ToLongDateString(),
-            //    Address = AddressOnCard,
-            //    BloodGroup = bloodGroup,
-            //    Height = Height,
-            //    Delim = Delim,
-            //    IDNumber = idNumber,
-            //    NextOfKin = nextOfKin,
-            //    Occupation = occupation,
-            //    IssuingAuthority = IssuingAuth,
-            //    IDType = IDType,
-            //    FormerIDNumber = formerID,
-            //    FirstIssueState = firstIssueState,
-            //    IDClass = IdClass,
-            //    Gender = gender
 
 
 
 
 
-            //};
+
+
             await context.ScannedIDCardDetail.AddAsync(scannedIDCardDetails);
             await context.SaveChangesAsync();
 
@@ -859,7 +826,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         [HttpGet]
         [Route("QaWork")]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public  IActionResult QaWork([Required] string identifier)
+        public IActionResult QaWork([Required] string identifier)
         {
 
 
@@ -904,7 +871,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         [HttpGet]
         [Route("NewToWorkWork")]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public  IActionResult NewToWorkWork(string identifier, string name)
+        public IActionResult NewToWorkWork(string identifier, string name)
         {
 
 
