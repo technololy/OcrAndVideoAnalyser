@@ -132,7 +132,9 @@ namespace AcctOpeningImageValidationAPI.Controllers
         public async Task<IActionResult> ValidateIDCard([FromBody] ValidateInputModel validate)
         {
 
-            context.RequestLog.Add(new RequestLogs { Email = validate.Email, Description = validate.Base64Encoded.Substring(0, 10), FileName = "Image validation" });
+      try
+      {
+      context.RequestLog.Add(new RequestLogs { Email = validate.Email, Description = validate.Base64Encoded.Substring(0, 10), FileName = "Image validation" });
             context.SaveChanges();
 
             var result = await _restClientService.UploadDocument(new DocumentUploadRequest
@@ -165,7 +167,9 @@ namespace AcctOpeningImageValidationAPI.Controllers
             //var response = await computerVision.ReadText(ImageURL);
             if (!response.isSuccess)
             {
-                return new UnprocessableEntityObjectResult(response.message);
+                return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod(response.message,false));
+
+              
             }
 
             //log json
@@ -333,6 +337,11 @@ namespace AcctOpeningImageValidationAPI.Controllers
             //    return new UnprocessableEntityObjectResult(appruv.msg);
 
             //}
+      }
+      catch (Exception ex)
+      {
+return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod(ex.ToString(),false));
+      }
         }
 
         [HttpPost]
