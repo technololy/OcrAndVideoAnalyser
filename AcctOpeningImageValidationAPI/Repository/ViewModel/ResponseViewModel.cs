@@ -30,29 +30,64 @@ namespace AcctOpeningImageValidationAPI.Repository.Response
         /// </summary>
         private ResponseViewModel() { }
 
-        private ResponseViewModel(bool Status)
-        {
-            this.Status = Status;
+        /// <summary>
+        /// Constructor Overload Method For Message
+        /// </summary>
+        /// <param name="message"></param>
+        private ResponseViewModel(string message) {
+
+            Message = message;
         }
 
-        private ResponseViewModel(bool Status, string Message)
+        /// <summary>
+        /// Method Overloads
+        /// </summary>
+        /// <param name="Status"></param>
+        private ResponseViewModel(bool status)
         {
-            this.Status = Status;
-            this.Message = Message;
+            Status = status;
         }
 
-        private ResponseViewModel(bool Status, string Message, T Data)
+        /// <summary>
+        /// Method Overloads
+        /// </summary>
+        /// <param name="Status"></param>
+        private ResponseViewModel(bool status, string message)
         {
-            this.Status = Status;
-            this.Message = Message;
-            this.Data = Data;
+            Status = status;
+            Message = message;
         }
 
-        public ResponseViewModel<T> Ok(string message)
+        /// <summary>
+        /// Method Overloads
+        /// </summary>
+        /// <param name="Status"></param>
+        private ResponseViewModel(bool status, string message, T data)
         {
-            return this;
+            Status = status;
+            Message = message;
+            Data = data;
         }
 
+        /// <summary>
+        /// OK - Success Method that returns true
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static ResponseViewModel<T> Ok(string message)
+        {
+            return new ResponseViewModel<T>(true, message);
+        }
 
+        /// <summary>
+        /// Ok - Success Method With Data
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static ResponseViewModel<T> Ok(string message, T data)
+        {
+            return new ResponseViewModel<T>(true, message, data);
+        }
     }
 }
