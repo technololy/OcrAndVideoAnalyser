@@ -159,7 +159,9 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 if (bypass.ToLower() == "true")
                 {
                     log.Info($"bypass set to true for {result.Url}");
-                    return new OkObjectResult("success");
+           //return new OkObjectResult("success");
+                    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethod("success",true));
+
 
                 }
 
