@@ -34,7 +34,9 @@ namespace AcctOpeningImageValidationAPI.Models
                 .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.BVN)
-              .HasMaxLength(11);
+              .HasMaxLength(50);
+
+
 
 
             });
@@ -102,6 +104,7 @@ namespace AcctOpeningImageValidationAPI.Models
     public class ScannedIDCardDetails
     {
         public int Id { get; set; }
+        public string DocumentType { get; set; }
         public string FullName { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

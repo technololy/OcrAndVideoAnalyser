@@ -151,16 +151,16 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 }
                 catch (MaximumOCRUsageException e)
                 {
-                        //TODO: Return a base response from here
-                        return BadRequest(ResponseViewModel<String>.Failed(ResponseMessageViewModel.UNSUCCESSFUL));
+                    //TODO: Return a base response from here
+                    return BadRequest(ResponseViewModel<String>.Failed(ResponseMessageViewModel.UNSUCCESSFUL));
                 }
 
                 var bypass = Configuration.GetSection("AppSettings").GetSection("ByPassIdCards").Value;
                 if (bypass.ToLower() == "true")
                 {
                     log.Info($"bypass set to true for {result.Url}");
-           //return new OkObjectResult("success");
-                    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethod("success",true));
+                    //return new OkObjectResult("success");
+                    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethod("success", true));
 
 
                 }
@@ -169,9 +169,9 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 //var response = await computerVision.ReadText(ImageURL);
                 if (!response.isSuccess)
                 {
-                    return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod(response.message,false));
+                    return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod(response.message, false));
 
-            
+
                 }
 
                 //log json
@@ -179,165 +179,24 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 await context.SaveChangesAsync();
 
                 Root documentRoot = JsonSerializer.Deserialize<Root>(response.message);
-                //QuickType.VotersCard.Root votersCard = new QuickType.VotersCard.Root();
-                //QuickType.Passport.InternationalPassportRoot internationalPassport = new QuickType.Passport.InternationalPassportRoot();
-                //QuickType.DriversLicenseRoot driversLicense = new QuickType.DriversLicenseRoot();
-                //QuickType.NationalID.NationalIdRoot nationalId = new QuickType.NationalID.NationalIdRoot();
-                DocumentType docType = new DocumentType();
-                string firstName = ""; string middleName = ""; string lastName = ""; string idNumber = ""; DateTime dateOfBirth = new DateTime();
-                (bool isSuccess, string msg) appruv;
-
-                Models.ScannedIDCardDetails scannedIDCardDetails = new Models.ScannedIDCardDetails();
-
-                if (documentRoot.analyzeResult.documentResults.FirstOrDefault().docType.ToLower().Contains("driverslicense"))
-                {
-                    var driversLicense = JsonSerializer.Deserialize<QuickType.DriversLicense.DriversLicenseRoot>(response.message);
-                    docType = DocumentType.DriversLicense;
-                    string[] splitNames = HelperLib.Function.SplitDriversLicenseFullName(driversLicense.analyzeResult.documentResults.FirstOrDefault().fields.FullName.text);
-                    firstName = splitNames[0];
-                    middleName = splitNames[1];
-                    lastName = splitNames[2];
-                    var details = driversLicense.analyzeResult.documentResults.FirstOrDefault().fields;
-
-
-                    idNumber = driversLicense.analyzeResult.documentResults.FirstOrDefault().fields.DriversLicenseNo.text;
-                    dateOfBirth = Convert.ToDateTime(driversLicense.analyzeResult.documentResults.FirstOrDefault().fields.DateOfBirth.text);
-
-                    //TODO: Another Endpoint
-                    scannedIDCardDetails = new Models.ScannedIDCardDetails()
-                    {
-                        Address = details.Address.text,
-                        IDType = details.CardType.text,
-                        DateOfBirth = dateOfBirth.ToLongDateString(),
-                        BloodGroup = details.BloofGroup.text,
-                        FullName = details.FullName.text,
-                        Gender = details.Sex.ToString(),
-                        IDNumber = idNumber,
-                        IssueDate = details.DateOfIssue.text,
-                        FirstName = firstName,
-                        MiddleName = middleName,
-                        LastName = lastName,
-                        FirstIssueState = details.FirstIssueState.text,
-                        ExpiryDate = details.DateOfExpiry.text,
-                        FormerIDNumber = details.FullName.text,
-                        NextOfKin = details.NextOfKin.text,
-                        Height = details.Height.text,
-                        IDClass = details.ClassOfLicense.text
-
-                    };
-                }
-                else if (documentRoot.analyzeResult.documentResults.FirstOrDefault().docType.ToLower().Contains("voterscard"))
-                {
-                    var votersCard = JsonSerializer.Deserialize<QuickType.VotersCard.Root>(response.message);
-                    docType = DocumentType.VotersCard;
-                    string[] splitNames = HelperLib.Function.SplitDriversLicenseFullName(votersCard.analyzeResult.documentResults.FirstOrDefault().fields.FullName.text);
-                    firstName = splitNames[0];
-                    middleName = splitNames[1];
-                    lastName = splitNames[2];
-                    dateOfBirth = Convert.ToDateTime(votersCard.analyzeResult.documentResults.FirstOrDefault().fields.DateOfBirth.text);
-
-                    var details = votersCard.analyzeResult.documentResults.FirstOrDefault().fields;
-
-                    scannedIDCardDetails = new Models.ScannedIDCardDetails()
-                    {
-                        Address = details.Address.text,
-                        IDType = details.CardType.text,
-                        DateOfBirth = dateOfBirth.ToLongDateString(),
-                        Delim = details.delim.text,
-                        FullName = details.FullName.text,
-                        Gender = details.Sex.ToString(),
-                        IDNumber = details.VoterCardNo.text,
-                        Occupation = details.Occupation.text,
-                        FirstName = firstName,
-                        MiddleName = middleName,
-                        LastName = lastName
-
-                    };
-                }
-                else if (documentRoot.analyzeResult.documentResults.FirstOrDefault().docType.ToLower().Contains("NationalIdNumber"))
-                {
-                    var nationalId = JsonSerializer.Deserialize<QuickType.NationalID.Root>(response.message);
-                    docType = DocumentType.nationalId;
-                    firstName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.Firstname.text;
-                    lastName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.Surname.text;
-                    middleName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.MiddleName.text;
-                    dateOfBirth = Convert.ToDateTime(nationalId.analyzeResult.documentResults.FirstOrDefault().fields.DateOfBirth.text);
-
-                    var details = nationalId.analyzeResult.documentResults.FirstOrDefault().fields;
-
-                    scannedIDCardDetails = new Models.ScannedIDCardDetails()
-                    {
-
-                        IDType = details.CardType.text,
-                        DateOfBirth = dateOfBirth.ToLongDateString(),
-
-                        IDNumber = idNumber,
-                        IssueDate = details.IssueDate.text,
-                        FirstName = firstName,
-                        MiddleName = middleName,
-                        LastName = lastName,
-                
-                        ExpiryDate = details.DateOfExpiry.text,
-
-                    };
-
-                }
-                else if (documentRoot.analyzeResult.documentResults.FirstOrDefault().docType.ToLower().Contains("internationalpassport"))
-                {
-                    var internationalPassport = JsonSerializer.Deserialize<QuickType.Passport.Root>(response.message);
-                    docType = DocumentType.InternationalPassport;
-                    string[] splitNames = HelperLib.Function.SplitInternationalPassportGivenName(internationalPassport.analyzeResult.documentResults.FirstOrDefault().fields.GivenNames.text);
-                    firstName = splitNames[0];
-                    middleName = splitNames[1];
-                    lastName = internationalPassport.analyzeResult.documentResults.FirstOrDefault().fields.Surname.text;
-                    dateOfBirth = Convert.ToDateTime(internationalPassport.analyzeResult.documentResults.FirstOrDefault().fields.DateOfBirth.text);
 
 
 
-                    var details = internationalPassport.analyzeResult.documentResults.FirstOrDefault().fields;
-                    scannedIDCardDetails = new Models.ScannedIDCardDetails()
-                    {
+                var scannedIDCardDetails = ProcessScannedIDJsonToObject.ProcessJsonToObject(documentRoot, response.message);
 
-                        IDType = details.CardType.text,
-                        DateOfBirth = dateOfBirth.ToLongDateString(),
-
-                        IDNumber = idNumber,
-                        IssueDate = details.DateOfIssue.text,
-                        FirstName = firstName,
-                        MiddleName = middleName,
-                        LastName = lastName,
-
-                        ExpiryDate = details.DateOfExpiry.text,
-                        FormerIDNumber = details.FormerPassportNo.text,
-                        FullName = details.Surname.text + " " + details.GivenNames.text,
-                        Address = details.Authority.text,
-                        IssuingAuthority = details.Authority.text,
-                        Gender = details.Sex.text,
-                        Email = validate.Email
-                    };
-                }
+                scannedIDCardDetails.Email = validate.Email;
 
                 await context.ScannedIDCardDetail.AddAsync(scannedIDCardDetails);
                 await context.SaveChangesAsync();
 
-                return Ok(scannedIDCardDetails);
+                //return Ok(scannedIDCardDetails);
+                return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<ScannedIDCardDetails>("Successful", scannedIDCardDetails, true));
 
-                //appruv = await this.externalImageValidationService.ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType);
-                //if (appruv.isSuccess)
-                //{
-                //    await context.AppruvResponses.AddAsync(new Models.AppruvResponse { StatusOfRequest = "success", Email = validate.Email });
-                //    await context.SaveChangesAsync();
-                //    return new OkObjectResult("success");
 
-                //}
-                //else
-                //{
-                //    return new UnprocessableEntityObjectResult(appruv.msg);
-
-                //}
             }
-            catch (Exception ex) {
-                return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod(ex.ToString(),false));
+            catch (Exception ex)
+            {
+                return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod(ex.ToString(), false));
             }
         }
 
@@ -385,141 +244,33 @@ namespace AcctOpeningImageValidationAPI.Controllers
             //QuickType.DriversLicenseRoot driversLicense = new QuickType.DriversLicenseRoot();
             //QuickType.NationalID.NationalIdRoot nationalId = new QuickType.NationalID.NationalIdRoot();
             DocumentType docType = new DocumentType();
-            string firstName = ""; string middleName = ""; string lastName = ""; string idNumber = ""; DateTime dateOfBirth = new DateTime();
+
             (bool isSuccess, string msg) appruv;
 
-            Models.ScannedIDCardDetails scannedIDCardDetails = new Models.ScannedIDCardDetails();
 
-            if (documentRoot.analyzeResult.documentResults.FirstOrDefault().docType.ToLower().Contains("driverslicense"))
+
+
+            var scannedIDCardDetails = ProcessScannedIDJsonToObject.ProcessJsonToObject(documentRoot, response.message);
+
+            scannedIDCardDetails.Email = UserEmail;
+            var card = scannedIDCardDetails.DocumentType.ToLower();
+            if (card.Contains("driver"))
             {
-                var driversLicense = JsonSerializer.Deserialize<QuickType.DriversLicense.DriversLicenseRoot>(response.message);
                 docType = DocumentType.DriversLicense;
-                string[] splitNames = HelperLib.Function.SplitDriversLicenseFullName(driversLicense.analyzeResult.documentResults.FirstOrDefault().fields.FullName.text);
-                firstName = splitNames[0];
-                middleName = splitNames[1];
-                lastName = splitNames[2];
-                var details = driversLicense.analyzeResult.documentResults.FirstOrDefault().fields;
-
-
-                idNumber = driversLicense.analyzeResult.documentResults.FirstOrDefault().fields.DriversLicenseNo.text;
-                dateOfBirth = Convert.ToDateTime(driversLicense.analyzeResult.documentResults.FirstOrDefault().fields.DateOfBirth.text);
-
-                //TODO: Another Endpoint
-                scannedIDCardDetails = new Models.ScannedIDCardDetails()
-                {
-                    Address = details.Address.text,
-                    IDType = details.CardType.text,
-                    DateOfBirth = dateOfBirth.ToLongDateString(),
-                    BloodGroup = details.BloofGroup.text,
-                    FullName = details.FullName.text,
-                    Gender = details.Sex.ToString(),
-                    IDNumber = idNumber,
-                    IssueDate = details.DateOfIssue.text,
-                    FirstName = firstName,
-                    MiddleName = middleName,
-                    LastName = lastName,
-                    FirstIssueState = details.FirstIssueState.text,
-                    ExpiryDate = details.DateOfExpiry.text,
-                    FormerIDNumber = details.FullName.text,
-                    NextOfKin = details.NextOfKin.text,
-                    Height = details.Height.text,
-                    IDClass = details.ClassOfLicense.text
-
-                };
             }
-            else if (documentRoot.analyzeResult.documentResults.FirstOrDefault().docType.ToLower().Contains("voterscard"))
+            else if (card.Contains("voter"))
             {
-                var votersCard = JsonSerializer.Deserialize<QuickType.VotersCard.Root>(response.message);
                 docType = DocumentType.VotersCard;
-                string[] splitNames = HelperLib.Function.SplitDriversLicenseFullName(votersCard.analyzeResult.documentResults.FirstOrDefault().fields.FullName.text);
-                firstName = splitNames[0];
-                middleName = splitNames[1];
-                lastName = splitNames[2];
-                dateOfBirth = Convert.ToDateTime(votersCard.analyzeResult.documentResults.FirstOrDefault().fields.DateOfBirth.text);
-
-                var details = votersCard.analyzeResult.documentResults.FirstOrDefault().fields;
-
-                scannedIDCardDetails = new Models.ScannedIDCardDetails()
-                {
-                    Address = details.Address.text,
-                    IDType = details.CardType.text,
-                    DateOfBirth = dateOfBirth.ToLongDateString(),
-                    Delim = details.delim.text,
-                    FullName = details.FullName.text,
-                    Gender = details.Sex.ToString(),
-                    IDNumber = details.VoterCardNo.text,
-                    Occupation = details.Occupation.text,
-                    FirstName = firstName,
-                    MiddleName = middleName,
-                    LastName = lastName
-
-                };
-            }
-            else if (documentRoot.analyzeResult.documentResults.FirstOrDefault().docType.ToLower().Contains("NationalIdNumber"))
-            {
-                var nationalId = JsonSerializer.Deserialize<QuickType.NationalID.Root>(response.message);
-                docType = DocumentType.nationalId;
-                firstName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.Firstname.text;
-                lastName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.Surname.text;
-                middleName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.MiddleName.text;
-                dateOfBirth = Convert.ToDateTime(nationalId.analyzeResult.documentResults.FirstOrDefault().fields.DateOfBirth.text);
-
-                var details = nationalId.analyzeResult.documentResults.FirstOrDefault().fields;
-
-                scannedIDCardDetails = new Models.ScannedIDCardDetails()
-                {
-
-                    IDType = details.CardType.text,
-                    DateOfBirth = dateOfBirth.ToLongDateString(),
-
-                    IDNumber = idNumber,
-                    IssueDate = details.IssueDate.text,
-                    FirstName = firstName,
-                    MiddleName = middleName,
-                    LastName = lastName,
-
-                    ExpiryDate = details.DateOfExpiry.text,
-
-
-                };
 
             }
-            else if (documentRoot.analyzeResult.documentResults.FirstOrDefault().docType.ToLower().Contains("internationalpassport"))
+            else if (card.Contains("international"))
             {
-                var internationalPassport = JsonSerializer.Deserialize<QuickType.Passport.Root>(response.message);
                 docType = DocumentType.InternationalPassport;
-                string[] splitNames = HelperLib.Function.SplitInternationalPassportGivenName(internationalPassport.analyzeResult.documentResults.FirstOrDefault().fields.GivenNames.text);
-                firstName = splitNames[0];
-                middleName = splitNames[1];
-                lastName = internationalPassport.analyzeResult.documentResults.FirstOrDefault().fields.Surname.text;
-                dateOfBirth = Convert.ToDateTime(internationalPassport.analyzeResult.documentResults.FirstOrDefault().fields.DateOfBirth.text);
 
-
-
-                var details = internationalPassport.analyzeResult.documentResults.FirstOrDefault().fields;
-                scannedIDCardDetails = new Models.ScannedIDCardDetails()
-                {
-
-                    IDType = details.CardType.text,
-                    DateOfBirth = dateOfBirth.ToLongDateString(),
-
-                    IDNumber = idNumber,
-                    IssueDate = details.DateOfIssue.text,
-                    FirstName = firstName,
-                    MiddleName = middleName,
-                    LastName = lastName,
-
-                    ExpiryDate = details.DateOfExpiry.text,
-                    FormerIDNumber = details.FormerPassportNo.text,
-                    FullName = details.Surname.text + " " + details.GivenNames.text,
-                    Address = details.Authority.text,
-                    IssuingAuthority = details.Authority.text,
-                    Gender = details.Sex.text,
-                    Email = UserEmail
-
-
-
-                };
+            }
+            else if (card.Contains("national"))
+            {
+                docType = DocumentType.nationalId;
 
             }
 
@@ -534,7 +285,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
             await context.ScannedIDCardDetail.AddAsync(scannedIDCardDetails);
             await context.SaveChangesAsync();
 
-            appruv = await this.externalImageValidationService.ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType);
+            // appruv = await this.externalImageValidationService.ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType);
+            appruv = await this.externalImageValidationService.ValidateDoc(scannedIDCardDetails.FirstName, scannedIDCardDetails.MiddleName, scannedIDCardDetails.LastName, scannedIDCardDetails.IDNumber, Convert.ToDateTime(scannedIDCardDetails.DateOfBirth), docType);
             if (appruv.isSuccess)
             {
                 await context.AppruvResponses.AddAsync(new Models.AppruvResponse { StatusOfRequest = "success", Email = UserEmail });
@@ -583,151 +335,14 @@ namespace AcctOpeningImageValidationAPI.Controllers
             //QuickType.Passport.InternationalPassportRoot internationalPassport = new QuickType.Passport.InternationalPassportRoot();
             //QuickType.DriversLicenseRoot driversLicense = new QuickType.DriversLicenseRoot();
             //QuickType.NationalID.NationalIdRoot nationalId = new QuickType.NationalID.NationalIdRoot();
-            DocumentType docType = new DocumentType();
-            string firstName = ""; string middleName = ""; string lastName = ""; string idNumber = ""; DateTime dateOfBirth = new DateTime();
+
             (bool isSuccess, string msg) appruv;
-
-            Models.ScannedIDCardDetails scannedIDCardDetails = new Models.ScannedIDCardDetails();
-
-            if (documentRoot.analyzeResult.documentResults.FirstOrDefault().docType.ToLower().Contains("driverslicense"))
-            {
-                var driversLicense = JsonSerializer.Deserialize<QuickType.DriversLicense.DriversLicenseRoot>(response.message);
-                docType = DocumentType.DriversLicense;
-                string[] splitNames = HelperLib.Function.SplitDriversLicenseFullName(driversLicense.analyzeResult.documentResults.FirstOrDefault().fields.FullName.text);
-                firstName = splitNames[0];
-                middleName = splitNames[1];
-                lastName = splitNames[2];
-                var details = driversLicense.analyzeResult.documentResults.FirstOrDefault().fields;
+            DocumentType docType = new DocumentType();
 
 
-                idNumber = driversLicense.analyzeResult.documentResults.FirstOrDefault().fields.DriversLicenseNo.text;
-                dateOfBirth = Convert.ToDateTime(driversLicense.analyzeResult.documentResults.FirstOrDefault().fields.DateOfBirth.text);
+            var scannedIDCardDetails = ProcessScannedIDJsonToObject.ProcessJsonToObject(documentRoot, response.message);
 
-
-                scannedIDCardDetails = new Models.ScannedIDCardDetails()
-                {
-                    Address = details.Address.text,
-                    IDType = details.CardType.text,
-                    DateOfBirth = dateOfBirth.ToLongDateString(),
-                    BloodGroup = details.BloofGroup.text,
-                    FullName = details.FullName.text,
-                    Gender = details.Sex.ToString(),
-                    IDNumber = idNumber,
-                    IssueDate = details.DateOfIssue.text,
-                    FirstName = firstName,
-                    MiddleName = middleName,
-                    LastName = lastName,
-                    FirstIssueState = details.FirstIssueState.text,
-                    ExpiryDate = details.DateOfExpiry.text,
-                    FormerIDNumber = details.FullName.text,
-                    NextOfKin = details.NextOfKin.text,
-                    Height = details.Height.text,
-                    IDClass = details.ClassOfLicense.text
-
-                };
-
-
-            }
-            else if (documentRoot.analyzeResult.documentResults.FirstOrDefault().docType.ToLower().Contains("voterscard"))
-            {
-                var votersCard = JsonSerializer.Deserialize<QuickType.VotersCard.Root>(response.message);
-                docType = DocumentType.VotersCard;
-                string[] splitNames = HelperLib.Function.SplitDriversLicenseFullName(votersCard.analyzeResult.documentResults.FirstOrDefault().fields.FullName.text);
-                firstName = splitNames[0];
-                middleName = splitNames[1];
-                lastName = splitNames[2];
-                dateOfBirth = Convert.ToDateTime(votersCard.analyzeResult.documentResults.FirstOrDefault().fields.DateOfBirth.text);
-
-                var details = votersCard.analyzeResult.documentResults.FirstOrDefault().fields;
-
-                scannedIDCardDetails = new Models.ScannedIDCardDetails()
-                {
-                    Address = details.Address.text,
-                    IDType = details.CardType.text,
-                    DateOfBirth = dateOfBirth.ToLongDateString(),
-                    Delim = details.delim.text,
-                    FullName = details.FullName.text,
-                    Gender = details.Sex.ToString(),
-                    IDNumber = details.VoterCardNo.text,
-                    Occupation = details.Occupation.text,
-                    FirstName = firstName,
-                    MiddleName = middleName,
-                    LastName = lastName
-
-                };
-
-
-
-
-            }
-            else if (documentRoot.analyzeResult.documentResults.FirstOrDefault().docType.ToLower().Contains("NationalIdNumber"))
-            {
-                var nationalId = JsonSerializer.Deserialize<QuickType.NationalID.Root>(response.message);
-                docType = DocumentType.nationalId;
-                firstName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.Firstname.text;
-                lastName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.Surname.text;
-                middleName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.MiddleName.text;
-                dateOfBirth = Convert.ToDateTime(nationalId.analyzeResult.documentResults.FirstOrDefault().fields.DateOfBirth.text);
-
-                var details = nationalId.analyzeResult.documentResults.FirstOrDefault().fields;
-
-                scannedIDCardDetails = new Models.ScannedIDCardDetails()
-                {
-
-                    IDType = details.CardType.text,
-                    DateOfBirth = dateOfBirth.ToLongDateString(),
-
-                    IDNumber = idNumber,
-                    IssueDate = details.IssueDate.text,
-                    FirstName = firstName,
-                    MiddleName = middleName,
-                    LastName = lastName,
-
-                    ExpiryDate = details.DateOfExpiry.text,
-
-
-                };
-
-            }
-            else if (documentRoot.analyzeResult.documentResults.FirstOrDefault().docType.ToLower().Contains("internationalpassport"))
-            {
-                var internationalPassport = JsonSerializer.Deserialize<QuickType.Passport.Root>(response.message);
-                docType = DocumentType.InternationalPassport;
-                string[] splitNames = HelperLib.Function.SplitInternationalPassportGivenName(internationalPassport.analyzeResult.documentResults.FirstOrDefault().fields.GivenNames.text);
-                firstName = splitNames[0];
-                middleName = splitNames[1];
-                lastName = internationalPassport.analyzeResult.documentResults.FirstOrDefault().fields.Surname.text;
-                dateOfBirth = Convert.ToDateTime(internationalPassport.analyzeResult.documentResults.FirstOrDefault().fields.DateOfBirth.text);
-
-
-
-                var details = internationalPassport.analyzeResult.documentResults.FirstOrDefault().fields;
-                scannedIDCardDetails = new Models.ScannedIDCardDetails()
-                {
-
-                    IDType = details.CardType.text,
-                    DateOfBirth = dateOfBirth.ToLongDateString(),
-
-                    IDNumber = idNumber,
-                    IssueDate = details.DateOfIssue.text,
-                    FirstName = firstName,
-                    MiddleName = middleName,
-                    LastName = lastName,
-
-                    ExpiryDate = details.DateOfExpiry.text,
-                    FormerIDNumber = details.FormerPassportNo.text,
-                    FullName = details.Surname.text + " " + details.GivenNames.text,
-                    Address = details.Authority.text,
-                    IssuingAuthority = details.Authority.text,
-                    Gender = details.Sex.text,
-                    Email = UserEmail
-
-
-
-                };
-
-            }
-
+            scannedIDCardDetails.Email = UserEmail;
 
 
 
@@ -739,7 +354,27 @@ namespace AcctOpeningImageValidationAPI.Controllers
             await context.ScannedIDCardDetail.AddAsync(scannedIDCardDetails);
             await context.SaveChangesAsync();
             return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<ScannedIDCardDetails>("Successful", scannedIDCardDetails, true));
-            appruv = await this.externalImageValidationService.ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType);
+            var card = scannedIDCardDetails.DocumentType.ToLower();
+            if (card.Contains("driver"))
+            {
+                docType = DocumentType.DriversLicense;
+            }
+            else if (card.Contains("voter"))
+            {
+                docType = DocumentType.VotersCard;
+
+            }
+            else if (card.Contains("international"))
+            {
+                docType = DocumentType.InternationalPassport;
+
+            }
+            else if (card.Contains("national"))
+            {
+                docType = DocumentType.nationalId;
+
+            }
+            appruv = await this.externalImageValidationService.ValidateDoc(scannedIDCardDetails.FirstName, scannedIDCardDetails.MiddleName, scannedIDCardDetails.LastName, scannedIDCardDetails.IDNumber, Convert.ToDateTime(scannedIDCardDetails.DateOfBirth), docType);
             if (appruv.isSuccess)
             {
                 await context.AppruvResponses.AddAsync(new Models.AppruvResponse { StatusOfRequest = "success", Email = UserEmail });

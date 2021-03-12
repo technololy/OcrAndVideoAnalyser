@@ -4,14 +4,16 @@ using AcctOpeningImageValidationAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AcctOpeningImageValidationAPI.Migrations
 {
     [DbContext(typeof(SterlingOnebankIDCardsContext))]
-    partial class SterlingOnebankIDCardsContextModelSnapshot : ModelSnapshot
+    [Migration("20210312115033_changeBVNCOlumnLength")]
+    partial class changeBVNCOlumnLength
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -212,9 +214,6 @@ namespace AcctOpeningImageValidationAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Delim")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DocumentType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
