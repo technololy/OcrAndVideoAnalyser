@@ -17,6 +17,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.0.7" />
     <PackageReference Include="Refit" Version="6.0.24" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
+    <PackageReference Include="NLog" Version="4.7.8" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="4.11.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IdentificationValidationLib\IdentificationValidationLib.csproj">
@@ -45,6 +47,7 @@
     <Folder Include="Repository\Services\Implementation\" />
     <Folder Include="Repository\Services\Response\" />
     <Folder Include="Repository\Services\Request\" />
+    <Folder Include="Repository\ViewModel\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Models\ExtracteTextModel.cs" />
