@@ -49,8 +49,16 @@ namespace IdentificationValidationLib
             //}
         }
 
-        public async Task<(bool isSuccess, string returnedStringContent, T1 SuccessObj, T2 failedObj)> Post<T1, T2>(object model, string endPoint)//T1 is success mode, T2 is failure model
+        public API()
         {
+            client = new HttpClient();
+
+
+        }
+
+        public async Task<(bool isSuccess, string returnedStringContent, sT1 SuccessObj, fT2 failedObj)> Post<sT1, fT2>(object model, string endPoint)//T1 is success mode, T2 is failure model
+        {
+            string contentResult = "";
             try
             {
                 await Task.Delay(1);
@@ -58,18 +66,18 @@ namespace IdentificationValidationLib
 
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(model);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-                response = client.PostAsync(endPoint, content).Result;
-                var result = response.Content.ReadAsStringAsync().Result;
+                response = await client.PostAsync(endPoint, content);
+                contentResult = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var successObj = Newtonsoft.Json.JsonConvert.DeserializeObject<T1>(result);
-                    return (true, result, successObj, default);
+                    var successObj = Newtonsoft.Json.JsonConvert.DeserializeObject<sT1>(contentResult);
+                    return (true, contentResult, successObj, default);
                 }
                 else
                 {
-                    var failedObj = Newtonsoft.Json.JsonConvert.DeserializeObject<T2>(result);
-                    return (false, result, default, failedObj);
+                    var failedObj = Newtonsoft.Json.JsonConvert.DeserializeObject<fT2>(contentResult);
+                    return (false, contentResult, default, failedObj);
 
                 }
 
@@ -77,7 +85,7 @@ namespace IdentificationValidationLib
             }
             catch (Exception ex)
             {
-                return (false, ex.ToString(), default, default);
+                return (false, contentResult + ">>>>>>>>>>" + ex.ToString(), default, default);
 
             }
         }

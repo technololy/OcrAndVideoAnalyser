@@ -1,0 +1,136 @@
+﻿@page "/OpenCamera"
+
+@inject IFileReaderService fileReader;
+@inject IHttpClientFactory ClientFactory
+
+<style>
+    img {
+        border-radius: 50%;
+        width: 150px;
+        height: 150px;
+    }
+</style>
+
+<div class="form-group">
+    <h3><label class="form-label">Open Camera/Pick file</label></h3>
+
+    <input class="form-control-file" type="file" accept="image/*" @ref="elementReference" capture @onchange="HandleSelected" />
+</div>
+
+<br />
+@if (showDetails)
+{
+    <div>
+        <ul>
+            <li><label class="form-label">Name:@name </label></li>
+            <li><label class="form-label">Size:@size </label></li>
+            <li><label class="form-label">Type:@type </label></li>
+
+
+        </ul>
+        <img src="@imgData" alt="your image" />
+    </div>
+
+    <div>
+        <EditForm class="col-md-3" Model="@ValidateInput" OnSubmit="ProcessForOCR">
+            <div class="form-group">
+                <label class="form-label">Enter email</label>
+                <InputText class="form-control" @bind-Value="@ValidateInput.Email" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Enter username</label>
+
+                <InputText class="form-control" @bind-Value="@ValidateInput.UserName" />
+            </div>
+
+            <button class="btn btn-primary">Process Image</button>
+        </EditForm>
+    </div>
+
+}
+@if (showIdDetails)
+{
+    <div class="card" style="width: 18rem;">
+        <div class="card-header">
+            Document Details
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Name:@documentData.fullName</li>
+            <li class="list-group-item">ID Card Number: @documentData.idNumber</li>
+            <li class="list-group-item">Date of birth:@documentData.dateOfBirth</li>
+            <li class="list-group-item">Date of issue:@documentData.issueDate</li>
+            <li class="list-group-item">Date of expiry:@documentData.expiryDate</li>
+            <li class="list-group-item">type of card:@documentData.idType</li>
+        </ul>
+    </div>
+}
+
+@code {
+
+    private EditContext editContext;
+    Models.ResponseClass.Data documentData;
+    ElementReference elementReference;
+    string name;
+    string Email;
+    string UserName;
+    long size;
+    string type;
+    string imgData;
+    string imgByte;
+    bool showDetails;
+    bool showIdDetails;
+    Models.ValidateInputModel ValidateInput = new Models.ValidateInputModel();
+
+    async Task HandleSelected()
+    {
+        var file = (await fileReader.CreateReference(elementReference).EnumerateFilesAsync()).FirstOrDefault();
+        var fileInfo = await file.ReadFileInfoAsync();
+        name = fileInfo.Name;
+        size = fileInfo.Size;
+        type = fileInfo.Type;
+        using (var ms = await file.CreateMemoryStreamAsync((int)fileInfo.Size))
+        {
+            var inputStream = new MemoryStream(ms.ToArray());
+            imgByte = Convert.ToBase64String(inputStream.ToArray());
+            imgData = "data:" + fileInfo.Type + ";base64," + imgByte;
+        }
+
+        StateHasChanged();
+        showDetails = true;
+
+
+
+    }
+
+    async Task ProcessForOCR()
+    {
+        try
+        {
+            IdentificationValidationLib.API apiCalls = new IdentificationValidationLib.API();
+
+
+            var endPoint = "https://pass.sterling.ng/FacialrecogAPI/ValidateIDCard";
+
+            ValidateInput.Base64Encoded = imgByte;
+
+            var result = await apiCalls.Post<Models.ResponseClass.Root, string>(ValidateInput, endPoint);
+            if (result.isSuccess)
+            {
+                documentData = result.SuccessObj.data;
+                showIdDetails = true;
+                showDetails = false;
+                StateHasChanged();
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine(result.returnedStringContent);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex);
+        }
+    }
+
+}

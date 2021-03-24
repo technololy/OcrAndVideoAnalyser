@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelLib", "ModelLib\ModelL
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperLib", "HelperLib\HelperLib.csproj", "{1849A843-3AA9-4A82-9464-90951DEE9E42}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageValidationUI", "ImageValidationUI\ImageValidationUI.csproj", "{EE074501-9B3B-4AB1-9A18-5A4A53292854}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageValidationBlazorServer", "ImageValidationBlazorServer\ImageValidationBlazorServer.csproj", "{003CC291-A102-42FB-BB30-F84A026B8EE2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,5 +71,13 @@ Global
 		{1849A843-3AA9-4A82-9464-90951DEE9E42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1849A843-3AA9-4A82-9464-90951DEE9E42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1849A843-3AA9-4A82-9464-90951DEE9E42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE074501-9B3B-4AB1-9A18-5A4A53292854}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE074501-9B3B-4AB1-9A18-5A4A53292854}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE074501-9B3B-4AB1-9A18-5A4A53292854}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE074501-9B3B-4AB1-9A18-5A4A53292854}.Release|Any CPU.Build.0 = Release|Any CPU
+		{003CC291-A102-42FB-BB30-F84A026B8EE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{003CC291-A102-42FB-BB30-F84A026B8EE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{003CC291-A102-42FB-BB30-F84A026B8EE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{003CC291-A102-42FB-BB30-F84A026B8EE2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

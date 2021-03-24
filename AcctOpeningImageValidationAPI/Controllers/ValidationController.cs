@@ -180,7 +180,10 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
                 Root documentRoot = JsonSerializer.Deserialize<Root>(response.message);
 
-
+                if (documentRoot == null || documentRoot.analyzeResult == null || documentRoot.analyzeResult.documentResults == null || documentRoot.analyzeResult.documentResults.FirstOrDefault().docType == null)
+                {
+                    return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod("The file is not valid. Its type is not valid", false));
+                }
 
                 var scannedIDCardDetails = ProcessScannedIDJsonToObject.ProcessJsonToObject(documentRoot, response.message);
 
