@@ -232,7 +232,7 @@ namespace IdentificationValidationLib
 
             }
 
-            System.Threading.Thread.Sleep(5000);
+            System.Threading.Thread.Sleep(11000);
             var jsonString = response.Headers.GetValues("Operation-Location").ToArray();
             var client2 = new HttpClient();
             client2.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", subscriptionKey);

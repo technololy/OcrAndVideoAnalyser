@@ -452,6 +452,79 @@ namespace AcctOpeningImageValidationAPI.Controllers
         }
 
 
+        [HttpPost]
+        [Route("ValidateStaticFaceImage")]
+
+        public async Task<IActionResult> ValidateStaticFaceImage([FromBody] ValidateInputModel validate)
+        {
+            context.RequestLog.Add(new RequestLogs { Email = validate.Email, Description = validate.Base64Encoded.Substring(0, 10), FileName = "Face Image validation" });
+            context.SaveChanges();
+
+            var ImageURL = await _restClientService.UploadDocument(new DocumentUploadRequest
+            {
+                FolderName = _appSettings.AzureContentFolderName,
+                Base64String = validate.Base64Encoded,
+                FileName = validate.UserName
+            });
+
+            try
+            {
+                _ocrRepository.ValidateUsage(ImageURL.Url);
+            }
+            catch (MaximumOCRUsageException e)
+            {
+                //TODO: Return a base response from here
+                return BadRequest(ResponseViewModel<String>.Failed(ResponseMessageViewModel.UNSUCCESSFUL));
+            }
+
+            var bypass = Configuration.GetSection("AppSettings").GetSection("ByPassFacial").Value;
+            if (bypass.ToLower() == "true")
+            {
+                log.Info($"bypass set to true for {validate.Email}");
+                return new OkObjectResult("success");
+
+            }
+
+            try
+            {
+                var result = await faceValidation.PerformFaceValidationAsync(ImageURL.Url);
+                log.Info($"source:{ImageURL}, result:{result.faces}");
+                if (result.IsSuccess)
+                {
+                    var faceAttributes = result.faces.FirstOrDefault().FaceAttributes;
+                    Models.FacialValidation facialValidation = new Models.FacialValidation()
+                    {
+                        FacialHair = faceAttributes.FacialHair?.Beard.ToString(),
+                        Hair = faceAttributes.Hair?.HairColor?.FirstOrDefault().Confidence.ToString(),
+                        Accessories = faceAttributes.Accessories?.FirstOrDefault().Confidence.ToString(),
+                        Age = faceAttributes.Age?.ToString(),
+                        Gender = faceAttributes.Gender.Value.ToString(),
+                        Emotion = $"Neutral {faceAttributes.Emotion?.Neutral.ToString()}, Sadness {faceAttributes.Emotion?.Sadness.ToString()}",
+                        Smile = faceAttributes.Smile.Value.ToString(),
+                        Occlusion = faceAttributes.Occlusion?.ToString(),
+                    };
+                    await context.FacialValidations.AddAsync(facialValidation);
+                    await context.SaveChangesAsync();
+                    //return new OkObjectResult(result.faces);
+                    //return new OkObjectResult("success");
+                    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<Models.FacialValidation>("Successful", facialValidation, true));
+
+                }
+                else
+                {
+                    return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod("Face not seen", false));
+                    // return new UnprocessableEntityObjectResult(result.faces);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error($"source:{ImageURL}, error {ex}");
+                return new BadRequestObjectResult(HelperLib.ReponseClass.ReponseMethod(ex.ToString(), false));
+            }
+        }
+
+
 
 
 

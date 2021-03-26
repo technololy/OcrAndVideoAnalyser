@@ -8,10 +8,10 @@ namespace QuickType.DriversLicense
 
     public class ReadResult
     {
-        public int page { get; set; }
-        public int angle { get; set; }
-        public int width { get; set; }
-        public int height { get; set; }
+        public decimal page { get; set; }
+        public decimal angle { get; set; }
+        public decimal width { get; set; }
+        public decimal height { get; set; }
         public string unit { get; set; }
     }
 

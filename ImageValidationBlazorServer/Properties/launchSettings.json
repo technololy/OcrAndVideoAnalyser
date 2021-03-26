@@ -3,8 +3,8 @@
         "windowsAuthentication": false,
         "anonymousAuthentication": true,
         "iisExpress": {
-            "applicationUrl": "https://pass.sterling.ng/FacialrecogAPI/ImageValidationUI",
-            "sslPort": 443
+            "applicationUrl": "http://localhost/gfgfg",
+            "sslPort": 44307
         }
     },
     "profiles": {

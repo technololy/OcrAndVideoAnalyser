@@ -39,23 +39,23 @@ namespace AcctOpeningImageValidationAPI.Helpers
 
                 scannedIDCardDetails = new Models.ScannedIDCardDetails()
                 {
-                    Address = details.Address.text,
-                    IDType = details.CardType.text,
+                    Address = details.Address?.text,
+                    IDType = details.CardType?.text,
                     DateOfBirth = dateOfBirth.ToLongDateString(),
-                    BloodGroup = details.BloofGroup.text,
-                    FullName = details.FullName.text,
-                    Gender = details.Sex.ToString(),
+                    BloodGroup = details.BloofGroup?.text,
+                    FullName = details.FullName?.text,
+                    Gender = details.Sex?.ToString(),
                     IDNumber = idNumber,
-                    IssueDate = details.DateOfIssue.text,
+                    IssueDate = details.DateOfIssue?.text,
                     FirstName = firstName,
                     MiddleName = middleName,
                     LastName = lastName,
-                    FirstIssueState = details.FirstIssueState.text,
-                    ExpiryDate = details.DateOfExpiry.text,
-                    FormerIDNumber = details.FullName.text,
-                    NextOfKin = details.NextOfKin.text,
-                    Height = details.Height.text,
-                    IDClass = details.ClassOfLicense.text,
+                    FirstIssueState = details.FirstIssueState?.text ?? "",
+                    ExpiryDate = details.DateOfExpiry?.text,
+                    FormerIDNumber = details?.FullName?.text,
+                    NextOfKin = details?.NextOfKin?.text,
+                    Height = details?.Height?.text,
+                    IDClass = details?.ClassOfLicense?.text,
                     DocumentType = documentType
 
 
@@ -79,14 +79,14 @@ namespace AcctOpeningImageValidationAPI.Helpers
 
                 scannedIDCardDetails = new Models.ScannedIDCardDetails()
                 {
-                    Address = details.Address.text,
-                    IDType = details.CardType.text,
+                    Address = details.Address?.text,
+                    IDType = details.CardType?.text,
                     DateOfBirth = dateOfBirth.ToLongDateString(),
-                    Delim = details.delim.text,
-                    FullName = details.FullName.text,
-                    Gender = details.Sex.ToString(),
-                    IDNumber = details.VoterCardNo.text,
-                    Occupation = details.Occupation.text,
+                    Delim = details.delim?.text,
+                    FullName = details.FullName?.text,
+                    Gender = details.Sex?.ToString(),
+                    IDNumber = details.VoterCardNo?.text,
+                    Occupation = details.Occupation?.text,
                     FirstName = firstName,
                     MiddleName = middleName,
                     LastName = lastName,
@@ -98,14 +98,14 @@ namespace AcctOpeningImageValidationAPI.Helpers
 
 
             }
-            else if (documentRoot.analyzeResult.documentResults.FirstOrDefault().docType.ToLower().Contains("NationalIdNumber"))
+            else if (documentRoot.analyzeResult.documentResults.FirstOrDefault().docType.ToLower().Contains("nationalidnumber"))
             {
                 var nationalId = JsonSerializer.Deserialize<QuickType.NationalID.Root>(json);
                 // docType = DocumentType.nationalId;
                 documentType = "National ID";
-                firstName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.Firstname.text;
-                lastName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.Surname.text;
-                middleName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.MiddleName.text;
+                firstName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.Firstname?.text;
+                lastName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.Surname?.text;
+                middleName = nationalId.analyzeResult.documentResults.FirstOrDefault().fields.MiddleName?.text;
                 dateOfBirth = Convert.ToDateTime(nationalId.analyzeResult.documentResults.FirstOrDefault().fields.DateOfBirth.text);
 
                 var details = nationalId.analyzeResult.documentResults.FirstOrDefault().fields;
@@ -113,16 +113,16 @@ namespace AcctOpeningImageValidationAPI.Helpers
                 scannedIDCardDetails = new Models.ScannedIDCardDetails()
                 {
 
-                    IDType = details.CardType.text,
+                    IDType = details.CardType?.text,
                     DateOfBirth = dateOfBirth.ToLongDateString(),
 
-                    IDNumber = idNumber,
-                    IssueDate = details.IssueDate.text,
+                    IDNumber = details.NumberOnCard?.text,
+                    IssueDate = details.IssueDate?.text,
                     FirstName = firstName,
                     MiddleName = middleName,
                     LastName = lastName,
-
-                    ExpiryDate = details.DateOfExpiry.text,
+                    FullName = $"{firstName} {middleName} {lastName}",
+                    ExpiryDate = details.DateOfExpiry?.text,
                     DocumentType = documentType
 
 
@@ -141,6 +141,7 @@ namespace AcctOpeningImageValidationAPI.Helpers
                 middleName = splitNames[1];
                 lastName = internationalPassport?.analyzeResult?.documentResults?.FirstOrDefault().fields.Surname.text;
                 dateOfBirth = Convert.ToDateTime(internationalPassport?.analyzeResult?.documentResults?.FirstOrDefault().fields?.DateOfBirth?.text);
+                idNumber = internationalPassport?.analyzeResult?.documentResults?.FirstOrDefault().fields?.PassPortNumber?.text;
 
 
 
