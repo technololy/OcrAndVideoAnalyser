@@ -1,5 +1,6 @@
-﻿
-@page "/ValidateStaticFace"
+﻿@page "/ValidateStaticFace"
+
+
 @inject IFileReaderService fileReader;
 @inject IHttpClientFactory ClientFactory
 
@@ -121,7 +122,6 @@
 }
 
 @code {
-
     private EditContext editContext;
     HelperLib.FacialValidationModel.Root documentData;
     ElementReference elementReference1;
@@ -214,5 +214,4 @@
             StateHasChanged();
         }
     }
-
 }

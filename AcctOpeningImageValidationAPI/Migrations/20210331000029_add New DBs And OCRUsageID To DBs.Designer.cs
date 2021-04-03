@@ -4,14 +4,16 @@ using AcctOpeningImageValidationAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AcctOpeningImageValidationAPI.Migrations
 {
     [DbContext(typeof(SterlingOnebankIDCardsContext))]
-    partial class SterlingOnebankIDCardsContextModelSnapshot : ModelSnapshot
+    [Migration("20210331000029_add New DBs And OCRUsageID To DBs")]
+    partial class addNewDBsAndOCRUsageIDToDBs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,18 +94,18 @@ namespace AcctOpeningImageValidationAPI.Migrations
                     b.Property<string>("HeadPose")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OCRUsageId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Occlusion")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OcrUsageId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Smile")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OCRUsageId")
+                    b.HasIndex("OcrUsageId")
                         .IsUnique();
 
                     b.ToTable("FacialValidations");
@@ -353,7 +355,7 @@ namespace AcctOpeningImageValidationAPI.Migrations
                 {
                     b.HasOne("AcctOpeningImageValidationAPI.Models.OCRUsage", "OCRUsage")
                         .WithOne("facialValidation")
-                        .HasForeignKey("AcctOpeningImageValidationAPI.Models.FacialValidation", "OCRUsageId")
+                        .HasForeignKey("AcctOpeningImageValidationAPI.Models.FacialValidation", "OcrUsageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

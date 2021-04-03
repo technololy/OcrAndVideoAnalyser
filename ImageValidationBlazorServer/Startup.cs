@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ImageValidationBlazorServer.Data;
 using Tewr.Blazor.FileReader;
+using Blazored.Toast;
 
 namespace ImageValidationBlazorServer
 {
@@ -38,6 +39,9 @@ namespace ImageValidationBlazorServer
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
 
             });
+
+            services.AddBlazoredToast();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

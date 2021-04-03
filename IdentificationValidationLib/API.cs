@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -72,11 +73,14 @@ namespace IdentificationValidationLib
                 if (response.IsSuccessStatusCode)
                 {
                     var successObj = Newtonsoft.Json.JsonConvert.DeserializeObject<sT1>(contentResult);
+                    Debug.WriteLine(contentResult);
                     return (true, contentResult, successObj, default);
                 }
                 else
                 {
                     var failedObj = Newtonsoft.Json.JsonConvert.DeserializeObject<fT2>(contentResult);
+                    Debug.WriteLine(contentResult);
+
                     return (false, contentResult, default, failedObj);
 
                 }

@@ -12,6 +12,8 @@ namespace ImageValidationBlazorServer.Models
 
 
         public string Base64Encoded { get; set; }
+        public string Base64EncodedTarget { get; set; }
+
         [Required(ErrorMessage = "Please enter a valid username")]
 
         public string UserName { get; set; }

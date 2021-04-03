@@ -451,7 +451,11 @@ namespace AcctOpeningImageValidationAPI.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Returns facial attribute and confidence level from static client images for lients to take decision. Automatically converts image byte to url
+        /// </summary>
+        /// <param name="validate"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("ValidateStaticFaceImage")]
 
@@ -505,9 +509,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     };
                     await context.FacialValidations.AddAsync(facialValidation);
                     await context.SaveChangesAsync();
-                    //return new OkObjectResult(result.faces);
-                    //return new OkObjectResult("success");
-                    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<Models.FacialValidation>("Successful", facialValidation, true));
+
+                    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<Microsoft.Azure.CognitiveServices.Vision.Face.Models.FaceAttributes>("Successful", faceAttributes, true));
 
                 }
                 else
@@ -520,6 +523,184 @@ namespace AcctOpeningImageValidationAPI.Controllers
             catch (Exception ex)
             {
                 log.Error($"source:{ImageURL}, error {ex}");
+                return new BadRequestObjectResult(HelperLib.ReponseClass.ReponseMethod(ex.ToString(), false));
+            }
+        }
+
+
+        /// <summary>
+        /// compare faces using byte array of images
+        /// </summary>
+        /// <param name="validate"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("CompareFaceUsingImageByte")]
+
+        public async Task<IActionResult> CompareFaceUsingImageByte([FromBody] ValidateInputModel validate)
+        {
+
+            OCRUsage ocr;
+            context.RequestLog.Add(new RequestLogs { Email = validate.Email, Description = validate.Base64Encoded.Substring(0, 10), FileName = "Face Image validation" });
+            context.SaveChanges();
+
+            var sourceImageURL = await _restClientService.UploadDocument(new DocumentUploadRequest
+            {
+                FolderName = _appSettings.AzureContentFolderName,
+                Base64String = validate.Base64Encoded,
+                FileName = validate.UserName
+            });
+
+            var targetImageURL = await _restClientService.UploadDocument(new DocumentUploadRequest
+            {
+                FolderName = _appSettings.AzureContentFolderName,
+                Base64String = validate.Base64EncodedTarget,
+                FileName = validate.UserName
+            });
+            if (sourceImageURL == null || targetImageURL == null)
+            {
+                return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod("source or image obj after upload document is null", false));
+
+            }
+
+            try
+            {
+                ocr = _ocrRepository.ValidateUsage(sourceImageURL.Url);
+                // _ocrRepository.ValidateUsage(targetImageURL.Url);
+                context.ImageScanneds.Add(new ImagesScanned { OcrUsageId = ocr.Id, ImageURL = sourceImageURL.Url });
+                context.ImageScanneds.Add(new ImagesScanned { OcrUsageId = ocr.Id, ImageURL = targetImageURL.Url });
+                await context.SaveChangesAsync();
+
+
+            }
+            catch (MaximumOCRUsageException e)
+            {
+                Debug.WriteLine(e);
+                //TODO: Return a base response from here
+                return BadRequest(ResponseViewModel<String>.Failed(ResponseMessageViewModel.UNSUCCESSFUL));
+            }
+
+            var bypass = Configuration.GetSection("AppSettings").GetSection("ByPassFacial").Value;
+            if (bypass.ToLower() == "true")
+            {
+                log.Info($"bypass set to true for {validate.Email}");
+                return new OkObjectResult("success");
+
+            }
+
+            try
+            {
+                var result = await faceValidation.FindSimilarFaces(new List<string>() { targetImageURL.Url }, sourceImageURL.Url);
+                if (result.IsSuccess)
+                {
+                    var similar = result.faces.FirstOrDefault();
+                    await context.SimilarFacesRecord.AddAsync(new SimilarFace { Confidence = similar.Confidence, FaceId = similar.FaceId, PersistedFaceId = similar.PersistedFaceId, OCRUsage = ocr });
+                    await context.SaveChangesAsync();
+
+
+                    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", similar, true));
+
+                }
+                else
+                {
+                    return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod("Face not seen", false));
+                    // return new UnprocessableEntityObjectResult(result.faces);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error($"source:{sourceImageURL} target {targetImageURL}, error {ex}");
+                return new BadRequestObjectResult(HelperLib.ReponseClass.ReponseMethod(ex.ToString(), false));
+            }
+        }
+
+
+
+
+
+
+        /// <summary>
+        /// compare faces using byte array of images
+        /// </summary>
+        /// <param name="validate"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("VerifyTwoFaces")]
+
+        public async Task<IActionResult> VerifyTwoFaces([FromBody] ValidateInputModel validate)
+        {
+
+            OCRUsage ocr;
+            context.RequestLog.Add(new RequestLogs { Email = validate.Email, Description = validate.Base64Encoded.Substring(0, 10), FileName = "Face Image validation" });
+            context.SaveChanges();
+
+            var sourceImageURL = await _restClientService.UploadDocument(new DocumentUploadRequest
+            {
+                FolderName = _appSettings.AzureContentFolderName,
+                Base64String = validate.Base64Encoded,
+                FileName = validate.UserName + "_source"
+            });
+
+            var targetImageURL = await _restClientService.UploadDocument(new DocumentUploadRequest
+            {
+                FolderName = _appSettings.AzureContentFolderName,
+                Base64String = validate.Base64EncodedTarget,
+                FileName = validate.UserName + "_target"
+            });
+            if (sourceImageURL == null || targetImageURL == null)
+            {
+                return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod("source or image obj after upload document is null", false));
+
+            }
+
+            try
+            {
+                ocr = _ocrRepository.ValidateUsage(sourceImageURL.Url);
+                // _ocrRepository.ValidateUsage(targetImageURL.Url);
+                context.ImageScanneds.Add(new ImagesScanned { OcrUsageId = ocr.Id, ImageURL = sourceImageURL.Url });
+                context.ImageScanneds.Add(new ImagesScanned { OcrUsageId = ocr.Id, ImageURL = targetImageURL.Url });
+                await context.SaveChangesAsync();
+
+
+            }
+            catch (MaximumOCRUsageException e)
+            {
+                Debug.WriteLine(e);
+                //TODO: Return a base response from here
+                return BadRequest(ResponseViewModel<String>.Failed(ResponseMessageViewModel.UNSUCCESSFUL));
+            }
+
+            var bypass = Configuration.GetSection("AppSettings").GetSection("ByPassFacial").Value;
+            if (bypass.ToLower() == "true")
+            {
+                log.Info($"bypass set to true for {validate.Email}");
+                return new OkObjectResult("success");
+
+            }
+
+            try
+            {
+                var result = await faceValidation.VerifySimilarFaces(new List<string>() { targetImageURL.Url }, sourceImageURL.Url);
+                if (result.IsSuccess)
+                {
+                    var similar = result.faces;
+                    await context.SimilarFacesRecord.AddAsync(new SimilarFace { Confidence = similar.Confidence, FaceId = Guid.NewGuid(), PersistedFaceId = Guid.NewGuid(), OCRUsage = ocr }); ;
+                    await context.SaveChangesAsync();
+
+
+                    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", similar, true));
+
+                }
+                else
+                {
+                    return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod("Face not seen", false));
+                    // return new UnprocessableEntityObjectResult(result.faces);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error($"source:{sourceImageURL} target {targetImageURL}, error {ex}");
                 return new BadRequestObjectResult(HelperLib.ReponseClass.ReponseMethod(ex.ToString(), false));
             }
         }

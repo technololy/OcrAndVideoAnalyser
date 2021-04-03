@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace AcctOpeningImageValidationAPI.Models
@@ -15,7 +16,7 @@ namespace AcctOpeningImageValidationAPI.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //optionsBuilder.UseSqlServer(@"Server=localhost;Database=SterlingOnebankIDCards;Persist Security Info=False;User ID=sa;Password=reallyStrongPwd123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;ConnectRetryCount=0");
-             optionsBuilder.UseSqlServer(@"Server=10.0.41.101;Database=SterlingOnebankIDCards;Persist Security Info=False;User ID=sa;Password=tylent;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;ConnectRetryCount=0");
+            optionsBuilder.UseSqlServer(@"Server=10.0.41.101;Database=SterlingOnebankIDCards;Persist Security Info=False;User ID=sa;Password=tylent;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;ConnectRetryCount=0");
         }
         public DbSet<AppruvResponse> AppruvResponses { get; set; }
         public DbSet<OCRResponse> OCRResponses { get; set; }
@@ -23,6 +24,8 @@ namespace AcctOpeningImageValidationAPI.Models
         public DbSet<FacialValidation> FacialValidations { get; set; }
         public DbSet<OCRUsage> OCRUsages { get; set; }
         public DbSet<RequestLogs> RequestLog { get; set; }
+        public DbSet<ImagesScanned> ImageScanneds { get; set; }
+        public DbSet<SimilarFace> SimilarFacesRecord { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -86,6 +89,20 @@ namespace AcctOpeningImageValidationAPI.Models
 
 
             });
+
+            modelBuilder.Entity<SimilarFace>(entity =>
+            {
+                entity.Property(e => e.DateInserted)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getdate())");
+
+
+
+
+            });
+
+
+
         }
 
 
@@ -128,6 +145,11 @@ namespace AcctOpeningImageValidationAPI.Models
         public string Delim { get; set; }
         public string Gender { get; set; }
         public DateTime? DateInserted { get; set; }
+
+        public int OCRUsageId { get; set; }
+
+
+        public virtual OCRUsage OCRUsage { get; set; }
     }
 
     public class AppruvResponse
@@ -147,6 +169,7 @@ namespace AcctOpeningImageValidationAPI.Models
     {
         public int Id { get; set; }
 
+        public Guid? FaceID { get; set; }
         public string BVN { get; set; }
         public string Email { get; set; }
         public string Accessories { get; set; }
@@ -159,7 +182,42 @@ namespace AcctOpeningImageValidationAPI.Models
         public string Gender { get; set; }
         public string Occlusion { get; set; }
         public DateTime? DateInserted { get; set; }
+
+        public int OCRUsageId { get; set; }
+
+        public OCRUsage OCRUsage { get; set; }
+
     }
 
+    public class SimilarFace
+    {
+        public int Id { get; set; }
+        public Guid? FaceId
+        {
+            get;
+            set;
+        }
+
+        public Guid? PersistedFaceId
+        {
+            get;
+            set;
+        }
+
+        public double Confidence
+        {
+            get;
+            set;
+        }
+
+
+        public int OCRUsageId { get; set; }
+
+        public virtual OCRUsage OCRUsage { get; set; }
+
+
+        public DateTime? DateInserted { get; set; }
+
+    }
 
 }

@@ -2,6 +2,8 @@
 
 @inject IFileReaderService fileReader;
 @inject IHttpClientFactory ClientFactory
+@inject IToastService toastService
+
 
 
 
@@ -81,15 +83,7 @@
 
                     </EditForm>
 
-                    @if (ShowAlerResult)
-                    {
-                        <div class="alert alert-warning alert-dismissible fade show col-md-6" role="alert">
-                            @AlertMessage
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    }
+
 
                 </div>
             </div>
@@ -196,12 +190,15 @@
                 documentData = result.SuccessObj.data;
                 showIdDetails = true;
                 showDetails = false;
-                AlertMessage = "Successfully done";
+                toastService.ShowSuccess("Successfully done");
+
             }
             else
             {
                 System.Diagnostics.Debug.WriteLine(result.failedObj?.Message ?? "Error");
-                AlertMessage = result.returnedStringContent;
+                // AlertMessage = result.returnedStringContent;
+                toastService.ShowError(result.returnedStringContent);
+
 
             }
 
@@ -210,6 +207,8 @@
         {
             System.Diagnostics.Debug.WriteLine(ex);
             AlertMessage = ex.ToString();
+            toastService.ShowError(AlertMessage);
+
 
         }
         finally

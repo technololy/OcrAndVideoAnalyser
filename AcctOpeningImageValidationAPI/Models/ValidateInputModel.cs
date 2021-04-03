@@ -11,5 +11,7 @@ namespace AcctOpeningImageValidationAPI.Models
         public string Base64Encoded { get; set; }
 
         public string UserName { get; set; }
+        public string Base64EncodedTarget { get; set; }
+
     }
 }
