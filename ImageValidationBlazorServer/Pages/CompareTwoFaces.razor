@@ -4,6 +4,8 @@
 @inject IHttpClientFactory ClientFactory
 @inject IToastService toastService
 
+@inject IConfiguration Configuration
+
 
 <div class="card">
     <div class="card-header">
@@ -276,10 +278,13 @@
             IdentificationValidationLib.API apiCalls = new IdentificationValidationLib.API();
 
 
-            var endPoint = "https://pass.sterling.ng/FacialrecogAPI/VerifyTwoFaces";
+            //var endPoint = "https://pass.sterling.ng/FacialrecogAPI/VerifyTwoFaces";
+
             //var endPoint = "https://localhost:32389/CompareFaceUsingImageByte";
             // var endPoint = "https://localhost:32389/VerifyTwoFaces";
 
+
+            var endPoint = $"{Configuration.GetConnectionString("LiveAPI")}VerifyTwoFaces";
 
             ValidateInput.Base64Encoded = imgByte1;
             ValidateInput.Base64EncodedTarget = imgByte2;
