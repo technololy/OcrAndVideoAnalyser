@@ -54,9 +54,9 @@ namespace AcctOpeningImageValidationAPI.Controllers
                                   RestClientService restClientService)
         {
             _env = env;
-            client = new FaceClient(new ApiKeyServiceClientCredentials("e8ef40efa4704769860e661c210a0fc5"))
+            client = new FaceClient(new ApiKeyServiceClientCredentials(option.Value.subscriptionKey)) //"e8ef40efa4704769860e661c210a0fc5"
             {
-                Endpoint = "https://eastus.api.cognitive.microsoft.com"
+                Endpoint = option.Value.AzureFacialBaseUrl
             };
             _restClientService = restClientService;
             _appSettings = option.Value;
