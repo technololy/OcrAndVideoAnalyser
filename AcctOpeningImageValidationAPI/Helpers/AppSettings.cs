@@ -8,5 +8,13 @@ namespace AcctOpeningImageValidationAPI.Helpers
         public string ApiDocumentBaseUrl { get; set; }
 
         public string AzureContentFolderName { get; set; }
+
+        public string subscriptionKey { get; set; }
+
+        public string AzureFacialBaseUrl { get; set; }
+
+        public string EncryptionKey { get; set; }
+
+        public string EncryptionIV { get; set; }
     }
 }

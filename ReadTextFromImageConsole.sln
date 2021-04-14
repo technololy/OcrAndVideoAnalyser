@@ -25,6 +25,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageValidationUI", "ImageV
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageValidationBlazorServer", "ImageValidationBlazorServer\ImageValidationBlazorServer.csproj", "{003CC291-A102-42FB-BB30-F84A026B8EE2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Encryption", "Encryption\Encryption.csproj", "{A871121E-6D04-451A-AE72-F1838B2B5DF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EncryptionConsole", "EncryptionConsole\EncryptionConsole.csproj", "{8D3B03AF-E042-4A36-8F37-1C529FCF42D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,5 +83,13 @@ Global
 		{003CC291-A102-42FB-BB30-F84A026B8EE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{003CC291-A102-42FB-BB30-F84A026B8EE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{003CC291-A102-42FB-BB30-F84A026B8EE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A871121E-6D04-451A-AE72-F1838B2B5DF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A871121E-6D04-451A-AE72-F1838B2B5DF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A871121E-6D04-451A-AE72-F1838B2B5DF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A871121E-6D04-451A-AE72-F1838B2B5DF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D3B03AF-E042-4A36-8F37-1C529FCF42D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D3B03AF-E042-4A36-8F37-1C529FCF42D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D3B03AF-E042-4A36-8F37-1C529FCF42D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D3B03AF-E042-4A36-8F37-1C529FCF42D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

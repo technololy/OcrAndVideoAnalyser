@@ -123,7 +123,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
             else
             {
                 return new UnprocessableEntityObjectResult(appruv.msg);
-
             }
 
         }
