@@ -65,7 +65,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GenerateWithSampleVideo([FromBody] ImageRequest model)
+        public async Task<IActionResult> TestVideoEncrypted([FromBody] ImageRequest model)
         {
             var encryption = await Encryption.Encryption.Decrypt(model.Body, _appSettings.EncryptionKey, _appSettings.EncryptionIV);
 
