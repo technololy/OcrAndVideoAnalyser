@@ -65,6 +65,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         }
 
         [HttpPost]
+        [Route("/liveness/test-encryption")]
         public async Task<IActionResult> TestVideoEncrypted([FromBody] ImageRequest model)
         {
             var encryption = await Encryption.Encryption.Decrypt(model.Body, _appSettings.EncryptionKey, _appSettings.EncryptionIV);
@@ -73,6 +74,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         }
 
         [HttpPost]
+        [Route("/liveness")]
         public async Task<IActionResult> ProcessVideoFile([FromBody] ImageRequest model)
         {
             try
