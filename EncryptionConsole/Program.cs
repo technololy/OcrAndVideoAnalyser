@@ -24,8 +24,7 @@ namespace EncryptionConsole
             {
                 httpClient.DefaultRequestHeaders.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiCallUrl}");
-                
+
                 var request_string = JsonConvert.SerializeObject(request);
 
                 using (StringContent content = new StringContent(request_string, Encoding.UTF8, "application/json"))
@@ -43,7 +42,6 @@ namespace EncryptionConsole
             {
                 Console.WriteLine(ex.Message);
             }
-            //return responseObject;
         }
     }
 
