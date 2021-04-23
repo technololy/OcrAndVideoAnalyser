@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AcctOpeningImageValidationAPI.Helpers;
+using AcctOpeningImageValidationAPI.Models;
 using AcctOpeningImageValidationAPI.Repository.Services.Implementation;
 using AcctOpeningImageValidationAPI.Repository.Services.Request;
 using AcctOpeningImageValidationAPI.Repository.Services.Response;
@@ -16,6 +17,7 @@ using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace AcctOpeningImageValidationAPI.Controllers
 {
@@ -63,12 +65,18 @@ namespace AcctOpeningImageValidationAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ProcessVideoFile([FromBody] ImageRequest req)
+        public async Task<IActionResult> ProcessVideoFile([FromBody] ImageRequest model)
         {
             try
             {
+                //TODO: Decrypt Data
+                var encryption = await Encryption.Encryption.Decrypt(model.Body, _appSettings.EncryptionKey, _appSettings.EncryptionIV);
+
+                var req = JsonConvert.DeserializeObject<FaceRequest>(model.Body);
+
                 var fileName = "test.mp4";
-                byte[] imageBytes = Convert.FromBase64String(req.ImageFile);
+
+                byte[] imageBytes = Convert.FromBase64String(req.VideoFile);
 
                 string FilePath = Path.Combine(Directory.GetCurrentDirectory(), "filess");
 
@@ -92,12 +100,15 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     HeadRollingDetected = headPoseResult.Item2,
                     HeadShakingDetected = headPoseResult.Item3
                 };
-                return Ok(response);
+
+                var encryptedValue = await Encryption.Encryption.Decrypt(JsonConvert.SerializeObject(response), _appSettings.EncryptionKey, _appSettings.EncryptionIV);
+
+                return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("success", new FaceResponse { Body = encryptedValue }, true));
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return BadRequest(ex.Message);
+                return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod("Unable to validate face, please try again!", false));
             }
         }
 
@@ -290,7 +301,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
 public class ImageRequest
 {
-    public string ImageFile { get; set; }
+    public string Body { get; set; }
 }
 
 public class LiveCameraResult
