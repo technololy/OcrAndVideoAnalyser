@@ -66,9 +66,9 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         [HttpPost]
         [Route("/liveness/test-encryption")]
-        public async Task<IActionResult> TestVideoEncrypted([FromBody] ImageRequest model)
+        public async Task<IActionResult> TestVideoEncrypted([FromBody] FaceRequest model)
         {
-            var encryption = await Encryption.Encryption.Decrypt(model.Body, _appSettings.EncryptionKey, _appSettings.EncryptionIV);
+            var encryption = await Encryption.Encryption.Decrypt(model.VideoFile, _appSettings.EncryptionKey, _appSettings.EncryptionIV);
 
             return Ok(encryption);
         }
@@ -88,7 +88,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
                 byte[] imageBytes = Convert.FromBase64String(req.VideoFile);
 
-                string FilePath = Path.Combine(Directory.GetCurrentDirectory(), "filess");
+                string FilePath = Path.Combine(Directory.GetCurrentDirectory(), "files");
 
                 if (!System.IO.File.Exists(FilePath))
                 {
@@ -118,8 +118,15 @@ namespace AcctOpeningImageValidationAPI.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+
                 return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod("Unable to validate face, please try again!", false));
             }
+        }
+
+        //TODO: Generate Random Name For Current Video
+        private string RandomVideoName ()
+        {
+            return string.Empty;
         }
 
         private void ExtractFrameFromVideo(string directory, string fiileName)
