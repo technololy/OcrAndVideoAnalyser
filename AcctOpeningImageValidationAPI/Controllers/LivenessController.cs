@@ -64,21 +64,21 @@ namespace AcctOpeningImageValidationAPI.Controllers
             _appSettings = option.Value;
         }
 
-        [HttpPost]
-        [Route("/liveness/test-encryption")]
-        public async Task<IActionResult> TestVideoEncrypted([FromBody] FaceRequest model)
-        {
-            var encryption = await Encryption.Encryption.Decrypt(model.VideoFile, _appSettings.EncryptionKey, _appSettings.EncryptionIV);
+        //[HttpPost]
+        //[Route("/liveness/test-encryption")]
+        //public async Task<IActionResult> TestVideoEncrypted([FromBody] FaceRequest model)
+        //{
+        //    var encryption = await Encryption.Encryption.Decrypt(model.VideoFile, _appSettings.EncryptionKey, _appSettings.EncryptionIV);
 
-            return Ok(encryption);
-        }
+        //    return Ok(encryption);
+        //}
 
         [HttpPost]
         [Route("/liveness")]
         public async Task<IActionResult> ProcessVideoFile([FromBody] FaceRequest model)
         {
-            try
-            {
+            //try
+            //{
                 //TODO: Decrypt Data
                // var encryption = await Encryption.Encryption.Decrypt(model.Body, _appSettings.EncryptionKey, _appSettings.EncryptionIV);
 
@@ -118,13 +118,13 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 var encryptedValue = await Encryption.Encryption.Decrypt(JsonConvert.SerializeObject(response), _appSettings.EncryptionKey, _appSettings.EncryptionIV);
 
                 return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("success", new FaceResponse { Body = encryptedValue }, true));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.Message);
 
-                return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod($"Unable to validate face, please try again! Reason : {ex.Message}", false));
-            }
+            //    return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod($"Unable to validate face, please try again! Reason : {ex.Message}", false));
+            //}
         }
 
         //TODO: Generate Random Name For Current Video
@@ -237,6 +237,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
                 }
             }
+
             return new Tuple<bool, bool, bool>(stepOneComplete, stepTwoComplete, stepThreeComplete);
         }
 

@@ -77,6 +77,9 @@ namespace AcctOpeningImageValidationAPI
                 app.UseDeveloperExceptionPage();
             }
 
+
+            app.UseDeveloperExceptionPage();
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
