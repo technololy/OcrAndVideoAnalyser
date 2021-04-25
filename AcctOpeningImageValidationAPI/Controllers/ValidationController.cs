@@ -73,6 +73,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(camudatafield);
 
             var bypass = Configuration.GetSection("AppSettings").GetSection("ByPass").Value;
+
             if (bypass.ToLower() == "true")
             {
                 log.Info($"bypass set to true for {json}");
