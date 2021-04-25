@@ -16,5 +16,7 @@ namespace AcctOpeningImageValidationAPI.Helpers
         public string EncryptionKey { get; set; }
 
         public string EncryptionIV { get; set; }
+
+        public string ContentServerDirectory { get; set; }
     }
 }

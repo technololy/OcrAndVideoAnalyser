@@ -90,7 +90,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
                 byte[] imageBytes = Convert.FromBase64String(model.VideoFile);
 
-                string FilePath = Path.Combine(Directory.GetCurrentDirectory(), "files");
+                string FilePath = Path.Combine(Directory.GetCurrentDirectory(), _appSettings.ContentServerDirectory);
 
                 if (!System.IO.File.Exists(FilePath))
                 {
