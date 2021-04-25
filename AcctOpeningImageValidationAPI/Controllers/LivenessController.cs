@@ -115,9 +115,12 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     HeadShakingDetected = headPoseResult.Item3
                 };
 
-                var encryptedValue = await Encryption.Encryption.Decrypt(JsonConvert.SerializeObject(response), _appSettings.EncryptionKey, _appSettings.EncryptionIV);
+            // var encryptedValue = await Encryption.Encryption.Decrypt(JsonConvert.SerializeObject(response), _appSettings.EncryptionKey, _appSettings.EncryptionIV);
 
-                return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("success", new FaceResponse { Body = encryptedValue }, true));
+            // return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("success", new FaceResponse { Body = encryptedValue }, true));
+
+            return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("success", response, true));
+
             //}
             //catch (Exception ex)
             //{
