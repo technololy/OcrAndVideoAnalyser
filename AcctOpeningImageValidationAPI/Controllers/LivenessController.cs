@@ -14,8 +14,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace AcctOpeningImageValidationAPI.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
+    
     public class LivenessController : ControllerBase
     {
 
@@ -37,7 +36,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         private static int processStep = 1;
 
-
         private readonly static int activeFrames = 14;
 
         private readonly IHostingEnvironment _env;
@@ -52,6 +50,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         }
 
         [HttpPost]
+        [Route("liveness")]
         public async Task<IActionResult> ProcessVideoFile([FromBody] FaceRequest req)
         {
             try
