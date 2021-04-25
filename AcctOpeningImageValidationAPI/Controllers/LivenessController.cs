@@ -186,7 +186,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     {
                         FolderName = _appSettings.AzureContentFolderName,
                         Base64String = ConvertToBase64(stream),
-                        FileName = "image-001"
+                        FileName = "image-001.jpg"
                     });
                 }
 
