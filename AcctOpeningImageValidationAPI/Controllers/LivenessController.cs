@@ -2,13 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using AcctOpeningImageValidationAPI.Helpers;
 using AcctOpeningImageValidationAPI.Models;
-using AcctOpeningImageValidationAPI.Repository.Services.Implementation;
-using AcctOpeningImageValidationAPI.Repository.Services.Request;
-using AcctOpeningImageValidationAPI.Repository.Services.Response;
 using MediaToolkit;
 using MediaToolkit.Model;
 using MediaToolkit.Options;
@@ -16,8 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace AcctOpeningImageValidationAPI.Controllers
 {
@@ -25,8 +18,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
     [Route("[controller]")]
     public class LivenessController : ControllerBase
     {
-        private readonly RestClientService _restClientService;
-        private readonly AppSettings _appSettings;
 
         private static IFaceClient client;
         private readonly double _headPitchMaxThreshold = 25;
@@ -51,57 +42,33 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         private readonly IHostingEnvironment _env;
 
-        public LivenessController(IHostingEnvironment env,
-                                  IOptions<AppSettings> option,
-                                  RestClientService restClientService)
+        public LivenessController(IHostingEnvironment env)
         {
             _env = env;
-            client = new FaceClient(new ApiKeyServiceClientCredentials(option.Value.subscriptionKey)) //"e8ef40efa4704769860e661c210a0fc5"
+            client = new FaceClient(new ApiKeyServiceClientCredentials("e8ef40efa4704769860e661c210a0fc5"))
             {
-                Endpoint = option.Value.AzureFacialBaseUrl
+                Endpoint = "https://eastus.api.cognitive.microsoft.com"
             };
-            _restClientService = restClientService;
-            _appSettings = option.Value;
         }
 
-        //[HttpPost]
-        //[Route("/liveness/test-encryption")]
-        //public async Task<IActionResult> TestVideoEncrypted([FromBody] FaceRequest model)
-        //{
-        //    var encryption = await Encryption.Encryption.Decrypt(model.VideoFile, _appSettings.EncryptionKey, _appSettings.EncryptionIV);
-
-        //    return Ok(encryption);
-        //}
-
         [HttpPost]
-        [Route("/liveness")]
-        public async Task<IActionResult> ProcessVideoFile([FromBody] FaceRequest model)
+        public async Task<IActionResult> ProcessVideoFile([FromBody] FaceRequest req)
         {
-            //try
-            //{
-                //TODO: Decrypt Data
-               // var encryption = await Encryption.Encryption.Decrypt(model.Body, _appSettings.EncryptionKey, _appSettings.EncryptionIV);
-
-               //var req = JsonConvert.DeserializeObject<FaceRequest>(model.Body);
-
+            try
+            {
                 var fileName = "test.mp4";
+                byte[] imageBytes = Convert.FromBase64String(req.VideoFile);
 
-                //byte[] imageBytes = Convert.FromBase64String(req.VideoFile);
-
-                byte[] imageBytes = Convert.FromBase64String(model.VideoFile);
-
-                string FilePath = Path.Combine(Directory.GetCurrentDirectory(), _appSettings.ContentServerDirectory);
+                string FilePath = Path.Combine(Directory.GetCurrentDirectory(), "filess");
 
                 if (!System.IO.File.Exists(FilePath))
                 {
                     if (!Directory.Exists(FilePath))
                     {
                         Directory.CreateDirectory(FilePath);
-
                         System.IO.File.WriteAllBytes(Path.Combine(FilePath, fileName), imageBytes);
                     }
                 }
-
                 //Extract
                 ExtractFrameFromVideo(FilePath, fileName);
 
@@ -114,26 +81,13 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     HeadRollingDetected = headPoseResult.Item2,
                     HeadShakingDetected = headPoseResult.Item3
                 };
-
-            // var encryptedValue = await Encryption.Encryption.Decrypt(JsonConvert.SerializeObject(response), _appSettings.EncryptionKey, _appSettings.EncryptionIV);
-
-            // return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("success", new FaceResponse { Body = encryptedValue }, true));
-
-            return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("success", response, true));
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine(ex.Message);
-
-            //    return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod($"Unable to validate face, please try again! Reason : {ex.Message}", false));
-            //}
-        }
-
-        //TODO: Generate Random Name For Current Video
-        private string RandomVideoName ()
-        {
-            return string.Empty;
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest(ex.Message);
+            }
         }
 
         private void ExtractFrameFromVideo(string directory, string fiileName)
@@ -177,27 +131,15 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 var imageName = fileName.Split('.').First();
 
                 //UPLOAD IMAGE TO FIREBASE 
-                //var baseString = GetBaseStringFromImagePath(item);
+                // var baseString = GetBaseStringFromImagePath(item);
                 byte[] imageArray = System.IO.File.ReadAllBytes(item);
-                //var uploadedContent = await FireBase.UploadDocumentAsync(fileName, imageName, item);
-
-                DocumentUploadResponse uploadContent = new DocumentUploadResponse();
-
-                using (var stream = new FileStream(item, FileMode.Open))
-                {
-                    uploadContent = await _restClientService.UploadDocument(new DocumentUploadRequest
-                    {
-                        FolderName = _appSettings.AzureContentFolderName,
-                        Base64String = ConvertToBase64(stream),
-                        FileName = "image-001.jpg"
-                    });
-                }
+                var uploadedContent = await FireBase.UploadDocumentAsync(fileName, imageName, item);
 
                 // Submit image to API. 
                 var attrs = new List<FaceAttributeType> { FaceAttributeType.HeadPose };
 
                 //TODO: USE IMAGE URL OF NETWORK
-                var faces = await client.Face.DetectWithUrlWithHttpMessagesAsync(uploadContent.Url, returnFaceId: false, returnFaceAttributes: attrs);
+                var faces = await client.Face.DetectWithUrlWithHttpMessagesAsync(uploadedContent, returnFaceId: false, returnFaceAttributes: attrs);
                 if (faces.Body.Count <= 0)
                 {
                     continue;
@@ -240,7 +182,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
                 }
             }
-
             return new Tuple<bool, bool, bool>(stepOneComplete, stepTwoComplete, stepThreeComplete);
         }
 
@@ -306,19 +247,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
             {
                 return null;
             }
-        }
-
-        public string ConvertToBase64(Stream stream)
-        {
-            byte[] bytes;
-            using (var memoryStream = new MemoryStream())
-            {
-                stream.CopyTo(memoryStream);
-                bytes = memoryStream.ToArray();
-            }
-
-            string base64 = Convert.ToBase64String(bytes);
-            return base64;
         }
     }
 }
