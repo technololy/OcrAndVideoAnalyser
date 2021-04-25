@@ -110,17 +110,22 @@ public class MIMETYPE
     public static string IMAGE => "image/jpeg";
 }
 
-public class AppSettings
-{
+//public class AppSettings
+//{ 
+//    public string ApiDocumentBaseUrl { get; set; }
 
-    public string UploadDrive { get; set; }
+//    public string AzureContentFolderName { get; set; }
 
-    public string DriveName { get; set; }
+//    public string MaximumUsageForOCR { get; set; }
 
-    public string FireBaseBucket { get; set; }
+//    public string UploadDrive { get; set; }
 
-    public string FireBaseSenderKey { get; set; }
+//    public string DriveName { get; set; }
 
-    public string RawHash { get; set; }
+//    public string FireBaseBucket { get; set; }
 
-}
+//    public string FireBaseSenderKey { get; set; }
+
+//    public string RawHash { get; set; }
+
+//}
