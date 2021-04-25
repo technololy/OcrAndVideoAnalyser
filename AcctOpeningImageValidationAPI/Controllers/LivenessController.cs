@@ -75,18 +75,20 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         [HttpPost]
         [Route("/liveness")]
-        public async Task<IActionResult> ProcessVideoFile([FromBody] ImageRequest model)
+        public async Task<IActionResult> ProcessVideoFile([FromBody] FaceRequest model)
         {
             try
             {
                 //TODO: Decrypt Data
-                var encryption = await Encryption.Encryption.Decrypt(model.Body, _appSettings.EncryptionKey, _appSettings.EncryptionIV);
+               // var encryption = await Encryption.Encryption.Decrypt(model.Body, _appSettings.EncryptionKey, _appSettings.EncryptionIV);
 
-                var req = JsonConvert.DeserializeObject<FaceRequest>(model.Body);
+               //var req = JsonConvert.DeserializeObject<FaceRequest>(model.Body);
 
                 var fileName = "test.mp4";
 
-                byte[] imageBytes = Convert.FromBase64String(req.VideoFile);
+                //byte[] imageBytes = Convert.FromBase64String(req.VideoFile);
+
+                byte[] imageBytes = Convert.FromBase64String(model.VideoFile);
 
                 string FilePath = Path.Combine(Directory.GetCurrentDirectory(), "files");
 
@@ -95,6 +97,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     if (!Directory.Exists(FilePath))
                     {
                         Directory.CreateDirectory(FilePath);
+
                         System.IO.File.WriteAllBytes(Path.Combine(FilePath, fileName), imageBytes);
                     }
                 }
@@ -104,6 +107,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
                 //Convert Image to stream
                 var headPoseResult = await RunHeadGestureOnImageFrame(FilePath);
+
                 var response = new Response
                 {
                     HeadNodingDetected = headPoseResult.Item1,
