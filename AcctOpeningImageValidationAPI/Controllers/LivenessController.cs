@@ -123,7 +123,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
             {
                 Console.WriteLine(ex.Message);
 
-                return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod("Unable to validate face, please try again!", false));
+                return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod($"Unable to validate face, please try again! Reason : {ex.Message}", false));
             }
         }
 
