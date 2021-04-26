@@ -82,12 +82,14 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     HeadRollingDetected = headPoseResult.Item2,
                     HeadShakingDetected = headPoseResult.Item3
                 };
-                return Ok(response);
+
+                return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<Response>("Successful", response, true));
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return BadRequest(ex.Message);
+
+                return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod(ex.ToString(), false));
             }
         }
 
