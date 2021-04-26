@@ -54,6 +54,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> ProcessVideoFile([FromBody] ImageRequest req)
         {
+
+            return Ok(req);
             try
             {
                 var fileName = "test.mp4";
