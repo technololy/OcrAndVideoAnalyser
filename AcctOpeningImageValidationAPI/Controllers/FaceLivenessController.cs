@@ -37,6 +37,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         private static int processStep = 1;
 
+        public List<HeadPoseData> HeadPoseData = new List<HeadPoseData>();
 
         private readonly static int activeFrames = 14;
 
@@ -83,7 +84,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     HeadShakingDetected = headPoseResult.Item3
                 };
 
-                return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<Response>("Successful", response, true));
+                return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", HeadPoseData, true));
             }
             catch (Exception ex)
             {
@@ -121,7 +122,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
             bool stepTwoComplete = false;
             bool stepThreeComplete = false;
 
-            var buff = new List<double>();
+            //var buff = new List<double>();
 
             var files = Directory.GetFiles(filePath);
             foreach (var item in files)
@@ -147,44 +148,56 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 {
                     continue;
                 }
+
                 var headPose = faces.Body.First().FaceAttributes?.HeadPose;
 
                 var pitch = headPose.Pitch;
                 var roll = headPose.Roll;
                 var yaw = headPose.Yaw;
 
-
-                if (runStepOne)
+                HeadPoseData.Add(new HeadPoseData
                 {
-                    headGestureResult = StepOne(buff, pitch);
-                    if (!string.IsNullOrEmpty(headGestureResult))
-                    {
-                        runStepOne = false;
-                        stepOneComplete = true;
-                    }
-                }
+                    Pitch = pitch,
+                    Roll = roll,
+                    Yaw = yaw
+                });
 
-                if (runStepTwo)
-                {
-                    headGestureResult = StepTwo(buff, pitch);
-                    if (!string.IsNullOrEmpty(headGestureResult))
-                    {
-                        runStepTwo = false;
-                        stepTwoComplete = true;
-                    }
-                }
+                //StepOne(buff, pitch);
+                //StepTwo(buff, pitch);
+                //StepThree(buff, pitch);
 
-                if (runStepThree)
-                {
-                    headGestureResult = StepThree(buff, pitch);
-                    if (!string.IsNullOrEmpty(headGestureResult))
-                    {
-                        runStepThree = false;
-                        stepThreeComplete = true;
-                    }
+                //if (runStepOne)
+                //{
+                //    headGestureResult = StepOne(buff, pitch);
+                //    if (!string.IsNullOrEmpty(headGestureResult))
+                //    {
+                //        runStepOne = false;
+                //        stepOneComplete = true;
+                //    }
+                //}
 
-                }
+                //if (runStepTwo)
+                //{
+                //    headGestureResult = StepTwo(buff, pitch);
+                //    if (!string.IsNullOrEmpty(headGestureResult))
+                //    {
+                //        runStepTwo = false;
+                //        stepTwoComplete = true;
+                //    }
+                //}
+
+                //if (runStepThree)
+                //{
+                //    headGestureResult = StepThree(buff, pitch);
+                //    if (!string.IsNullOrEmpty(headGestureResult))
+                //    {
+                //        runStepThree = false;
+                //        stepThreeComplete = true;
+                //    }
+
+                //}
             }
+
             return new Tuple<bool, bool, bool>(stepOneComplete, stepTwoComplete, stepThreeComplete);
         }
 
@@ -273,3 +286,20 @@ public class Response
     public bool HeadRollingDetected { get; set; }
 }
 
+
+public class HeadPoseData
+{
+    public double Pitch { get; set; }
+
+    public double Yaw { get; set; }
+
+    public double Roll { get; set; }
+
+    public string ImageUrl { get; set; }
+}
+
+
+public class HeadPoseResponse
+{
+    
+}
