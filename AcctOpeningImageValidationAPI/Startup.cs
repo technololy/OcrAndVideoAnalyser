@@ -44,6 +44,7 @@ namespace AcctOpeningImageValidationAPI
             services.AddScoped<IExternalImageValidationService, ExternalImageValidationService>();
             services.AddScoped<ReadAttributesFromFacialImage.IFaceValidation, ReadAttributesFromFacialImage.FaceValidation>();
             services.AddScoped<IOCRRepository, OCRRepository>();
+            services.AddScoped<IFaceRepository, FaceRepository>();
             services.AddScoped<RestClientService, RestClientService>();
             // Register the Swagger generator, defining 1 or more Swagger documents
 
