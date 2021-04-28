@@ -16,13 +16,13 @@ using Microsoft.Extensions.Hosting;
 
 namespace AcctOpeningImageValidationAPI.Controllers
 {
-    public class FaceLivenessController : Controller
+    public class FaceLivenessController : ControllerBase
     {
-
+ 
         private static IFaceClient client;
-        private readonly double _headPitchMaxThreshold = 25;
+        private readonly double _headPitchMaxThreshold = 9; //25
 
-        private readonly double _headPitchMinThreshold = -15;
+        private readonly double _headPitchMinThreshold = -9; //-15
 
         private readonly double _headYawMaxThreshold = 20;
 
@@ -37,7 +37,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         private static int processStep = 1;
 
-        public List<HeadPoseData> HeadPoseData = new List<HeadPoseData>();
 
         private readonly static int activeFrames = 14;
 
@@ -53,7 +52,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
         }
 
         [HttpPost]
-        [Route("liveness")]
         public async Task<IActionResult> ProcessVideoFile([FromBody] ImageRequest req)
         {
             try
@@ -71,26 +69,23 @@ namespace AcctOpeningImageValidationAPI.Controllers
                         System.IO.File.WriteAllBytes(Path.Combine(FilePath, fileName), imageBytes);
                     }
                 }
-                //Extract
+                // Extract
                 ExtractFrameFromVideo(FilePath, fileName);
 
                 //Convert Image to stream
                 var headPoseResult = await RunHeadGestureOnImageFrame(FilePath);
-
                 var response = new Response
                 {
                     HeadNodingDetected = headPoseResult.Item1,
-                    HeadRollingDetected = headPoseResult.Item2,
-                    HeadShakingDetected = headPoseResult.Item3
+                    HeadShakingDetected = headPoseResult.Item2,
+                    HeadRollingDetected = headPoseResult.Item3
                 };
-
-                return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", HeadPoseData, true));
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-
-                return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod(ex.ToString(), false));
+                return BadRequest(ex.Message);
             }
         }
 
@@ -122,7 +117,9 @@ namespace AcctOpeningImageValidationAPI.Controllers
             bool stepTwoComplete = false;
             bool stepThreeComplete = false;
 
-            //var buff = new List<double>();
+            var buffPitch = new List<double>();
+            var buffYaw = new List<double>();
+            var buffRoll = new List<double>();
 
             var files = Directory.GetFiles(filePath);
             foreach (var item in files)
@@ -148,71 +145,59 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 {
                     continue;
                 }
-
                 var headPose = faces.Body.First().FaceAttributes?.HeadPose;
 
                 var pitch = headPose.Pitch;
                 var roll = headPose.Roll;
                 var yaw = headPose.Yaw;
 
-                HeadPoseData.Add(new HeadPoseData
+
+                if (runStepOne)
                 {
-                    Pitch = pitch,
-                    Roll = roll,
-                    Yaw = yaw
-                });
+                    headGestureResult = StepOne(buffPitch, pitch);
+                    if (!string.IsNullOrEmpty(headGestureResult))
+                    {
+                        runStepOne = false;
+                        stepOneComplete = true;
+                    }
+                }
 
-                //StepOne(buff, pitch);
-                //StepTwo(buff, pitch);
-                //StepThree(buff, pitch);
+                if (runStepTwo)
+                {
+                    headGestureResult = StepTwo(buffYaw, yaw);
+                    if (!string.IsNullOrEmpty(headGestureResult))
+                    {
+                        runStepTwo = false;
+                        stepTwoComplete = true;
+                    }
+                }
 
-                //if (runStepOne)
-                //{
-                //    headGestureResult = StepOne(buff, pitch);
-                //    if (!string.IsNullOrEmpty(headGestureResult))
-                //    {
-                //        runStepOne = false;
-                //        stepOneComplete = true;
-                //    }
-                //}
+                if (runStepThree)
+                {
+                    headGestureResult = StepThree(buffRoll, roll);
+                    if (!string.IsNullOrEmpty(headGestureResult))
+                    {
+                        runStepThree = false;
+                        stepThreeComplete = true;
+                    }
 
-                //if (runStepTwo)
-                //{
-                //    headGestureResult = StepTwo(buff, pitch);
-                //    if (!string.IsNullOrEmpty(headGestureResult))
-                //    {
-                //        runStepTwo = false;
-                //        stepTwoComplete = true;
-                //    }
-                //}
-
-                //if (runStepThree)
-                //{
-                //    headGestureResult = StepThree(buff, pitch);
-                //    if (!string.IsNullOrEmpty(headGestureResult))
-                //    {
-                //        runStepThree = false;
-                //        stepThreeComplete = true;
-                //    }
-
-                //}
+                }
             }
-
             return new Tuple<bool, bool, bool>(stepOneComplete, stepTwoComplete, stepThreeComplete);
         }
 
-        private string StepOne(List<double> buff, double pitch)
+        private string StepOne(List<double> buffPitch, double pitch)
         {
-            buff.Add(pitch);
-            if (buff.Count > activeFrames)
+            buffPitch.Add(pitch);
+            if (buffPitch.Count > activeFrames)
             {
-                buff.RemoveAt(0);
+                buffPitch.RemoveAt(0);
             }
 
-            var max = buff.Max();
-            var min = buff.Min();
+            var max = buffPitch.Max();
+            var min = buffPitch.Min();
 
-            if (max > _headPitchMaxThreshold && min < _headPitchMinThreshold)
+            if (min < _headPitchMinThreshold && max > _headPitchMaxThreshold)
             {
                 return "Nodding Detected success.";
             }
@@ -222,16 +207,16 @@ namespace AcctOpeningImageValidationAPI.Controllers
             }
         }
 
-        private string StepTwo(List<double> buff, double yaw)
+        private string StepTwo(List<double> buffYaw, double yaw)
         {
-            buff.Add(yaw);
-            if (buff.Count > activeFrames)
+            buffYaw.Add(yaw);
+            if (buffYaw.Count > activeFrames)
             {
-                buff.RemoveAt(0);
+                buffYaw.RemoveAt(0);
             }
 
-            var max = buff.Max();
-            var min = buff.Min();
+            var max = buffYaw.Max();
+            var min = buffYaw.Min();
 
             if (min < _headYawMinThreshold && max > _headYawMaxThreshold)
             {
@@ -243,16 +228,16 @@ namespace AcctOpeningImageValidationAPI.Controllers
             }
         }
 
-        private string StepThree(List<double> buff, double roll)
+        private string StepThree(List<double> buffRoll, double roll)
         {
-            buff.Add(roll);
-            if (buff.Count > activeFrames)
+            buffRoll.Add(roll);
+            if (buffRoll.Count > activeFrames)
             {
-                buff.RemoveAt(0);
+                buffRoll.RemoveAt(0);
             }
 
-            var max = buff.Max();
-            var min = buff.Min();
+            var max = buffRoll.Max();
+            var min = buffRoll.Min();
 
             if (min < _headRollMinThreshold && max > _headRollMaxThreshold)
             {
@@ -286,20 +271,3 @@ public class Response
     public bool HeadRollingDetected { get; set; }
 }
 
-
-public class HeadPoseData
-{
-    public double Pitch { get; set; }
-
-    public double Yaw { get; set; }
-
-    public double Roll { get; set; }
-
-    public string ImageUrl { get; set; }
-}
-
-
-public class HeadPoseResponse
-{
-    
-}
