@@ -17,8 +17,6 @@ using Microsoft.Extensions.Options;
 
 namespace AcctOpeningImageValidationAPI.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
     public class FaceLivenessController : ControllerBase
     {
 
@@ -54,10 +52,16 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// <param name="req"></param>
         /// <returns></returns>
         [HttpPost]
+        [Route("liveness")]
         public async Task<IActionResult> ProcessVideoFile([FromBody] FaceRequest model)
         {
             try
             {
+                if(!ModelState.IsValid)
+                {
+                    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<LivenessCheckResponse>("All fields are required", null, false));
+                }
+
                 //Set File Name
                 var fileName = $"{model.UserIdentification}.${_setting.LivenessVideoFormat}";
 
@@ -87,7 +91,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     HeadRollingDetected = headPoseResult.Item3
                 };
 
-                return Ok(response);
+                return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", response, true));
             }
             catch (Exception ex)
             {
