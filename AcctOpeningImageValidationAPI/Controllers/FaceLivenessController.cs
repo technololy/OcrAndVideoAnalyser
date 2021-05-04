@@ -116,9 +116,17 @@ namespace AcctOpeningImageValidationAPI.Controllers
             //TODO: This should be limited to 9 Seconds video
             while (i < mp4.Metadata.Duration.Seconds)
             {
+                //Conversion Options Settings
                 var options = new ConversionOptions { Seek = TimeSpan.FromSeconds(i), };
+
+                //Constructing the output file
                 var outputFile = new MediaFile { Filename = string.Format("{0}\\image-{1}.jpeg", Path.Combine(directory), i) };
+
+                //Actual extraction of image
                 engine.GetThumbnail(mp4, outputFile, options);
+
+                //This is weird, but we've got to rotate it
+                //Discalimer: DO NOT COMMENT, THIS IS THE PILLAR OF THE ENTIRE PROCESS!!!
                 RotateImage(outputFile.Filename);
                 i++;
             }
