@@ -195,39 +195,40 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
             foreach (var item in items)
             {
+                //Neglect any file ending .mp4
                 if (item.EndsWith("mp4"))
                 {
                     continue;
                 }
 
-                var fileName = item.Split('\\').Last();
+                //Extract file name and extension
+                var fileName = item.Split('\\').Last(); var imageName = fileName.Split('.').First();
 
-                var imageName = fileName.Split('.').First();
-
-                //UPLOAD IMAGE TO FIREBASE 
                 // var baseString = GetBaseStringFromImagePath(item);
                 byte[] imageArray = System.IO.File.ReadAllBytes(item);
-                 
+
+                //Convert Image From Byte Array To Stream
                 Stream stream = new MemoryStream(imageArray);
 
                 // Submit image to API. 
                 var attrs = new List<FaceAttributeType> { FaceAttributeType.HeadPose };
 
-                //TODO: USE IMAGE URL OF NETWORK
                 //var faces = await client.Face.DetectWithUrlWithHttpMessagesAsync(uploadedContent, returnFaceId: false, returnFaceAttributes: attrs);
                 var faces = await client.Face.DetectWithStreamWithHttpMessagesAsync(stream, returnFaceId: false, returnFaceAttributes: attrs);
+
+                //Check if Face is a Human face
                 if (faces.Body.Count <= 0)
                 {
                     continue;
                 }
 
+                //Get Head Pose (For Liveness Algorithm Check) Object
                 var headPose = faces.Body.First().FaceAttributes?.HeadPose;
 
-                var pitch = headPose.Pitch;
-                var roll = headPose.Roll;
-                var yaw = headPose.Yaw;
+                //Get Pitch, Roll and Yaw values as a determinant for each Head Pose
+                var pitch = headPose.Pitch; var roll = headPose.Roll; var yaw = headPose.Yaw;
 
-
+                //Run Step One, Pitch Algorithm and Value Calculation
                 if (runStepOne)
                 {
                     headGestureResult = StepOne(buffPitch, pitch);
@@ -238,6 +239,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     }
                 }
 
+                //Run Step Two, Yaw Algorithm and Value Calculation
                 if (runStepTwo)
                 {
                     headGestureResult = StepTwo(buffYaw, yaw);
@@ -248,6 +250,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     }
                 }
 
+                //Run Step Three, Roll Algorithm and Value Calculation
                 if (runStepThree)
                 {
                     headGestureResult = StepThree(buffRoll, roll);
