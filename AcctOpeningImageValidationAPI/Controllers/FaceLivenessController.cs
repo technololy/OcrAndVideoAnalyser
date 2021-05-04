@@ -19,7 +19,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class FaceLivenessController : ControllerBase
     {
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// Constructor
         /// </summary>
         /// <param name="options"></param>
-        public WeatherForecastController(IOptions<AppSettings> options)
+        public FaceLivenessController(IOptions<AppSettings> options)
         {
             _setting = options.Value;
 
@@ -86,6 +86,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     HeadShakingDetected = headPoseResult.Item2,
                     HeadRollingDetected = headPoseResult.Item3
                 };
+
                 return Ok(response);
             }
             catch (Exception ex)
