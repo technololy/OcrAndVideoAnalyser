@@ -347,13 +347,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
             scannedIDCardDetails.Email = UserEmail;
 
-
-
-
-
-
-
-
             await context.ScannedIDCardDetail.AddAsync(scannedIDCardDetails);
             await context.SaveChangesAsync();
             return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<ScannedIDCardDetails>("Successful", scannedIDCardDetails, true));
