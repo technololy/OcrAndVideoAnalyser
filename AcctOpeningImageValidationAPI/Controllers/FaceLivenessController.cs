@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AcctOpeningImageValidationAPI.Helpers;
 using AcctOpeningImageValidationAPI.Models;
 using MediaToolkit;
 using MediaToolkit.Model;
@@ -12,7 +13,7 @@ using MediaToolkit.Options;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace AcctOpeningImageValidationAPI.Controllers
 {
@@ -20,7 +21,10 @@ namespace AcctOpeningImageValidationAPI.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-       
+
+        /// <summary>
+        /// Properties
+        /// </summary>
         private static IFaceClient client;
 
         private readonly double _headPitchMinThreshold = -9; //-15
@@ -31,12 +35,17 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         private readonly static int activeFrames = 14;
 
-        private readonly IHostingEnvironment _env;
+        private AppSettings _setting;
 
-        public WeatherForecastController(IHostingEnvironment env)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="options"></param>
+        public WeatherForecastController(IOptions<AppSettings> options)
         {
-            _env = env;
-            client = new FaceClient(new ApiKeyServiceClientCredentials("e8ef40efa4704769860e661c210a0fc5")) { Endpoint = "https://eastus.api.cognitive.microsoft.com" };
+            _setting = options.Value;
+
+            client = new FaceClient(new ApiKeyServiceClientCredentials(_setting.subscriptionKey)) { Endpoint = _setting.AzureFacialBaseUrl };
         }
 
         /// <summary>
@@ -45,35 +54,32 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// <param name="req"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> ProcessVideoFile([FromBody] FaceRequest req)
+        public async Task<IActionResult> ProcessVideoFile([FromBody] FaceRequest model)
         {
             try
             {
-                var fileName = "test.mp4";
+                //Set File Name
+                var fileName = $"{model.UserIdentification}.${_setting.LivenessVideoFormat}";
 
-                byte[] imageBytes = Convert.FromBase64String(req.VideoFile);
+                //Convert the images from Base64 to VideoBytes
+                byte[] videoBytes = Convert.FromBase64String(model.VideoFile);
 
-                string FilePath = Path.Combine(Directory.GetCurrentDirectory(), "filess");
+                //Get File Path from the root liveness directory
+                string FilePath = Path.Combine(Directory.GetCurrentDirectory(), _setting.LivenessRootFolder);
 
+                //Create directory always
                 Directory.CreateDirectory(FilePath);
 
-                System.IO.File.WriteAllBytes(Path.Combine(FilePath, fileName), imageBytes);
+                //Create Video File
+                System.IO.File.WriteAllBytes(Path.Combine(FilePath, fileName), videoBytes);
 
-                if (!System.IO.File.Exists(FilePath))
-                {
-                    if (!Directory.Exists(FilePath))
-                    {
-                        Directory.CreateDirectory(FilePath);
-                        System.IO.File.WriteAllBytes(Path.Combine(FilePath, fileName), imageBytes);
-                    }
-                }
-
-                // Extract
+                // Extract Frames From Video
                 ExtractFrameFromVideo(FilePath, fileName);
 
                 //Convert Image to stream
                 var headPoseResult = await RunHeadGestureOnImageFrame(FilePath);
 
+                //Return Response
                 var response = new LivenessCheckResponse
                 {
                     HeadNodingDetected = headPoseResult.Item1,
@@ -96,13 +102,18 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// <param name="fiileName"></param>
         private void ExtractFrameFromVideo(string directory, string fiileName)
         {
+            //Initiatlize Medial Took Kit to Extracting image(frame) from video
             var mp4 = new MediaFile { Filename = Path.Combine(directory, fiileName) };
             using var engine = new Engine();
 
-
+            //Getting Meta Data
             engine.GetMetadata(mp4);
 
+            //Initializing Seek to One
             var i = 0;
+
+            //Looping through
+            //TODO: This should be limited to 9 Seconds video
             while (i < mp4.Metadata.Duration.Seconds)
             {
                 var options = new ConversionOptions { Seek = TimeSpan.FromSeconds(i), };
@@ -243,7 +254,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         }
 
         /// <summary>
-        /// Step One Gesture
+        /// Step One Gesture - Pitch
         /// </summary>
         /// <param name="buffPitch"></param>
         /// <param name="pitch"></param>
@@ -270,7 +281,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         }
 
         /// <summary>
-        /// Step Two Gesture
+        /// Step Two Gesture - Yaw
         /// </summary>
         /// <param name="buffYaw"></param>
         /// <param name="yaw"></param>
@@ -297,7 +308,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         }
 
         /// <summary>
-        /// Step Three Gesture
+        /// Step Three Gesture - Roll
         /// </summary>
         /// <param name="buffRoll"></param>
         /// <param name="roll"></param>

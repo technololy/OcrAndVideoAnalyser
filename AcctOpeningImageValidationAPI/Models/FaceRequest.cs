@@ -7,5 +7,8 @@ namespace AcctOpeningImageValidationAPI.Models
     {
         [Required]
         public string VideoFile { get; set; }
+
+        [Required]
+        public string UserIdentification { get; set; }
     }
 }

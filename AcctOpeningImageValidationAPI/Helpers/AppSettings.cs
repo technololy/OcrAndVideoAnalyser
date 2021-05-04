@@ -18,5 +18,9 @@ namespace AcctOpeningImageValidationAPI.Helpers
         public string EncryptionIV { get; set; }
 
         public string ContentServerDirectory { get; set; }
+
+        public string LivenessRootFolder { get; set; }
+
+        public string LivenessVideoFormat { get; set; }
     }
 }
