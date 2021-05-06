@@ -25,7 +25,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// </summary>
         private static IFaceClient client;
 
-        private readonly double _headPitchMinThreshold = -9; //-15
+        private readonly double _headPitchMinThreshold = -15; //-15
 
         private readonly double _headYawMinThreshold = -20;
 
@@ -33,7 +33,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         private readonly static int activeFrames = 14;
 
-        private AppSettings _setting;
+        private readonly AppSettings _setting;
 
         /// <summary>
         /// Constructor
@@ -63,8 +63,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 }
 
                 //Set File Name
-                var fileName = $"{model.UserIdentification}.${_setting.LivenessVideoFormat}";
-
+                var fileName = $"{model.UserIdentification}.${_setting.LivenessVideoFormat}"; fileName = "test.mp4";
                 //Convert the images from Base64 to VideoBytes
                 byte[] videoBytes = Convert.FromBase64String(model.VideoFile);
 
@@ -88,7 +87,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 {
                     HeadNodingDetected = headPoseResult.Item1,
                     HeadShakingDetected = headPoseResult.Item2,
-                    HeadRollingDetected = headPoseResult.Item3
+                    HeadRollingDetected = headPoseResult.Item3,
+                    HasFaceSmile = headPoseResult.Item4
                 };
 
                 return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", response, true));
@@ -179,31 +179,22 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        private async Task<Tuple<bool, bool, bool>> RunHeadGestureOnImageFrame(string filePath)
+        private async Task<Tuple<bool, bool, bool, bool>> RunHeadGestureOnImageFrame(string filePath)
         {
-            var headGestureResult = string.Empty;
-            bool runStepOne = true;
-            bool runStepTwo = true;
-            bool runStepThree = true;
-            bool stepOneComplete = false;
-            bool stepTwoComplete = false;
-            bool stepThreeComplete = false;
+            var isSmiled = false;
 
-            var buffPitch = new List<double>();
-            var buffYaw = new List<double>();
-            var buffRoll = new List<double>();
+            var headGestureResult = string.Empty; bool runStepOne = true; bool runStepTwo = true; bool runStepThree = true;
 
-            var files = Directory.GetFiles(filePath);
+            bool stepOneComplete = false; bool stepTwoComplete = false; bool stepThreeComplete = false;
 
-            var items = files.Reverse();
+            var buffPitch = new List<double>(); var buffYaw = new List<double>(); var buffRoll = new List<double>();
+
+            var files = Directory.GetFiles(filePath); var items = files.Reverse();
 
             foreach (var item in items)
             {
                 //Neglect any file ending .mp4
-                if (item.EndsWith("mp4"))
-                {
-                    continue;
-                }
+                if (item.EndsWith("mp4")) { continue; }
 
                 //Extract file name and extension
                 var fileName = item.Split('\\').Last(); var imageName = fileName.Split('.').First();
@@ -215,7 +206,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 Stream stream = new MemoryStream(imageArray);
 
                 // Submit image to API. 
-                var attrs = new List<FaceAttributeType> { FaceAttributeType.HeadPose };
+                var attrs = new List<FaceAttributeType> { FaceAttributeType.HeadPose, FaceAttributeType.Smile };
 
                 //var faces = await client.Face.DetectWithUrlWithHttpMessagesAsync(uploadedContent, returnFaceId: false, returnFaceAttributes: attrs);
                 var faces = await client.Face.DetectWithStreamWithHttpMessagesAsync(stream, returnFaceId: false, returnFaceAttributes: attrs);
@@ -228,6 +219,16 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
                 //Get Head Pose (For Liveness Algorithm Check) Object
                 var headPose = faces.Body.First().FaceAttributes?.HeadPose;
+
+                //Check if this person has smile
+                var smilePose = faces.Body.First().FaceAttributes?.Smile;
+
+                //Smile. The smile expression of the given face. This value is between zero for no smile and one for a clear smile.
+
+                if (smilePose > 0)
+                {
+                    isSmiled = true;
+                }
 
                 //Get Pitch, Roll and Yaw values as a determinant for each Head Pose
                 var pitch = headPose.Pitch; var roll = headPose.Roll; var yaw = headPose.Yaw;
@@ -263,10 +264,9 @@ namespace AcctOpeningImageValidationAPI.Controllers
                         runStepThree = false;
                         stepThreeComplete = true;
                     }
-
                 }
             }
-            return new Tuple<bool, bool, bool>(stepOneComplete, stepTwoComplete, stepThreeComplete);
+            return new Tuple<bool, bool, bool, bool>(stepOneComplete, stepTwoComplete, stepThreeComplete, isSmiled);
         }
 
         /// <summary>
