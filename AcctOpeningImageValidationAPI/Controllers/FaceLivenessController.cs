@@ -59,11 +59,12 @@ namespace AcctOpeningImageValidationAPI.Controllers
             {
                 if(!ModelState.IsValid)
                 {
-                    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<LivenessCheckResponse>("All fields are required", null, false));
+                    return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<LivenessCheckResponse>("All fields are required", null, false));
                 }
 
                 //Set File Name
-                var fileName = $"{model.UserIdentification}.${_setting.LivenessVideoFormat}"; fileName = "test.mp4";
+                var fileName = $"{model.UserIdentification}.${_setting.LivenessVideoFormat}";
+
                 //Convert the images from Base64 to VideoBytes
                 byte[] videoBytes = Convert.FromBase64String(model.VideoFile);
 
@@ -224,7 +225,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 var smilePose = faces.Body.First().FaceAttributes?.Smile;
 
                 //Smile. The smile expression of the given face. This value is between zero for no smile and one for a clear smile.
-
                 if (smilePose > 0)
                 {
                     isSmiled = true;
