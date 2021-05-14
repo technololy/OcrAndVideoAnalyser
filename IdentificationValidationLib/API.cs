@@ -53,8 +53,6 @@ namespace IdentificationValidationLib
         public API()
         {
             client = new HttpClient();
-
-
         }
 
         public async Task<(bool isSuccess, string returnedStringContent, sT1 SuccessObj, fT2 failedObj)> Post<sT1, fT2>(object model, string endPoint)//T1 is success mode, T2 is failure model

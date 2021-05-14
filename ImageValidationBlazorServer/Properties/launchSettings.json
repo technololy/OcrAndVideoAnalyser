@@ -15,13 +15,14 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             }
         },
-        "ImageValidationBlazorServer": {
-            "commandName": "Project",
-            "launchBrowser": true,
-            "applicationUrl": "https://localhost:44509;http://localhost:61837",
-            "environmentVariables": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            }
+      "ImageValidationBlazorServer": {
+        "commandName": "Project",
+        "launchBrowser": true,
+        //"applicationUrl": "https://localhost:44509;http://localhost:61837",
+        "applicationUrl": "https://localhost:44609;http://localhost:44509",
+        "environmentVariables": {
+          "ASPNETCORE_ENVIRONMENT": "Development"
         }
+      }
     }
 }

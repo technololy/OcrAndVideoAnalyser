@@ -1,44 +1,60 @@
-﻿
-@page "/CompareTwoFace"
+﻿@page "/docs/face/compare"
+@layout DocumentLayout
 @inject IFileReaderService fileReader;
 @inject IHttpClientFactory ClientFactory
 @inject IToastService toastService
-
 @inject IConfiguration Configuration
 
+<article>
+    <h2 id="example">Compare Two Faces</h2>
+    <p>Creating a step component is so easy. Simply use a <code>&lt;ul class="step-text"></code> tag. You can have sub-steps with nested lists.</p>
 
-<div class="card">
-    <div class="card-header">
-        This process scans a two facial image and validates it
+    <div class="code-preview">
+        <h5>Two Face validation API takes 2 images as input. The first one is the target and while the second is the source image</h5>
+        <br>
+        <ul class="step-text">
+            <li>
+                <h5>Select the target image (Left)</h5>
+                <p>A gallery can go anywhere on a page or post - by itself on a blank page, or above, below, or in the midst of text. Start by placing your cursor where you want the gallery to appear.</p>
+            </li>
 
+            <li>
+                <h5>Click and open the source image (Right)</h5>
+                <p>Once you've placed your cursor where you want your image gallery to appear, click on the Add Media button (located left above the editing window) to launch the media uploader interface. In the resulting popup window, select the 'Create a Gallery' option from the list of actions on the left.</p>
+            </li>
+        </ul>
     </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <h5 class="card-title">Select file 1 from gallery</h5>
-                <input class="form-control-file" type="file" accept="image/*" @ref="elementReference1" capture @onchange="HandleSelected1" />
-            </div>
-            <div class="col-md-6">
-                <h5 class="card-title">Select file 2 from gallery</h5>
-                <input class="form-control-file" type="file" accept="image/*" @ref="elementReference2" capture @onchange="HandleSelected2" />
+</article>
+
+<article>
+    <h2 id="example">Try It Out! - Playground</h2>
+    <p class="lead">The following is a simulation using our already made sample application.</p>
+
+    <div class="code-preview">
+        <h5>Select Images To Compare</h5>
+        <br>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="card-title">Select file 1 from gallery</h5>
+                    <input class="form-control-file" type="file" accept="image/*" @ref="elementReference1" capture @onchange="HandleSelected1" />
+                </div>
+                <div class="col-md-6">
+                    <h5 class="card-title">Select file 2 from gallery</h5>
+                    <input class="form-control-file" type="file" accept="image/*" @ref="elementReference2" capture @onchange="HandleSelected2" />
+                </div>
             </div>
         </div>
-
     </div>
-</div>
-<br />
+</article>
 
 <div class="row">
-
     @if (showDetails1)
     {
-
         <div class="card col-md-6 ">
             <img src="@imgData1" class="card-img-top img-thumbnail" style="width: 250px; height:250px" alt="your image" />
             <div class="card-body">
                 <h5 class="card-title">Preview details of the selected file</h5>
-
-
 
                 <ul class="list-group">
                     <li class="list-group-item">Name:@name1</li>
@@ -47,18 +63,11 @@
 
                 </ul>
                 <br />
-
             </div>
         </div>
 
         <br />
-
-
-
-
     }
-
-
 
     @if (showDetails2)
     {
@@ -67,25 +76,15 @@
             <img src="@imgData2" class="card-img-top img-thumbnail" style="width: 250px; height:250px" alt="your image" />
             <div class="card-body">
                 <h5 class="card-title">Preview details of the selected file</h5>
-
-
-
                 <ul class="list-group">
                     <li class="list-group-item">Name:@name2</li>
                     <li class="list-group-item">Size:@size2 </li>
                     <li class="list-group-item">Type:@type2</li>
-
                 </ul>
                 <br />
-
             </div>
         </div>
-
         <br />
-
-
-
-
     }
 </div>
 
@@ -125,7 +124,6 @@
                             <InputText class="form-control" @bind-Value="@ValidateInput.UserName" />
                         </div>
 
-
                         @if (IsRunning)
                         {
                             <button class="btn btn-primary btn-lg btn-block mx-auto disabled" disabled><span class='fa-left fas fa-sync-alt spinning'></span>Please wait...</button>
@@ -135,15 +133,11 @@
                             <button class="btn btn-primary btn-outline-primary btn-lg btn-block mx-auto">Begin Facial Process</button>
                         }
 
-
                     </EditForm>
-
-
 
                 </div>
             </div>
         </div>
-
     }
     <br />
     @if (showCompareDetails)
@@ -152,7 +146,6 @@
             <div class="card-header">
                 Document Details
             </div>
-
 
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">Confidence: @documentData.data.Confidence</li>
@@ -165,6 +158,23 @@
     <br />
 </div>
 
+<h4 id="code-blocks-pre">Sample API Request</h4>
+<p>Use <code>&lt;pre&gt;</code> for multiple lines of code. Be sure to escape any angle brackets in the code for proper rendering.</p>
+<div class="code-snippet">
+    <div class="code-preview">
+        <pre><code>POST</code>&nbsp;&nbsp;<code>/FacialrecogAPI/liveness</code></pre>
+    </div>
+    <pre class="no-toolbar">
+        <code class="language-markup">
+            {
+                "email": "string",
+                "base64Encoded": "string",
+                "userName": "string",
+                "base64EncodedTarget": "string"
+            }
+        </code>
+    </pre>
+</div>
 
 @code {
 
@@ -196,7 +206,6 @@
     string AlertMessage;
     Models.ValidateInputModel ValidateInput = new Models.ValidateInputModel();
 
-
     async Task HandleSelected1()
     {
         var file = (await fileReader.CreateReference(elementReference1).EnumerateFilesAsync()).FirstOrDefault();
@@ -222,9 +231,6 @@
         }
         ShowProcessForm = false;
         StateHasChanged();
-
-
-
     }
 
     async Task HandleSelected2()
@@ -240,6 +246,7 @@
             imgByte2 = Convert.ToBase64String(inputStream.ToArray());
             imgData2 = "data:" + fileInfo.Type + ";base64," + imgByte2;
         }
+
         showDetails2 = true;
 
         if (showDetails1 && showDetails2)
@@ -249,13 +256,10 @@
         else
         {
             ShowProcessButton = false;
-
         }
 
         ShowProcessForm = false;
         StateHasChanged();
-
-
 
     }
 
@@ -307,18 +311,13 @@
                 toastService.ShowError(result.returnedStringContent);
                 showCompareDetails = false;
                 ShowProcessForm = false;
-
-
-
             }
-
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine(ex);
 
             toastService.ShowError(ex.ToString());
-
         }
         finally
         {
@@ -327,5 +326,4 @@
             StateHasChanged();
         }
     }
-
 }

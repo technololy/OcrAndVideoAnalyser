@@ -1,31 +1,65 @@
-﻿@page "/ValidateStaticFace"
-
+﻿@page "/docs/face/validate"
+@layout DocumentLayout
 
 @inject IFileReaderService fileReader;
 @inject IHttpClientFactory ClientFactory
+@*<div class="card">
+        <div class="card-header">
+            Select file from gallery
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">This process scans a facial image and validates it</h5>
+            <input class="form-control-file" type="file" accept="image/*" @ref="elementReference1" capture @onchange="HandleSelected" />
 
-<div class="card">
-    <div class="card-header">
-        Select file from gallery
+        </div>
     </div>
-    <div class="card-body">
-        <h5 class="card-title">This process scans a facial image and validates it</h5>
-        <input class="form-control-file" type="file" accept="image/*" @ref="elementReference1" capture @onchange="HandleSelected" />
+    <br />*@
 
+<article>
+    <h2 id="example">Validate Single Face</h2>
+    <p>Creating a step component is so easy. Simply use a <code>&lt;ul class="step-text"></code> tag. You can have sub-steps with nested lists.</p>
+
+    <div class="code-preview">
+        <h5>Two Face validation API takes 2 images as input. The first one is the target and while the second is the source image</h5>
+        <br>
+        <ul class="step-text">
+            <li>
+                <h5>Select the target image (Left)</h5>
+                <p>A gallery can go anywhere on a page or post - by itself on a blank page, or above, below, or in the midst of text. Start by placing your cursor where you want the gallery to appear.</p>
+            </li>
+
+            <li>
+                <h5>Click and open the source image (Right)</h5>
+                <p>Once you've placed your cursor where you want your image gallery to appear, click on the Add Media button (located left above the editing window) to launch the media uploader interface. In the resulting popup window, select the 'Create a Gallery' option from the list of actions on the left.</p>
+            </li>
+        </ul>
     </div>
-</div>
-<br />
+</article>
 
+<article>
+    <h2 id="example">Try It Out! - Playground</h2>
+    <p class="lead">The following is a simulation using our already made sample application.</p>
+
+    <div class="code-preview">
+        <h5>Select Images For Validation</h5>
+        <br>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="card-title">Select image from gallery</h5>
+                    <input class="form-control-file" type="file" accept="image/*" @ref="elementReference1" capture @onchange="HandleSelected" />
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
 
 @if (showDetails)
 {
-
     <div class="card" style="width: 38rem;">
         <img src="@imgData" class="card-img-top" alt="your image" />
         <div class="card-body">
             <h5 class="card-title">Preview details of the selected file</h5>
-
-
 
             <ul class="list-group">
                 <li class="list-group-item">Name:@name</li>
@@ -95,8 +129,6 @@
 
     <br />
 
-
-
 }
 
 @if (showFaceDetails)
@@ -120,6 +152,23 @@
         </ul>
     </div>
 }
+
+<h4 id="code-blocks-pre">Sample API Request</h4>
+<p>Use <code>&lt;pre&gt;</code> for multiple lines of code. Be sure to escape any angle brackets in the code for proper rendering.</p>
+<div class="code-snippet">
+    <div class="code-preview">
+        <pre><code>POST</code>&nbsp;&nbsp;<code>/FacialrecogAPI/ValidateFaceImage</code></pre>
+    </div>
+    <pre class="no-toolbar">
+    <code class="language-markup">
+            {
+                "email": "string",
+                "base64Encoded": "string",
+                "userName": "string"
+            }
+        </code>
+    </pre>
+</div>
 
 @code {
     private EditContext editContext;

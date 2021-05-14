@@ -1,0 +1,226 @@
+﻿@inherits LayoutComponentBase
+
+@code {
+
+}
+
+<nav class="navbar navbar-expand-lg navbar-light navbar-stick-dark">
+    <div class="container">
+
+        <div class="navbar-left">
+            <button class="navbar-toggler" type="button">&#9776;</button>
+            <a class="navbar-brand" href="introduction">
+                <img class="logo-dark" src="../assets/img/logo-dark.png" alt="logo">
+                <img class="logo-light" src="../assets/img/logo-light.png" alt="logo">
+            </a>
+        </div>
+
+        <section class="navbar-mobile">
+            <span class="navbar-divider d-mobile-none"></span>
+
+            <ul class="nav nav-navbar">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Layouts <span class="arrow"></span></a>
+                    <nav class="nav">
+                        <a class="nav-link" href="../layout/general-1.html">General 1</a>
+                        <a class="nav-link" href="../layout/general-2.html">General 2</a>
+                        <a class="nav-link" href="../layout/general-3.html">General 3</a>
+                        <a class="nav-link" href="../layout/minimal-1.html">Minimal 1</a>
+                        <a class="nav-link" href="../layout/minimal-2.html">Minimal 2</a>
+                        <a class="nav-link" href="../layout/one-page-1.html">One Page</a>
+                    </nav>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Help Center <span class="arrow"></span></a>
+                    <ul class="nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Homepage <span class="arrow"></span></a>
+                            <nav class="nav">
+                                <a class="nav-link" href="../help/homepage-1.html">Homepage 1</a>
+                                <a class="nav-link" href="../help/homepage-2.html">Homepage 2</a>
+                            </nav>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Archive <span class="arrow"></span></a>
+                            <nav class="nav">
+                                <a class="nav-link" href="../help/archive-1.html">Archive 1</a>
+                                <a class="nav-link" href="../help/archive-2.html">Archive 2</a>
+                                <a class="nav-link" href="../help/archive-3.html">Archive 3</a>
+                            </nav>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Article <span class="arrow"></span></a>
+                            <nav class="nav">
+                                <a class="nav-link" href="../help/article-1.html">Article 1</a>
+                                <a class="nav-link" href="../help/article-2.html">Article 2</a>
+                                <a class="nav-link" href="../help/article-3.html">Article 3</a>
+                            </nav>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">FAQ <span class="arrow"></span></a>
+                            <nav class="nav">
+                                <a class="nav-link" href="../help/faq-1.html">FAQ 1</a>
+                                <a class="nav-link" href="../help/faq-2.html">FAQ 2</a>
+                                <a class="nav-link" href="../help/faq-3.html">FAQ 3</a>
+                            </nav>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Pages <span class="arrow"></span></a>
+                    <ul class="nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Contact <span class="arrow"></span></a>
+                            <nav class="nav">
+                                <a class="nav-link" href="../page/contact-1.html">Contact 1</a>
+                                <a class="nav-link" href="../page/contact-2.html">Contact 2</a>
+                            </nav>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Changelog <span class="arrow"></span></a>
+                            <nav class="nav">
+                                <a class="nav-link" href="../page/changelog-1.html">Changelog 1</a>
+                                <a class="nav-link" href="../page/changelog-2.html">Changelog 2</a>
+                            </nav>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="../page/terms.html">Terms</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="../page/error-404.html">Error 404</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Docs <span class="arrow"></span></a>
+                    <nav class="nav">
+                        <a class="nav-link" href="kb-introduction.html">Getting started</a>
+                        <a class="nav-link" href="typography.html">Content</a>
+                        <a class="nav-link" href="navbar.html">Layout</a>
+                        <a class="nav-link" href="accordion.html">Components</a>
+                    </nav>
+                </li>
+            </ul>
+        </section>
+
+        <a class="btn btn-sm btn-round btn-danger" href="/">Subscribe</a>
+
+    </div>
+</nav><!-- /.navbar -->
+<!-- Header -->
+<header class="header text-white bg-dark pt-9 pb-5" style="background-image: linear-gradient(-20deg, #2b5876 0%, #dd2128 100%);">
+    <div class="container">
+        <h3>Documentation</h3>
+    </div>
+</header><!-- /.header -->
+<!-- Main Content -->
+<main class="main-content">
+    <div class="container">
+        <div class="row">
+
+            <!--
+            |‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒
+            | Sidebar
+            |‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒
+            !-->
+            <div class="col-md-4 col-xl-3 order-last order-md-first">
+                <hr class="d-md-none">
+                <aside class="sidebar sidebar-sticky sidebar-stick-shadow pr-md-5 br-1">
+                    <ul class="nav nav-sidebar nav-sidebar-hero" data-accordion="true">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Getting started <i class="nav-angle"></i></a>
+                            <div class="nav">
+                                <NavLink class ="nav-link active" href="introduction" Match="NavLinkMatch.All">Introduction</NavLink>
+                                    <a class="nav-link" href="kb-contents.html">Authentication</a>
+                                    <a class="nav-link" href="kb-basic-starter.html">Security Scheme</a>
+                                    <a class="nav-link" href="kb-expert-starter.html">Nigerian ID Card (Quick Validation)</a>
+                            </div>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Content <i class="nav-angle"></i></a>
+                            <div class="nav">
+                                <a class="nav-link" href="typography.html">Typography</a>
+                                <a class="nav-link" href="code.html">Code</a>
+                                <a class="nav-link" href="icon.html">Icon</a>
+                                <a class="nav-link" href="image.html">Image</a>
+                                <a class="nav-link" href="table.html">Table</a>
+                                <a class="nav-link" href="video.html">Video</a>
+                            </div>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Layout <i class="nav-angle"></i></a>
+                            <div class="nav">
+                                <a class="nav-link" href="navbar.html">Navbar</a>
+                                <a class="nav-link" href="sidebar.html">Sidebar</a>
+                                <a class="nav-link" href="toc.html">Table of content</a>
+                                <a class="nav-link" href="utility.html">Utility classes</a>
+                            </div>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Components <i class="nav-angle"></i></a>
+                            <div class="nav">
+                                <a class="nav-link" href="accordion.html">Accordion</a>
+                                <a class="nav-link" href="alert.html">Alert</a>
+                                <a class="nav-link" href="badge.html">Badge</a>
+                                <a class="nav-link" href="button.html">Button</a>
+                                <a class="nav-link" href="files.html">Files</a>
+                                <a class="nav-link" href="form.html">Form</a>
+                                <a class="nav-link" href="pagination.html">Pagination</a>
+                                <a class="nav-link" href="palette.html">Palette</a>
+                                <a class="nav-link" href="progress.html">Progress</a>
+                                <a class="nav-link" href="scroll.html">Scroll</a>
+                                <a class="nav-link" href="social.html">Social</a>
+                                <a class="nav-link" href="steps.html">Steps</a>
+                                <a class="nav-link" href="tab.html">Tab</a>
+                            </div>
+                        </li>
+
+                    </ul>
+                </aside>
+            </div>
+
+            <!--
+            |‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒
+            | Content
+            |‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒
+            !-->
+            <div class="col-md-7 col-xl-8 ml-md-auto py-8">
+                @Body
+            </div>
+
+
+        </div>
+    </div>
+</main><!-- /.main-content -->
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row gap-y align-items-center">
+
+            <div class="col-md-9">
+                <div class="nav justify-content-center justify-content-md-start">
+                    <a class="nav-link" href="/">Home</a>
+                    <a class="nav-link" href="introduction">Docs</a>
+                    <a class="nav-link" href="introduction">Changelog</a>
+                    <a class="nav-link" href="/">Subscribe</a>
+                </div>
+            </div>
+
+            <div class="col-md-3 text-center text-md-right">
+                <a href="/">© OneBank Cognitive Service</a>
+            </div>
+        </div>
+    </div>
+</footer>

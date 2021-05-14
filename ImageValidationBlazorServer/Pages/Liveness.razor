@@ -1,0 +1,41 @@
+﻿@page "/docs/face/liveness"
+@layout DocumentLayout
+@inject IJSRuntime JSRuntime
+
+
+<h1>Fun Blazor Web Camera Application</h1>
+<div>
+    <canvas id="@options.CanvasID"
+            style="background-color:lightgray;"
+            width="@options.Width"
+            height="360">
+    </canvas>
+</div>
+<div>
+    <button @onclick="Start">Start</button>
+</div>
+<div>
+    <video id="@options.VideoID"
+           style="background-color:lightblue; visibility:hidden;"
+           width="@options.Width">
+        Video stream not available.
+    </video>
+</div>
+
+@code{
+    Models.WebCamOptions options = new Models.WebCamOptions()
+    {
+        CanvasID = "canvas",
+        VideoID = "video"
+    };
+
+    protected override void OnInitialized()
+    {
+        options.Width = 480;
+    }
+
+    public async Task Start()
+    {
+        await JSRuntime.InvokeVoidAsync("WebCamFunctions.start", options);
+    }
+}

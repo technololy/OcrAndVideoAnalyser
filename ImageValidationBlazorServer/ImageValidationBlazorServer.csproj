@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BlazorMedia" Version="0.4.0.2" />
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0-preview.2.21154.6" />
     <PackageReference Include="Tewr.Blazor.FileReader" Version="3.0.0.20340" />
     <PackageReference Include="Blazored.Toast" Version="3.1.2" />
@@ -13,8 +14,5 @@
     <ProjectReference Include="..\IdentificationValidationLib\IdentificationValidationLib.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
   </ItemGroup>
 </Project>

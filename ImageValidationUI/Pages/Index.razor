@@ -1,7 +1,150 @@
 ﻿@page "/"
+<!--<h1>Image Validation using Azure form Recognizer</h1>
 
-<h1>Image Validation using Azure form Recognizer</h1>
-
-Click on the links to the left
-
+Click on the links to the left-->
 @*<SurveyPrompt Title="How is Blazor working for you?" />*@
+
+<section class="section py-9">
+    <div class="container">
+
+        <div class="row gap-y text-center">
+
+            <div class="col-md-4">
+                <a class="card px-6 py-8 shadow-11 hover-shadow-9 text-default border" href="help/archive-1.html">
+                    <p><i class="ti-book lead-7 text-danger"></i></p>
+                    <h5 class="fw-500 my-4">Knowledge Base</h5>
+                    <p class="mb-0">Get started using this template by reading the helpful articles.</p>
+                </a>
+            </div>
+
+            <div class="col-md-4">
+                <a class="card px-6 py-8 shadow-11 hover-shadow-9 text-default border" href="help/faq-1.html">
+                    <p><i class="ti-help lead-7 text-danger"></i></p>
+                    <h5 class="fw-500 my-4">FAQ</h5>
+                    <p class="mb-0">Lots of questions have asked before and have answers here.</p>
+                </a>
+            </div>
+
+            <div class="col-md-4">
+                <a class="card px-6 py-8 shadow-11 hover-shadow-9 text-default border" href="docs/kb-introduction.html">
+                    <p><i class="ti-agenda lead-7 text-danger"></i></p>
+                    <h5 class="fw-500 my-4">Documentation</h5>
+                    <p class="mb-0">Read our documentation to get start and browse the available UI kit.</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--
+|‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒
+| Featured articles
+|‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒
+!-->
+<section class="section bg-gray">
+    <div class="container">
+        <header class="section-header">
+            <h2>Quick Services</h2>
+            <hr>
+            <p class="lead">The following services are the most widely used services. One of them might be the one you look for.</p>
+        </header>
+
+
+        <div class="row gap-y">
+
+            <div class="col-md-6 col-xl-4">
+                <h6 class="fw-500">Getting started</h6>
+                <ul class="list-unstyled lead">
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="text-inherit" href="docs/kb-introduction.html">Introduction</a>
+                    </li>
+
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="text-inherit" href="docs/kb-contents.html">Authentication</a>
+                    </li>
+
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="text-inherit" href="docs/kb-basic-starter.html">Security Scheme</a>
+                    </li>
+
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="text-inherit" href="docs/kb-expert-starter.html">Nigerian ID Card (Quick Validation)</a>
+                    </li>
+
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="small" href="docs/kb-introduction.html">See All (4)</a>
+                    </li>
+                </ul>
+            </div>
+
+
+            <div class="col-md-6 col-xl-4">
+                <h6 class="fw-500">Face API</h6>
+                <ul class="list-unstyled lead">
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="text-inherit" href="docs/typography.html">Single Face Validation</a>
+                    </li>
+
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="text-inherit" href="docs/code.html">Multiple Face Validation</a>
+                    </li>
+
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="text-inherit" href="docs/icon.html">Face Comparison</a>
+                    </li>
+
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="text-inherit" href="docs/table.html">Face - BVN Match</a>
+                    </li>
+
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="small" href="docs/typography.html">See All (6)</a>
+                    </li>
+                </ul>
+            </div>
+
+
+            <div class="col-md-6 col-xl-4">
+                <h6 class="fw-500">Human Liveness - Security</h6>
+                <ul class="list-unstyled lead">
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="text-inherit" href="docs/button.html">Validate Liveness</a>
+                    </li>
+
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="text-inherit" href="docs/form.html">Validate HeadPose</a>
+                    </li>
+
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="text-inherit" href="docs/alert.html">Confidence Value</a>
+                    </li>
+
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="text-inherit" href="docs/palette.html">Liveness BVN Validation</a>
+                    </li>
+
+                    <li>
+                        <i class="fa fa-caret-right text-primary small-1 mr-2"></i>
+                        <a class="small" href="docs/accordion.html">See All (13)</a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+</section>

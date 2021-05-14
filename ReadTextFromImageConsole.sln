@@ -1,33 +1,34 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadTextFromImageConsole", "ReadTextFromImageConsole\ReadTextFromImageConsole.csproj", "{66CF547C-3FFC-4749-A9F6-ED24565A4D22}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReadTextFromImageConsole", "ReadTextFromImageConsole\ReadTextFromImageConsole.csproj", "{66CF547C-3FFC-4749-A9F6-ED24565A4D22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadAttributesFromFacialImage", "ReadAttributesFromFacialImage\ReadAttributesFromFacialImage.csproj", "{8411F168-8A18-4D34-8D53-42E357E9246E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReadAttributesFromFacialImage", "ReadAttributesFromFacialImage\ReadAttributesFromFacialImage.csproj", "{8411F168-8A18-4D34-8D53-42E357E9246E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlertsAndRestriction", "AlertsAndRestriction\AlertsAndRestriction.csproj", "{38F9DBDF-86E3-49A8-9DBA-0275363824CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlertsAndRestriction", "AlertsAndRestriction\AlertsAndRestriction.csproj", "{38F9DBDF-86E3-49A8-9DBA-0275363824CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SendImageToOneExpress", "SendImageToOneExpress\SendImageToOneExpress.csproj", "{11F36EC7-25DA-4EF5-9637-7F0FF9D4FC5D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SendImageToOneExpress", "SendImageToOneExpress\SendImageToOneExpress.csproj", "{11F36EC7-25DA-4EF5-9637-7F0FF9D4FC5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentificationValidationLib", "IdentificationValidationLib\IdentificationValidationLib.csproj", "{AA41B6A0-B557-4052-986B-D36C0EA33CDA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentificationValidationLib", "IdentificationValidationLib\IdentificationValidationLib.csproj", "{AA41B6A0-B557-4052-986B-D36C0EA33CDA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggingLib", "LoggingLib\LoggingLib.csproj", "{91C009D4-E296-42A7-B3AB-08E696306BB8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoggingLib", "LoggingLib\LoggingLib.csproj", "{91C009D4-E296-42A7-B3AB-08E696306BB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcctOpeningImageValidationAPI", "AcctOpeningImageValidationAPI\AcctOpeningImageValidationAPI.csproj", "{B2A3FD62-9C28-43AB-AC09-3103EC3853BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AcctOpeningImageValidationAPI", "AcctOpeningImageValidationAPI\AcctOpeningImageValidationAPI.csproj", "{B2A3FD62-9C28-43AB-AC09-3103EC3853BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlDataClientLib", "SqlDataClientLib\SqlDataClientLib.csproj", "{5EF84AC5-CDCD-4666-8D46-345F1EC31966}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlDataClientLib", "SqlDataClientLib\SqlDataClientLib.csproj", "{5EF84AC5-CDCD-4666-8D46-345F1EC31966}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelLib", "ModelLib\ModelLib.csproj", "{36C98A7E-0BE2-4B46-BC84-9DCD9C873E03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModelLib", "ModelLib\ModelLib.csproj", "{36C98A7E-0BE2-4B46-BC84-9DCD9C873E03}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperLib", "HelperLib\HelperLib.csproj", "{1849A843-3AA9-4A82-9464-90951DEE9E42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelperLib", "HelperLib\HelperLib.csproj", "{1849A843-3AA9-4A82-9464-90951DEE9E42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageValidationUI", "ImageValidationUI\ImageValidationUI.csproj", "{EE074501-9B3B-4AB1-9A18-5A4A53292854}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImageValidationUI", "ImageValidationUI\ImageValidationUI.csproj", "{EE074501-9B3B-4AB1-9A18-5A4A53292854}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageValidationBlazorServer", "ImageValidationBlazorServer\ImageValidationBlazorServer.csproj", "{003CC291-A102-42FB-BB30-F84A026B8EE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImageValidationBlazorServer", "ImageValidationBlazorServer\ImageValidationBlazorServer.csproj", "{003CC291-A102-42FB-BB30-F84A026B8EE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Encryption", "Encryption\Encryption.csproj", "{A871121E-6D04-451A-AE72-F1838B2B5DF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Encryption", "Encryption\Encryption.csproj", "{A871121E-6D04-451A-AE72-F1838B2B5DF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EncryptionConsole", "EncryptionConsole\EncryptionConsole.csproj", "{8D3B03AF-E042-4A36-8F37-1C529FCF42D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EncryptionConsole", "EncryptionConsole\EncryptionConsole.csproj", "{8D3B03AF-E042-4A36-8F37-1C529FCF42D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,5 +92,11 @@ Global
 		{8D3B03AF-E042-4A36-8F37-1C529FCF42D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D3B03AF-E042-4A36-8F37-1C529FCF42D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D3B03AF-E042-4A36-8F37-1C529FCF42D1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {164F0587-3A77-4303-A4FD-9D8AFB5A6A01}
 	EndGlobalSection
 EndGlobal
