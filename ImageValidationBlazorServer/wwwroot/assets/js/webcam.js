@@ -1,63 +1,90 @@
-﻿let video = null;
-let canvas = null;
-let context = null;
-let streaming = false;
+﻿//https://stackoverflow.com/questions/61763796/record-webcam-video-using-javascript
 
-let width = 100;    // We will scale the photo width to this.
-let height = 0;     // This will be computed based on the input stream
-let filter = 'sepia(1)';
+function onStart(options)  {
+    let preview = document.getElementById("preview");
+    let recording = document.getElementById("recording");
+    let startButton = document.getElementById("startButton");
+    let stopButton = document.getElementById("stopButton");
+    let downloadButton = document.getElementById("downloadButton");
+    let logElement = document.getElementById("log");
 
-function onStart(options) {
-    video = document.getElementById(options.videoID);
-    canvas = document.getElementById(options.canvasID);
-    context = canvas.getContext('2d');
-    width = options.width;
-    filter = options.filter;
+    let recordingTimeMS = 9000;
 
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-        .then(function (stream) {
-            video.srcObject = stream;
-            video.play();
-        })
-        .catch(function (err) {
-            console.log("An error occurred: " + err);
+    function log(msg) {
+        logElement.innerHTML += msg + "\n";
+    }
+
+    function wait(delayInMS) {
+        return new Promise(resolve => setTimeout(resolve, delayInMS));
+    }
+
+    function startRecording(stream, lengthInMS) {
+        let recorder = new MediaRecorder(stream);
+        let data = [];
+
+        recorder.ondataavailable = event => data.push(event.data);
+        recorder.start();
+        log(recorder.state + " for " + (lengthInMS / 1000) + " seconds...");
+
+        let stopped = new Promise((resolve, reject) => {
+            recorder.onstop = resolve;
+            recorder.onerror = event => reject(event.name);
         });
 
-    video.addEventListener('canplay', function () {
-        if (!streaming) {
-            height = video.videoHeight / (video.videoWidth / width);
+        let recorded = wait(lengthInMS).then(
+            () => recorder.state == "recording" && recorder.stop()
+        );
 
-            if (isNaN(height)) {
-                height = width / (4 / 3);
-            }
-
-            video.setAttribute('width', width);
-            video.setAttribute('height', height);
-            canvas.setAttribute('width', width);
-            canvas.setAttribute('height', height);
-            streaming = true;
-        }
-    }, false);
-
-    video.addEventListener("play", function () {
-        console.log('play');
-        timercallback();
-    }, false);
-}
-
-function timercallback() {
-    if (video.paused || video.ended) {
-        return;
+        return Promise.all([
+            stopped,
+            recorded
+        ])
+            .then(() => data);
     }
-    computeFrame();
-    setTimeout(function () {
-        timercallback();
-    }, 0);
-}
+    function stop(stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+    startButton.addEventListener("click", function () {
+        navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+        }).then(stream => {
+            preview.srcObject = stream;
+            downloadButton.href = stream;
+            preview.captureStream = preview.captureStream || preview.mozCaptureStream;
+            return new Promise(resolve => preview.onplaying = resolve);
+        }).then(() => startRecording(preview.captureStream(), recordingTimeMS))
+            .then(recordedChunks => {
+                console.log("recordedChunks");
+                console.log(recordedChunks);
+                let recordedBlob = new Blob(recordedChunks, { type: "video/mp4" });
+                console.log("recordedBlob");
 
-function computeFrame() {
-    context.drawImage(video, 0, 0, width, height);
-    context.filter = filter;
+                var reader = new FileReader();
+                reader.readAsDataURL(recordedBlob);
+                reader.onloadend = function () {
+                    var base64String = reader.result;
+                    console.log('Base64 String - ', base64String);
+
+                    // Simply Print the Base64 Encoded String,
+                    // without additional data: Attributes.
+                    console.log('Base64 String without Tags- ',
+                        base64String.substr(base64String.indexOf(', ') + 1));
+                }
+                console.log(recordedBlob);
+                recording.src = URL.createObjectURL(recordedBlob);
+                downloadButton.href = recording.src;
+                downloadButton.download = "RecordedVideo.mp4";
+
+                log("Successfully recorded " + recordedBlob.size + " bytes of " +
+                    recordedBlob.type + " media.");
+            })
+            .catch(log);
+    }, false);
+
+    stopButton.addEventListener("click", function () {
+        stop(preview.srcObject);
+    }, false);
 }
 
 window.WebCamFunctions = {

@@ -20,7 +20,7 @@ namespace AcctOpeningImageValidationAPI.Repository
     {
         private readonly double _headPitchMinThreshold = -15; //-15
 
-        private readonly double _headYawMinThreshold = -20;
+        private readonly double _headYawMinThreshold = -21;  //20
 
         private readonly double _headRollMinThreshold = -20;
 

@@ -2,40 +2,56 @@
 @layout DocumentLayout
 @inject IJSRuntime JSRuntime
 
-
 <h1>Fun Blazor Web Camera Application</h1>
-<div>
-    <canvas id="@options.CanvasID"
-            style="background-color:lightgray;"
-            width="@options.Width"
-            height="360">
-    </canvas>
+<div class="left">
+    <button @onclick="Start" id="startButton" class="button">Start</button>
+    <h2>Preview</h2>
+    <video id="preview" width="360" height="360" autoplay muted></video>
 </div>
-<div>
-    <button @onclick="Start">Start</button>
+<div class="right">
+    <button id="stopButton" class="button">Stop</button>
+    <h2>Recording</h2>
+    <video id="recording" width="360" height="360" controls></video>
+    <a id="downloadButton" class="button">Download</a>
 </div>
-<div>
-    <video id="@options.VideoID"
-           style="background-color:lightblue; visibility:hidden;"
-           width="@options.Width">
-        Video stream not available.
-    </video>
+<div class="bottom">
+    <pre id="log"></pre>
 </div>
 
-@code{
-    Models.WebCamOptions options = new Models.WebCamOptions()
-    {
-        CanvasID = "canvas",
-        VideoID = "video"
-    };
-
+@code {
     protected override void OnInitialized()
     {
-        options.Width = 480;
+
     }
 
     public async Task Start()
     {
-        await JSRuntime.InvokeVoidAsync("WebCamFunctions.start", options);
+        await JSRuntime.InvokeVoidAsync("WebCamFunctions.start");
+    }
+
+    public static object CreateDotNetObjectRefSyncObj = new object();
+
+    public async Task ReadFileContent(UIChangeEventArgs ea)
+    {
+        // Fire & Forget: ConfigureAwait(false) is telling "I'm not expecting this call to return a thing"
+        await jsRuntime.InvokeAsync<object>("readFileProxy", CreateDotNetObjectRef(this), "ReadFileCallback", ea.Value.ToString()).ConfigureAwait(false);
+    }
+
+
+    [JSInvokable] // This is required in order to JS be able to execute it
+    public void ReadFileCallback(string response)
+    {
+        fileContent = response?.ToString();
+        StateHasChanged();
+    }
+
+    // Hack to fix https://github.com/aspnet/AspNetCore/issues/11159    
+    protected DotNetObjectRef<T> CreateDotNetObjectRef<T>(T value) where T : class
+    {
+        lock (CreateDotNetObjectRefSyncObj)
+        {
+            JSRuntime.SetCurrentJSRuntime(jsRuntime);
+            return DotNetObjectRef.Create(value);
+        }
     }
 }

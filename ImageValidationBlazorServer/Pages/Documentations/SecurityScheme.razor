@@ -41,6 +41,7 @@
     {
         // invoke script loader
         Console.WriteLine("Loading jQuery");
+        
 
         await jsRuntime.InvokeVoidAsync("loadScript", "https://localhost:44609/assets/js/page.min.js");
         await jsRuntime.InvokeVoidAsync("loadScript", "https://localhost:44609/assets/js/script.js");
