@@ -37,7 +37,15 @@ namespace AcctOpeningImageValidationAPI
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
-            
+            services.AddCors(options =>
+            {
+                options.AddPolicy("EnableCORS", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+            });
 
             services.AddControllers();
             services.AddSingleton<IConfiguration>(Configuration);
@@ -51,15 +59,7 @@ namespace AcctOpeningImageValidationAPI
             // Register the Swagger generator, defining 1 or more Swagger documents
 
             services.AddSwaggerGen();
-            services.AddCors(options =>
-            {
-                options.AddPolicy("EnableCORS", builder =>
-                {
-                    builder.AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
-                });
-            });
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -88,12 +88,13 @@ namespace AcctOpeningImageValidationAPI
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseRouting();
+
+            app.UseCors("EnableCORS");
 
             app.UseDeveloperExceptionPage();
 
             app.UseHttpsRedirection();
-
-            app.UseRouting();
 
             app.UseAuthorization();
 
@@ -101,8 +102,6 @@ namespace AcctOpeningImageValidationAPI
             {
                 endpoints.MapControllers();
             });
-
-            app.UseCors("EnableCORS");
         }
     }
 }
