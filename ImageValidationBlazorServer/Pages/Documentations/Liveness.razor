@@ -6,24 +6,23 @@
 @inject IJSRuntime JS
 
 <h1>Liveness Check</h1>
-    <div class="left">
-        <video style="background-color: lightgrey;" id="preview" width="760" height="360" autoplay muted></video>
-
-    </div>
+<div class="left">
+    <video style="background-color: lightgrey;" id="preview" width="760" height="360" autoplay muted></video>
+    @if (isProcessing)
+    {
+        <h1>@activityStatus</h1>
+    }
+</div>
     <div class="right">
         <button @onclick="Start" id="startButton" class="btn btn-primary btn-block">Check Liveness</button>
         <button id="stopButton" style="visibility: hidden;" class="button">Stop</button>
         <h2 style="visibility: hidden">Recording</h2>
         <video id="recording" style="visibility: hidden" width="360" height="360" controls></video>
-        <a id="downloadButton" class="button">Download</a>
+        <a style="visibility: hidden" id="downloadButton" class="button">Download</a>
     </div>
     <div class="bottom" style="visibility: hidden;">
         <pre id="log"></pre>
     </div>
-
-@if(isProcessing) { 
-    <h1>@activityStatus</h1>
-}
 
 
 @code {
@@ -44,6 +43,9 @@
     public async Task Start()
     {
         isProcessing = true;
+        StateHasChanged();
+
+        activityStatus = "Running check...please wait";
         StateHasChanged();
 
         objRef = DotNetObjectReference.Create(this);
@@ -68,8 +70,8 @@
 
         var result = await apiCalls.Post<HelperLib.BaseResponse<IdentificationValidationLib.Models.LivenessCheckResponse>, HelperLib.BaseResponse>(request, endPoint);
 
-        isProcessing = false;
-
+        activityStatus = $"Heading Shaking : {result.SuccessObj.Data.HeadShakingDetected.ToString()} | Head Nodding {result.SuccessObj.Data.HeadNodingDetected.ToString()} | Head Rolling : {result.SuccessObj.Data.HeadRollingDetected.ToString()} | Has Smile : {result.SuccessObj.Data.HasFaceSmile.ToString()}";
+           
         //TODO: Make An API Call
         StateHasChanged();
     }
