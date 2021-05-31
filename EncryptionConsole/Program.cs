@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using AcctOpeningImageValidationAPI.Models;
+using IdentificationValidationLib.Models;
 using Newtonsoft.Json;
 
 namespace EncryptionConsole
