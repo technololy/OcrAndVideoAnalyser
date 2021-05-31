@@ -1,24 +1,36 @@
 ﻿@page "/docs/face/liveness"
-@layout DocumentLayout
-@inject IJSRuntime JSRuntime
+@using Microsoft.JSInterop
+@using System.Text.RegularExpressions
 
-<h1>Fun Blazor Web Camera Application</h1>
-<div class="left">
-    <button @onclick="Start" id="startButton" class="button">Start</button>
-    <h2>Preview</h2>
-    <video id="preview" width="360" height="360" autoplay muted></video>
-</div>
-<div class="right">
-    <button id="stopButton" class="button">Stop</button>
-    <h2>Recording</h2>
-    <video id="recording" width="360" height="360" controls></video>
-    <a id="downloadButton" class="button">Download</a>
-</div>
-<div class="bottom">
-    <pre id="log"></pre>
-</div>
+@layout DocumentLayout
+@inject IJSRuntime JS
+
+<h1>Liveness Check</h1>
+    <div class="left">
+        <video style="background-color: lightgrey;" id="preview" width="360" height="360" autoplay muted></video>
+
+    </div>
+    <div class="right">
+        <button id="stopButton" class="button">Stop</button>
+        <h2>Recording</h2>
+        <video id="recording" width="360" height="360" controls></video>
+        <a id="downloadButton" class="button">Download</a>
+    </div>
+    <div class="bottom" style="visibility: hidden;">
+        <pre id="log"></pre>
+    </div>
+
+<button @onclick="Start" id="startButton" class="btn btn-primary btn-block">Check Liveness</button>
 
 @code {
+    //https://stackoverflow.com/questions/56627649/how-can-i-get-javascript-callback-in-net-blazor
+    private string name;
+    private string result;
+    private DotNetObjectReference<Liveness> objRef;
+    bool isProcessing;
+    private IdentificationValidationLib.Models.FaceRequest request = new IdentificationValidationLib.Models.FaceRequest();
+    private static Random random = new Random();
+
     protected override void OnInitialized()
     {
 
@@ -26,32 +38,38 @@
 
     public async Task Start()
     {
-        await JSRuntime.InvokeVoidAsync("WebCamFunctions.start");
+        objRef = DotNetObjectReference.Create(this);
+        result = await JS.InvokeAsync<string>("WebCamFunctions.start", objRef, name);
+
     }
 
-    public static object CreateDotNetObjectRefSyncObj = new object();
+    [JSInvokable]
+    public async Task WebCameraCallBack(string base64EncodedString)
+    {
 
-    //public async Task ReadFileContent(UIChangeEventArgs ea)
-    //{
-    //    // Fire & Forget: ConfigureAwait(false) is telling "I'm not expecting this call to return a thing"
-    //    await jsRuntime.InvokeAsync<object>("readFileProxy", CreateDotNetObjectRef(this), "ReadFileCallback", ea.Value.ToString()).ConfigureAwait(false);
-    //}
+        IdentificationValidationLib.API apiCalls = new IdentificationValidationLib.API();
+        var endPoint = "https://pass.sterling.ng/FacialrecogAPI/liveness";
+
+        string encodedResult = base64EncodedString.Replace("data:video/mp4;base64,", string.Empty);
+        request.VideoFile = encodedResult;
+        request.UserIdentification = RandomString(14);
+
+        var result = await apiCalls.Post<HelperLib.BaseResponse<IdentificationValidationLib.Models.FaceResponse>, HelperLib.BaseResponse>(request, endPoint);
+
+        //TODO: Make An API Call
+        StateHasChanged();
+    }
 
 
-    //[JSInvokable] // This is required in order to JS be able to execute it
-    //public void ReadFileCallback(string response)
-    //{
-    //    fileContent = response?.ToString();
-    //    StateHasChanged();
-    //}
+    public static string RandomString(int length)
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        return new string(Enumerable.Repeat(chars, length)
+          .Select(s => s[random.Next(s.Length)]).ToArray());
+    }
 
-    //// Hack to fix https://github.com/aspnet/AspNetCore/issues/11159    
-    //protected DotNetObjectRef<T> CreateDotNetObjectRef<T>(T value) where T : class
-    //{
-    //    lock (CreateDotNetObjectRefSyncObj)
-    //    {
-    //        JSRuntime.SetCurrentJSRuntime(jsRuntime);
-    //        return DotNetObjectRef.Create(value);
-    //    }
-    //}
+    public void Dispose()
+    {
+        objRef?.Dispose();
+    }
 }

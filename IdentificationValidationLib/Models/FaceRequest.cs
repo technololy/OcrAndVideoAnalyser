@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace AcctOpeningImageValidationAPI.Models
+namespace IdentificationValidationLib.Models
 {
     public class FaceRequest
     {

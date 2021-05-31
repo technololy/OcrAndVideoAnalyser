@@ -1,6 +1,6 @@
 ﻿//https://stackoverflow.com/questions/61763796/record-webcam-video-using-javascript
 
-function onStart(options)  {
+function onStart(instance, callback)  {
     let preview = document.getElementById("preview");
     let recording = document.getElementById("recording");
     let startButton = document.getElementById("startButton");
@@ -44,6 +44,7 @@ function onStart(options)  {
     function stop(stream) {
         stream.getTracks().forEach(track => track.stop());
     }
+
     startButton.addEventListener("click", function () {
         navigator.mediaDevices.getUserMedia({
             video: true,
@@ -70,6 +71,8 @@ function onStart(options)  {
                     // without additional data: Attributes.
                     console.log('Base64 String without Tags- ',
                         base64String.substr(base64String.indexOf(', ') + 1));
+
+                    instance.invokeMethodAsync('WebCameraCallBack', base64String);
                 }
                 console.log(recordedBlob);
                 recording.src = URL.createObjectURL(recordedBlob);
@@ -80,7 +83,7 @@ function onStart(options)  {
                     recordedBlob.type + " media.");
             })
             .catch(log);
-    }, false);
+    }, true);
 
     stopButton.addEventListener("click", function () {
         stop(preview.srcObject);
@@ -88,5 +91,11 @@ function onStart(options)  {
 }
 
 window.WebCamFunctions = {
-    start: (options) => { onStart(options); }
+    start: (instance, callback) => {
+        onStart(instance, callback);
+    }
+};
+
+window.sayHello2 = (dotNetHelper, name) => {
+    return dotNetHelper.invokeMethodAsync('GetHelloMessage', name);
 };

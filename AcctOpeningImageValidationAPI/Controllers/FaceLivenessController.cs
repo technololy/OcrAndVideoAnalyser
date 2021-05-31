@@ -1,19 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using AcctOpeningImageValidationAPI.Helpers;
 using AcctOpeningImageValidationAPI.Models;
 using AcctOpeningImageValidationAPI.Repository.Abstraction;
-using MediaToolkit;
-using MediaToolkit.Model;
-using MediaToolkit.Options;
+using IdentificationValidationLib.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.CognitiveServices.Vision.Face;
-using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 using Microsoft.Extensions.Options;
 
 namespace AcctOpeningImageValidationAPI.Controllers
