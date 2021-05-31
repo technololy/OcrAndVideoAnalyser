@@ -20,6 +20,11 @@
         <pre id="log"></pre>
     </div>
 
+@if(isProcessing) { 
+    <h1>Processing</h1>
+} else { 
+<h1>Not Processing</h1>
+}
 <button @onclick="Start" id="startButton" class="btn btn-primary btn-block">Check Liveness</button>
 
 @code {
@@ -43,7 +48,7 @@
 
     }
 
-    [JSInvokable]
+    [JSInvokable("WebCameraCallBack")]
     public async Task WebCameraCallBack(string base64EncodedString)
     {
 
@@ -55,6 +60,8 @@
         request.UserIdentification = RandomString(14);
 
         var result = await apiCalls.Post<HelperLib.BaseResponse<IdentificationValidationLib.Models.FaceResponse>, HelperLib.BaseResponse>(request, endPoint);
+
+        isProcessing = true;
 
         //TODO: Make An API Call
         StateHasChanged();

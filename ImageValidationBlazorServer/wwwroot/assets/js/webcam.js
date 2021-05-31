@@ -41,8 +41,34 @@ function onStart(instance, callback)  {
         ])
             .then(() => data);
     }
+
     function stop(stream) {
         stream.getTracks().forEach(track => track.stop());
+    }
+
+    function callApi (base64EncodedString) {
+        $.ajax({
+            type: "POST",
+            url: "https://pass.sterling.ng/FacialrecogAPI/liveness",
+            data: {
+                videoFile: base64EncodedString,
+                userIdentification : "sterling-00001"
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType : "json",
+            success: function (response) {
+                console.log("success");
+                console.log(response);
+            },
+            failure: function (response) {
+                console.log("failure");
+                console.log(response)
+            },
+            error: function (response) {
+                console.log("error");
+                console.log(response);
+            }
+        });
     }
 
     startButton.addEventListener("click", function () {
@@ -72,7 +98,8 @@ function onStart(instance, callback)  {
                     console.log('Base64 String without Tags- ',
                         base64String.substr(base64String.indexOf(', ') + 1));
 
-                    instance.invokeMethodAsync('WebCameraCallBack', base64String);
+                    callApi(base64String.replace("data:video/mp4;base64,", ""));
+                    //instance.invokeMethodAsync('WebCameraCallBack', base64String);
                 }
                 console.log(recordedBlob);
                 recording.src = URL.createObjectURL(recordedBlob);

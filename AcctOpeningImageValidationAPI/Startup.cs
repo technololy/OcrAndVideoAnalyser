@@ -37,6 +37,16 @@ namespace AcctOpeningImageValidationAPI
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("EnableCORS", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+            });
+
             services.AddControllers();
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddScoped<IComputerVision, ComputerVision>();
@@ -84,6 +94,7 @@ namespace AcctOpeningImageValidationAPI
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseCors("EnableCORS");
 
             app.UseAuthorization();
 
