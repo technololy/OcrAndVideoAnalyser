@@ -1,5 +1,5 @@
 ﻿using System;
-namespace AcctOpeningImageValidationAPI.Models
+namespace IdentificationValidationLib.Models
 {
     public class LivenessCheckResponse
     {

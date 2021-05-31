@@ -97,10 +97,10 @@ function onStart(instance, callback)  {
 
                     var base64EncodedString = base64String.replace("data:video/mp4;base64,", "")
 
-                    callApi({
-                        videoFile: base64EncodedString,
-                        userIdentification: "sterling-00000001"
-                    });
+                    //callApi({
+                    //    videoFile: base64EncodedString,
+                    //    userIdentification: "sterling-00000001"
+                    //});
                     instance.invokeMethodAsync('WebCameraCallBack', base64String);
                 }
                 console.log(recordedBlob);

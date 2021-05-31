@@ -7,13 +7,14 @@
 
 <h1>Liveness Check</h1>
     <div class="left">
-        <video style="background-color: lightgrey;" id="preview" width="360" height="360" autoplay muted></video>
+        <video style="background-color: lightgrey;" id="preview" width="760" height="360" autoplay muted></video>
 
     </div>
     <div class="right">
-        <button id="stopButton" class="button">Stop</button>
-        <h2>Recording</h2>
-        <video id="recording" width="360" height="360" controls></video>
+        <button @onclick="Start" id="startButton" class="btn btn-primary btn-block">Check Liveness</button>
+        <button id="stopButton" style="visibility: hidden;" class="button">Stop</button>
+        <h2 style="visibility: hidden">Recording</h2>
+        <video id="recording" style="visibility: hidden" width="360" height="360" controls></video>
         <a id="downloadButton" class="button">Download</a>
     </div>
     <div class="bottom" style="visibility: hidden;">
@@ -21,15 +22,14 @@
     </div>
 
 @if(isProcessing) { 
-    <h1>Processing</h1>
-} else { 
-<h1>Not Processing</h1>
+    <h1>@activityStatus</h1>
 }
-<button @onclick="Start" id="startButton" class="btn btn-primary btn-block">Check Liveness</button>
+
 
 @code {
     //https://stackoverflow.com/questions/56627649/how-can-i-get-javascript-callback-in-net-blazor
     private string name;
+    private string activityStatus = "Capturing Face";
     private string result;
     private DotNetObjectReference<Liveness> objRef;
     bool isProcessing;
@@ -43,14 +43,21 @@
 
     public async Task Start()
     {
+        isProcessing = true;
+        StateHasChanged();
+
         objRef = DotNetObjectReference.Create(this);
         result = await JS.InvokeAsync<string>("WebCamFunctions.start", objRef, name);
 
+        activityStatus = "Processing";
+        StateHasChanged();
     }
 
     [JSInvokable("WebCameraCallBack")]
     public async Task WebCameraCallBack(string base64EncodedString)
     {
+        activityStatus = "Please wait Checking for liveness";
+        StateHasChanged();
 
         IdentificationValidationLib.API apiCalls = new IdentificationValidationLib.API();
         var endPoint = "https://pass.sterling.ng/FacialrecogAPI/liveness";
@@ -59,9 +66,9 @@
         request.VideoFile = encodedResult;
         request.UserIdentification = RandomString(14);
 
-        var result = await apiCalls.Post<HelperLib.BaseResponse<IdentificationValidationLib.Models.FaceResponse>, HelperLib.BaseResponse>(request, endPoint);
+        var result = await apiCalls.Post<HelperLib.BaseResponse<IdentificationValidationLib.Models.LivenessCheckResponse>, HelperLib.BaseResponse>(request, endPoint);
 
-        isProcessing = true;
+        isProcessing = false;
 
         //TODO: Make An API Call
         StateHasChanged();
