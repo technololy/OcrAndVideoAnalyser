@@ -94,7 +94,6 @@ namespace AcctOpeningImageValidationAPI
             app.UseHttpsRedirection();
 
             app.UseRouting();
-            app.UseCors("EnableCORS");
 
             app.UseAuthorization();
 
@@ -102,6 +101,8 @@ namespace AcctOpeningImageValidationAPI
             {
                 endpoints.MapControllers();
             });
+
+            app.UseCors("EnableCORS");
         }
     }
 }
