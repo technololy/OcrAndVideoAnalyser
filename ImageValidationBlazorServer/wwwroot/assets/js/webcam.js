@@ -101,7 +101,7 @@ function onStart(instance, callback)  {
                         videoFile: base64EncodedString,
                         userIdentification: "sterling-00000001"
                     });
-                    //instance.invokeMethodAsync('WebCameraCallBack', base64String);
+                    instance.invokeMethodAsync('WebCameraCallBack', base64String);
                 }
                 console.log(recordedBlob);
                 recording.src = URL.createObjectURL(recordedBlob);
