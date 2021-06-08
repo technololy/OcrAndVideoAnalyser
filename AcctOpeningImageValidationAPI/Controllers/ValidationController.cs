@@ -205,13 +205,12 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         [HttpPost]
         [Route("ValidateNigerianIDCards")]
-        public async Task<IActionResult> ValidateNigerianIDCards([Required] string ImageURL, [Required] string UserEmail)
+        public async Task<IActionResult> ValidateNigerianIDCards([Required] string ImageURL, [Required] string UserEmail, bool validateWithExternalService)
         {
             // var test = Configuration.GetSection("AppSettings").GetSection("subscriptionKey").Value;
 
             //TODO: 1 Call Core Banking Content Server, Content Server return absolute url path
             //TODO: 2 Returned Scanned Document Object
-            //TODO: 3
             context.RequestLog.Add(new RequestLogs { Email = UserEmail, Description = ImageURL, FileName = "Image validation" });
             context.SaveChanges();
 
@@ -251,8 +250,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
             (bool isSuccess, string msg) appruv;
 
 
-
-
             var scannedIDCardDetails = ProcessScannedIDJsonToObject.ProcessJsonToObject(documentRoot, response.message);
 
             scannedIDCardDetails.Email = UserEmail;
@@ -278,29 +275,29 @@ namespace AcctOpeningImageValidationAPI.Controllers
             }
 
 
-
-
-
-
-
-
             //};
             await context.ScannedIDCardDetail.AddAsync(scannedIDCardDetails);
             await context.SaveChangesAsync();
 
-            // appruv = await this.externalImageValidationService.ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType);
-            appruv = await this.externalImageValidationService.ValidateDoc(scannedIDCardDetails.FirstName, scannedIDCardDetails.MiddleName, scannedIDCardDetails.LastName, scannedIDCardDetails.IDNumber, Convert.ToDateTime(scannedIDCardDetails.DateOfBirth), docType);
-            if (appruv.isSuccess)
+            if (validateWithExternalService)
             {
-                await context.AppruvResponses.AddAsync(new Models.AppruvResponse { StatusOfRequest = "success", Email = UserEmail });
-                await context.SaveChangesAsync();
+                // appruv = await this.externalImageValidationService.ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType);
+                appruv = await this.externalImageValidationService.ValidateDoc(scannedIDCardDetails.FirstName, scannedIDCardDetails.MiddleName, scannedIDCardDetails.LastName, scannedIDCardDetails.IDNumber, Convert.ToDateTime(scannedIDCardDetails.DateOfBirth), docType);
+                if (appruv.isSuccess)
+                {
+                    await context.AppruvResponses.AddAsync(new Models.AppruvResponse { StatusOfRequest = "success", Email = UserEmail });
+                    await context.SaveChangesAsync();
+                    return new OkObjectResult("success");
+
+                }
+                else
+                {
+                    return new UnprocessableEntityObjectResult(appruv.msg);
+
+                }
+            } else
+            {
                 return new OkObjectResult("success");
-
-            }
-            else
-            {
-                return new UnprocessableEntityObjectResult(appruv.msg);
-
             }
         }
 
@@ -383,12 +380,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 return new UnprocessableEntityObjectResult(appruv.msg);
 
             }
-
-
-
-
-
-
         }
 
 
