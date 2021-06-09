@@ -145,10 +145,7 @@ namespace AcctOpeningImageValidationAPI.Models
         public string Delim { get; set; }
         public string Gender { get; set; }
         public DateTime? DateInserted { get; set; }
-
         public int OCRUsageId { get; set; }
-
-
         public virtual OCRUsage OCRUsage { get; set; }
     }
 

@@ -186,8 +186,13 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
                 scannedIDCardDetails.Email = validate.Email; scannedIDCardDetails.OCRUsageId = ocrUsage.Id;
 
-                await context.ScannedIDCardDetail.AddAsync(scannedIDCardDetails);
-                await context.SaveChangesAsync();
+                var count = context.ScannedIDCardDetail.Count(x => x.FormerIDNumber == scannedIDCardDetails.FormerIDNumber);
+
+                if (count == 0)
+                {
+                    await context.ScannedIDCardDetail.AddAsync(scannedIDCardDetails);
+                    await context.SaveChangesAsync();
+                }
 
                 //return Ok(scannedIDCardDetails);
                 return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<ScannedIDCardDetails>("Successful", scannedIDCardDetails, true));
