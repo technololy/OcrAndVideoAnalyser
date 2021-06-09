@@ -135,6 +135,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
             try
             {
+                OCRUsage ocrUsage = OCRUsage.Empty;
                 context.RequestLog.Add(new RequestLogs { Email = validate.Email, Description = validate.Base64Encoded.Substring(0, 10), FileName = "Image validation" });
                 context.SaveChanges();
 
@@ -147,7 +148,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
                 try
                 {
-                    _ocrRepository.ValidateUsage(result.Url);
+                    ocrUsage = _ocrRepository.ValidateUsage(result.Url);
                 }
                 catch (MaximumOCRUsageException e)
                 {
@@ -161,8 +162,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     log.Info($"bypass set to true for {result.Url}");
                     //return new OkObjectResult("success");
                     return new OkObjectResult(HelperLib.ReponseClass.ReponseMethod("success", true));
-
-
                 }
 
                 var response = await computerVision.PerformOcrWithAzureAI(result.Url, null);
@@ -170,8 +169,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 if (!response.isSuccess)
                 {
                     return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod(response.message, false));
-
-
                 }
 
                 //log json
@@ -187,7 +184,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
                 var scannedIDCardDetails = ProcessScannedIDJsonToObject.ProcessJsonToObject(documentRoot, response.message);
 
-                scannedIDCardDetails.Email = validate.Email;
+                scannedIDCardDetails.Email = validate.Email; scannedIDCardDetails.OCRUsageId = ocrUsage.Id;
 
                 await context.ScannedIDCardDetail.AddAsync(scannedIDCardDetails);
                 await context.SaveChangesAsync();
@@ -304,7 +301,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         [HttpPost]
         [Route("ReadOutNigerianIDCards")]
-
         public async Task<IActionResult> ReadOutNigerianIDCards([Required] string ImageURL, [Required] string UserEmail)
         {
             // var test = Configuration.GetSection("AppSettings").GetSection("subscriptionKey").Value;

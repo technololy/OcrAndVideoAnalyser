@@ -13,6 +13,7 @@ namespace AcctOpeningImageValidationAPI.Models
         public FacialValidation facialValidation { get; set; }
         public ScannedIDCardDetails scannedIDCardDetails { get; set; }
         public SimilarFace SimilarFaces { get; set; }
+        public static OCRUsage Empty => new OCRUsage();
     }
 
     public class ImagesScanned : BaseEntity
