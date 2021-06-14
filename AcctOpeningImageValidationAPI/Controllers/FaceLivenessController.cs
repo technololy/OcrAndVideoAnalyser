@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using AcctOpeningImageValidationAPI.Repository.Abstraction;
 using IdentificationValidationLib;
+using IdentificationValidationLib.Abstractions;
 using IdentificationValidationLib.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -15,6 +16,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// IFaceRepository _faceRepository
         /// </summary>
         private readonly IFaceRepository _faceRepository;
+        private readonly INetworkService _networkService;
 
         /// <summary>
         /// AppSettings | Production or Development
@@ -25,10 +27,11 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// Constructor
         /// </summary>
         /// <param name="options"></param>
-        public FaceLivenessController(IFaceRepository faceRepository, IOptions<AppSettings> options)
+        public FaceLivenessController(IFaceRepository faceRepository, IOptions<AppSettings> options, INetworkService networkService)
         {
             _faceRepository = faceRepository;
             _setting = options.Value;
+            _networkService = networkService;
         }
 
         /// <summary>
@@ -84,6 +87,22 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 Console.WriteLine(ex.Message);
                 return BadRequest(ex.Message);
             }
+        }
+
+        [HttpGet]
+        [Route("test")]
+        public async Task<IActionResult> Test()
+        {
+            var request = new DriverLicenseRequest {
+                idNumber = "TTD17607AA02",
+                firstname = "Oyekanmi",
+                lastname = "Owolabi",
+                dob = "02-11-1989"
+            };
+
+            var result = await _networkService.PostAsync<DriverLicenseResponse, DriverLicenseRequest>("/frsc", AuthType.BASIC, request);
+
+            return Ok();
         }
     }
 }

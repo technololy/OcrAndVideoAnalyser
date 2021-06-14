@@ -7,6 +7,7 @@ using AcctOpeningImageValidationAPI.Repository;
 using AcctOpeningImageValidationAPI.Repository.Abstraction;
 using AcctOpeningImageValidationAPI.Repository.Services.Implementation;
 using IdentificationValidationLib;
+using IdentificationValidationLib.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -59,6 +60,7 @@ namespace AcctOpeningImageValidationAPI
             services.AddScoped<IOCRRepository, OCRRepository>();
             services.AddScoped<IFaceRepository, FaceRepository>();
             services.AddScoped<RestClientService, RestClientService>();
+            services.AddScoped<INetworkService, NetworkService>();
             // Register the Swagger generator, defining 1 or more Swagger documents
 
             services.AddSwaggerGen();

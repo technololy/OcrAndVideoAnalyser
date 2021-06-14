@@ -36,9 +36,9 @@ namespace IdentificationValidationLib
         /// <param name="authType"></param>
         /// <param name="authValue"></param>
         /// <returns></returns>
-        public async Task<T> GetAsync<T>(string path, AuthType authType, T data)
+        public async Task<T> GetAsync<T, R>(string path, AuthType authType, R data)
         {
-            return await CreateHttpRequestMessageAsync(AuthRequestType.GET, authType, data, path);
+            return await CreateHttpRequestMessageAsync<T,R>(AuthRequestType.POST, authType, data, path);
         }
 
         /// <summary>
@@ -49,9 +49,9 @@ namespace IdentificationValidationLib
         /// <param name="authType"></param>
         /// <param name="authValue"></param>
         /// <returns></returns>
-        public async Task<T> PostAsync<T>(string path, AuthType authType, T data)
+        public async Task<T> PostAsync<T, R>(string path, AuthType authType, R data)
         {
-            return await CreateHttpRequestMessageAsync(AuthRequestType.POST, authType, data, path);
+            return await CreateHttpRequestMessageAsync<T, R>(AuthRequestType.POST, authType, data, path);
         }
 
         /// <summary>
@@ -62,9 +62,9 @@ namespace IdentificationValidationLib
         /// <param name="authType"></param>
         /// <param name="authValue"></param>
         /// <returns></returns>
-        public async Task<T> PutAsync<T>(string path, AuthType authType, T data)
+        public async Task<T> PutAsync<T, R>(string path, AuthType authType, R data)
         {
-            return await CreateHttpRequestMessageAsync(AuthRequestType.PUT, authType, data, path);
+            return await CreateHttpRequestMessageAsync<T, R>(AuthRequestType.PUT, authType, data, path);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace IdentificationValidationLib
         /// <param name="type"></param>
         /// <param name="url"></param>
         /// <returns></returns>
-        private async Task<T> CreateHttpRequestMessageAsync<T> (AuthRequestType type, AuthType authType, T data, string path)
+        private async Task<T> CreateHttpRequestMessageAsync<T, R> (AuthRequestType type, AuthType authType, R data, string path)
         {
             try
             {

@@ -7,9 +7,9 @@ namespace IdentificationValidationLib.Abstractions
 {
     public interface INetworkService
     {
-        Task<T> GetAsync<T>(string path, AuthType authType, T data);
-        Task<T> PostAsync<T>(string path, AuthType authType, T data);
-        Task<T> PutAsync<T>(string path, AuthType authType, T data);
+        Task<T> GetAsync<T, R>(string path, AuthType authType, R data);
+        Task<T> PostAsync<T, R>(string path, AuthType authType, R data);
+        Task<T> PutAsync<T, R>(string path, AuthType authType, R data);
     }
 
     public enum AuthType
