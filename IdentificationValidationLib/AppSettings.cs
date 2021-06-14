@@ -22,5 +22,12 @@ namespace IdentificationValidationLib
         public string LivenessRootFolder { get; set; }
 
         public string LivenessVideoFormat { get; set; }
+        public VerifyMeConfig VerifyMeConfig { get; set; }
+    }
+
+    public class VerifyMeConfig
+    {
+        public string BASE_URL { get; set; }
+        public string AUTH_TOKEN { get; set; }
     }
 }
