@@ -89,20 +89,20 @@ namespace AcctOpeningImageValidationAPI.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("test")]
-        public async Task<IActionResult> Test()
-        {
-            var request = new DriverLicenseRequest {
-                idNumber = "TTD17607AA02",
-                firstname = "Oyekanmi",
-                lastname = "Owolabi",
-                dob = "02-11-1989"
-            };
+        //[HttpGet]
+        //[Route("test")]
+        //public async Task<IActionResult> Test()
+        //{
+        //    var request = new DriverLicenseRequest {
+        //        idNumber = "TTD17607AA02",
+        //        firstname = "Oyekanmi",
+        //        lastname = "Owolabi",
+        //        dob = "02-11-1989"
+        //    };
 
-            var result = await _networkService.PostAsync<DriverLicenseResponse, DriverLicenseRequest>("/frsc", AuthType.BASIC, request);
+        //    var result = await _networkService.PostAsync<DriverLicenseResponse, DriverLicenseRequest>("/frsc", AuthType.BASIC, request);
 
-            return Ok();
-        }
+        //    return Ok();
+        //}
     }
 }
