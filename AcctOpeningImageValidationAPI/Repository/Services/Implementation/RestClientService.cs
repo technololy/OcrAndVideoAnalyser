@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AcctOpeningImageValidationAPI.Helpers;
 using AcctOpeningImageValidationAPI.Repository.Services.Request;
 using AcctOpeningImageValidationAPI.Repository.Services.Response;
+using IdentificationValidationLib;
 using Microsoft.Extensions.Options;
 using Refit;
 
@@ -12,7 +13,7 @@ namespace AcctOpeningImageValidationAPI.Repository.Services.Implementation
     public class RestClientService
     {
         private readonly IRestClientService _restClientService;
-        private AppSettings _setting;
+        private readonly AppSettings _setting;
 
         public RestClientService(IOptions<AppSettings> options)
         {

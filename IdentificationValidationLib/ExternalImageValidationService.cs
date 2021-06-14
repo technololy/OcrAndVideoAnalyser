@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using IdentificationValidationLib.Models;
 using log4net;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using static IdentificationValidationLib.Validation;
 
 namespace IdentificationValidationLib
 {
@@ -14,7 +16,8 @@ namespace IdentificationValidationLib
     public interface IExternalImageValidationService
     {
         public Task<(bool isSuccess, string msg)> ValidateDoc(Validation v, Models.Camudatafield camudatafield);
-        public Task<(bool isSuccess, string msg)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, IdentificationValidationLib.Validation.DocumentType docType);
+        public Task<(bool isSuccess, string msg)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType);
+        public Task<(bool isSuccess, string msg, object data)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType, DocumentServiceType documentServiceType);
     }
 
 
@@ -23,11 +26,13 @@ namespace IdentificationValidationLib
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private readonly IConfiguration configuration;
         private readonly IAPI aPI;
+        private readonly AppSettings _setting;
 
-        public ExternalImageValidationService(IConfiguration configuration, IAPI aPI)
+        public ExternalImageValidationService(IConfiguration configuration, IAPI aPI, IOptions<AppSettings> options)
         {
             this.configuration = configuration;
             this.aPI = aPI;
+            _setting = options.Value;
         }
 
 
@@ -115,7 +120,7 @@ namespace IdentificationValidationLib
         }
 
 
-        public async Task<(bool isSuccess, string msg)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, IdentificationValidationLib.Validation.DocumentType docType)
+        public async Task<(bool isSuccess, string msg)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType)
         {
             string url = GetAppruvURLByDocType(docType);
             var model = new { id = idNumber, first_name = firstName, last_name = lastName, date_of_birth = dateOfBirth.ToString("yyyy-MM-dd") };
@@ -165,9 +170,9 @@ namespace IdentificationValidationLib
 
         }
 
-
-
-
-
+        public Task<(bool isSuccess, string msg, object data)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType, DocumentServiceType documentServiceType)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

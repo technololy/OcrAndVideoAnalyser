@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using AcctOpeningImageValidationAPI.Helpers;
-using AcctOpeningImageValidationAPI.Models;
 using AcctOpeningImageValidationAPI.Repository.Abstraction;
+using IdentificationValidationLib;
 using IdentificationValidationLib.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;

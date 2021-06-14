@@ -4,6 +4,7 @@ using AcctOpeningImageValidationAPI.Helpers;
 using AcctOpeningImageValidationAPI.Models;
 using AcctOpeningImageValidationAPI.Repository.Abstraction;
 using HelperLib.Exceptions;
+using IdentificationValidationLib;
 using Microsoft.Extensions.Options;
 
 namespace AcctOpeningImageValidationAPI.Repository

@@ -808,6 +808,12 @@ namespace IdentificationValidationLib
             VotersCard,
             nationalId
         }
+
+        public enum DocumentServiceType
+        {
+            APPRUV,
+            VERIFY_ME
+        }
         public string[] dateFormats;
         List<string> dataFormatWork = new List<string>();
         List<string> dateFormatsListType = new List<string> {"M/d/yyyy", "d/M/yyyy",

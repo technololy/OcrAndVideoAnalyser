@@ -283,6 +283,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
             if (validateWithExternalService)
             {
+                // Entry Point For Validation Here
                 // appruv = await this.externalImageValidationService.ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType);
                 appruv = await this.externalImageValidationService.ValidateDoc(scannedIDCardDetails.FirstName, scannedIDCardDetails.MiddleName, scannedIDCardDetails.LastName, scannedIDCardDetails.IDNumber, Convert.ToDateTime(scannedIDCardDetails.DateOfBirth), docType);
                 if (appruv.isSuccess)
