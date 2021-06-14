@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
+using IdentificationValidationLib.Abstractions;
 using IdentificationValidationLib.Models;
 using log4net;
 using Microsoft.Extensions.Configuration;
@@ -27,12 +28,14 @@ namespace IdentificationValidationLib
         private readonly IConfiguration configuration;
         private readonly IAPI aPI;
         private readonly AppSettings _setting;
+        private readonly INetworkService _networkService;
 
-        public ExternalImageValidationService(IConfiguration configuration, IAPI aPI, IOptions<AppSettings> options)
+        public ExternalImageValidationService(IConfiguration configuration, IAPI aPI, IOptions<AppSettings> options, INetworkService networkService)
         {
             this.configuration = configuration;
             this.aPI = aPI;
             _setting = options.Value;
+            _networkService = networkService;
         }
 
 
@@ -170,9 +173,16 @@ namespace IdentificationValidationLib
 
         }
 
-        public Task<(bool isSuccess, string msg, object data)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType, DocumentServiceType documentServiceType)
+        public async Task<(bool isSuccess, string msg, object data)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType, DocumentServiceType documentServiceType)
         {
-            throw new NotImplementedException();
+            object result = documentServiceType switch
+            {
+                DocumentServiceType.APPRUV => await ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType),
+                DocumentServiceType.VERIFY_ME => await _networkService.PostAsync<DriverLicenseResponse, DriverLicenseRequest>("/frsc", AuthType.BASIC, new DriverLicenseRequest { }),
+                _ => await ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType),
+            };
+
+            return (true, string.Empty, new { });
         }
     }
 }
