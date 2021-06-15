@@ -52,7 +52,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 }
 
                 //Set File Name
-                var fileName = $"{model.UserIdentification}.${_setting.LivenessVideoFormat}";
+                var fileName = $"{model.UserIdentification}.{_setting.LivenessVideoFormat}";
 
                 //Convert the images from Base64 to VideoBytes
                 byte[] videoBytes = Convert.FromBase64String(model.VideoFile);
@@ -147,7 +147,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     model.File.CopyTo(ms);
                     
                     //Set File Name
-                    var fileName = $"FormVideo.${_setting.LivenessVideoFormat}";
+                    var fileName = $"FormVideo.{_setting.LivenessVideoFormat}";
 
                     //Convert the images from Base64 to VideoBytes
                     byte[] videoBytes = ms.ToArray();
