@@ -338,7 +338,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
             //QuickType.DriversLicenseRoot driversLicense = new QuickType.DriversLicenseRoot();
             //QuickType.NationalID.NationalIdRoot nationalId = new QuickType.NationalID.NationalIdRoot();
 
-            (bool isSuccess, string msg) appruv;
+            (bool isSuccess, string msg, object data) appruv;
             DocumentType docType = new DocumentType();
 
 
