@@ -806,7 +806,8 @@ namespace IdentificationValidationLib
             InternationalPassport,
             DriversLicense,
             VotersCard,
-            nationalId
+            nationalId,
+            NIN
         }
 
         public enum DocumentServiceType

@@ -17,7 +17,7 @@ namespace IdentificationValidationLib
     public interface IExternalImageValidationService
     {
         public Task<(bool isSuccess, string msg)> ValidateDoc(Validation v, Models.Camudatafield camudatafield);
-        public Task<(bool isSuccess, string msg)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType);
+        public Task<(bool isSuccess, string msg, object data)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType);
         public Task<(bool isSuccess, string msg, object data)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType, DocumentServiceType documentServiceType);
     }
 
@@ -28,14 +28,14 @@ namespace IdentificationValidationLib
         private readonly IConfiguration configuration;
         private readonly IAPI aPI;
         private readonly AppSettings _setting;
-        private readonly INetworkService _networkService;
+        private readonly IVerifyMeService _verifyMeService;
 
-        public ExternalImageValidationService(IConfiguration configuration, IAPI aPI, IOptions<AppSettings> options, INetworkService networkService)
+        public ExternalImageValidationService(IConfiguration configuration, IAPI aPI, IOptions<AppSettings> options, IVerifyMeService verifyMeService)
         {
             this.configuration = configuration;
             this.aPI = aPI;
             _setting = options.Value;
-            _networkService = networkService;
+            _verifyMeService = verifyMeService;
         }
 
 
@@ -123,7 +123,7 @@ namespace IdentificationValidationLib
         }
 
 
-        public async Task<(bool isSuccess, string msg)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType)
+        public async Task<(bool isSuccess, string msg, object data)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType)
         {
             string url = GetAppruvURLByDocType(docType);
             var model = new { id = idNumber, first_name = firstName, last_name = lastName, date_of_birth = dateOfBirth.ToString("yyyy-MM-dd") };
@@ -158,7 +158,7 @@ namespace IdentificationValidationLib
                 //got success from appruve
                 //UpdateCamuDataOfAppruveResponse(result, camudatafield);
                 log.Info(result.returnedStringContent);
-                return (result.isSuccess, result.returnedStringContent);
+                return (result.isSuccess, result.returnedStringContent, null);
             }
             else
             {
@@ -166,7 +166,7 @@ namespace IdentificationValidationLib
                 Console.WriteLine(result.failedObj.message);
                 //UpdateCamuDataOfAppruveResponse(result, camudatafield);
                 log.Info($"{result.failedObj} for {firstName} {lastName} {middleName} {idNumber}");
-                return (result.isSuccess, result.failedObj.message + $"{Environment.NewLine}Our partners at Appruv, the validation agency, were not able to validate the identification document with the ID:{idNumber},First Name:{firstName},Last Name:{lastName}, and Date of Birth:{dateOfBirth}");
+                return (result.isSuccess, result.failedObj.message + $"{Environment.NewLine}Our partners at Appruv, the validation agency, were not able to validate the identification document with the ID:{idNumber},First Name:{firstName},Last Name:{lastName}, and Date of Birth:{dateOfBirth}", null);
                 // Console.WriteLine(result.returnedStringContent);
 
             }
@@ -178,14 +178,14 @@ namespace IdentificationValidationLib
             //TODO: Make a generic response (bool, string, object)
             //TODO: Verify me must return the generic response
             //TODO: Create VerifyMeService that returns (bool, string, object)
-            object result = documentServiceType switch
+            var result = documentServiceType switch
             {
                 DocumentServiceType.APPRUV => await ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType),
-                DocumentServiceType.VERIFY_ME => await _networkService.PostAsync<DriverLicenseResponse, DriverLicenseRequest>("/frsc", AuthType.BASIC, new DriverLicenseRequest { }),
+                DocumentServiceType.VERIFY_ME => _verifyMeService.Validate(firstName, middleName, lastName, idNumber, dateOfBirth, docType, documentServiceType).Result,
                 _ => await ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType),
             };
 
-            return (true, string.Empty, new { });
+            return result; 
         }
     }
 }

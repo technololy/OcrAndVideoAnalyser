@@ -36,7 +36,7 @@ namespace IdentificationValidationLib.Models
         public DriverLicenseData dataResponse { get; set; }
     }
 
-    public class DriverLicenseRequest
+    public class VerifyMeVerificationRequest
     {
         public string idNumber { get; set; }
         public string firstname { get; set; }
