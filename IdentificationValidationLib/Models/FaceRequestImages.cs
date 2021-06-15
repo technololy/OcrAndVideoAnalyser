@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -9,5 +10,11 @@ namespace IdentificationValidationLib.Models
     {
         [Required]
         public string [] Images { get; set; }
+    }
+
+    public class FaceRequestForm
+    {
+        [Required]
+        public IFormFile File { get; set; }
     }
 }

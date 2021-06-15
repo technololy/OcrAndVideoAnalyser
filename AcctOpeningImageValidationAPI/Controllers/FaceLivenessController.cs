@@ -5,6 +5,7 @@ using AcctOpeningImageValidationAPI.Repository.Abstraction;
 using IdentificationValidationLib;
 using IdentificationValidationLib.Abstractions;
 using IdentificationValidationLib.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -130,20 +131,62 @@ namespace AcctOpeningImageValidationAPI.Controllers
             return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", response, true));
         }
 
-            //[HttpGet]
-            //[Route("test")]
-            //public async Task<IActionResult> Test()
-            //{
-            //    var request = new DriverLicenseRequest {
-            //        idNumber = "TTD17607AA02",
-            //        firstname = "Oyekanmi",
-            //        lastname = "Owolabi",
-            //        dob = "02-11-1989"
-            //    };
+        [HttpPost]
+        [Route("liveness/form")]
+        public async Task<IActionResult> ProcessVideoFormMultiPart(FaceRequestForm model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<LivenessCheckResponse>("All fields are required", null, false));
+                }
 
-            //    var result = await _networkService.PostAsync<DriverLicenseResponse, DriverLicenseRequest>("/frsc", AuthType.BASIC, request);
+                using(var ms = new MemoryStream())
+                {
+                    model.File.CopyTo(ms);
+                    
+                    //Set File Name
+                    var fileName = $"FormVideo.${_setting.LivenessVideoFormat}";
 
-            //    return Ok();
-            //}
+                    //Convert the images from Base64 to VideoBytes
+                    byte[] videoBytes = ms.ToArray();
+
+                    ms.Flush(); ms.Close();
+
+                    //Get File Path from the root liveness directory
+                    string FilePath = Path.Combine(Directory.GetCurrentDirectory(), _setting.LivenessRootFolder);
+
+                    //Create directory always
+                    Directory.CreateDirectory(FilePath);
+
+                    //Create Video File
+                    System.IO.File.WriteAllBytes(Path.Combine(FilePath, fileName), videoBytes);
+
+                    // Extract Frames From Video
+                    _faceRepository.ExtractFrameFromVideo(FilePath, fileName);
+
+                    //Convert Image to stream
+                    var headPoseResult = await _faceRepository.RunHeadGestureOnImageFrame(FilePath);
+
+                    //Return Response
+                    var response = new LivenessCheckResponse
+                    {
+                        HeadNodingDetected = headPoseResult.Item1,
+                        HeadShakingDetected = headPoseResult.Item2,
+                        HeadRollingDetected = headPoseResult.Item3,
+                        HasFaceSmile = headPoseResult.Item4
+                    };
+
+                    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", response, true));
+                }
+              
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest(ex.Message);
+            }
         }
+    }
 }
