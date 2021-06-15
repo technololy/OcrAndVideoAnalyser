@@ -91,7 +91,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         }
 
         [HttpPost]
-        [Route("liveness/images")]
+        [Route("liveness/multiple-images")]
         public async Task<IActionResult> ProcessVideoImages ([FromBody] FaceRequestImages model)
         {
             if(!ModelState.IsValid)
