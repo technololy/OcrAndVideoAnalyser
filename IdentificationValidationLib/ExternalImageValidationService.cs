@@ -150,8 +150,6 @@ namespace IdentificationValidationLib
             //}
 #endif
 
-
-
             var result = await aPI.Post<AppruveResponseModelSuccess, AppruveResponseModelFailure>(model, url);
             if (result.isSuccess)
             {
@@ -173,6 +171,18 @@ namespace IdentificationValidationLib
 
         }
 
+        /// <summary>
+        /// Validate Document Sub-Method
+        /// </summary>
+        /// <param name="firstName"></param>
+        /// <param name="middleName"></param>
+        /// <param name="lastName"></param>
+        /// <param name="idNumber"></param>
+        /// <param name="dateOfBirth"></param>
+        /// <param name="docType"></param>
+        /// <param name="documentServiceType"></param>
+        /// 2nd method overload, this method is different because it accepts Document Service Type
+        /// <returns></returns>
         public async Task<(bool isSuccess, string msg, object data)> ValidateDoc (string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType, DocumentServiceType documentServiceType)
         {
             var result = documentServiceType switch
