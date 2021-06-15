@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace IdentificationValidationLib
 {
-    public class VerfiyMeService : IVerifyMeService
+    public class VerifyMeService : IVerifyMeService
     {
         private readonly INetworkService _networkService;
-        public VerfiyMeService(INetworkService networkService)
+        public VerifyMeService(INetworkService networkService)
         {
             _networkService = networkService;
         }

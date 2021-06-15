@@ -61,7 +61,7 @@ namespace AcctOpeningImageValidationAPI
             services.AddScoped<IFaceRepository, FaceRepository>();
             services.AddScoped<RestClientService, RestClientService>();
             services.AddScoped<INetworkService, NetworkService>();
-            services.AddScoped<IVerifyMeService, IVerifyMeService>();
+            services.AddScoped<IVerifyMeService, VerifyMeService>();
             // Register the Swagger generator, defining 1 or more Swagger documents
 
             services.AddSwaggerGen();
