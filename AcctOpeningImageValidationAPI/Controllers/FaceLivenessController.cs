@@ -133,7 +133,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         [HttpPost]
         [Route("liveness/form")]
-        public async Task<IActionResult> ProcessVideoFormMultiPart(FaceRequestForm model)
+        public async Task<IActionResult> ProcessVideoFormMultiPart([FromForm] FaceRequestForm model)
         {
             try
             {
