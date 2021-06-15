@@ -249,7 +249,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
             //QuickType.NationalID.NationalIdRoot nationalId = new QuickType.NationalID.NationalIdRoot();
             DocumentType docType = new DocumentType();
 
-            (bool isSuccess, string msg) appruv;
+            (bool isSuccess, string msg, object data) appruv;
 
 
             var scannedIDCardDetails = ProcessScannedIDJsonToObject.ProcessJsonToObject(documentRoot, response.message);

@@ -173,18 +173,14 @@ namespace IdentificationValidationLib
 
         }
 
-        public async Task<(bool isSuccess, string msg, object data)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType, DocumentServiceType documentServiceType)
+        public async Task<(bool isSuccess, string msg, object data)> ValidateDoc (string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType, DocumentServiceType documentServiceType)
         {
-            //TODO: Make a generic response (bool, string, object)
-            //TODO: Verify me must return the generic response
-            //TODO: Create VerifyMeService that returns (bool, string, object)
             var result = documentServiceType switch
             {
                 DocumentServiceType.APPRUV => await ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType),
                 DocumentServiceType.VERIFY_ME => _verifyMeService.Validate(firstName, middleName, lastName, idNumber, dateOfBirth, docType, documentServiceType).Result,
                 _ => await ValidateDoc(firstName, middleName, lastName, idNumber, dateOfBirth, docType),
             };
-
             return result; 
         }
     }
