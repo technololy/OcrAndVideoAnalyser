@@ -9,5 +9,6 @@ namespace AcctOpeningImageValidationAPI.Repository.Abstraction
     {
         void ExtractFrameFromVideo(string directory, string fiileName);
         Task<Tuple<bool, bool, bool, bool>> RunHeadGestureOnImageFrame(string filePath);
+        bool SaveImageToDisk(string base64String, string path);
     }
 }

@@ -89,20 +89,61 @@ namespace AcctOpeningImageValidationAPI.Controllers
             }
         }
 
-        //[HttpGet]
-        //[Route("test")]
-        //public async Task<IActionResult> Test()
-        //{
-        //    var request = new DriverLicenseRequest {
-        //        idNumber = "TTD17607AA02",
-        //        firstname = "Oyekanmi",
-        //        lastname = "Owolabi",
-        //        dob = "02-11-1989"
-        //    };
+        [HttpPost]
+        [Route("liveness/images")]
+        public async Task<IActionResult> ProcessVideoImages ([FromBody] FaceRequestImages model)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
 
-        //    var result = await _networkService.PostAsync<DriverLicenseResponse, DriverLicenseRequest>("/frsc", AuthType.BASIC, request);
+            //Get File Path from the root liveness directory
+            string FilePath = Path.Combine(Directory.GetCurrentDirectory(), _setting.LivenessRootFolder);
 
-        //    return Ok();
-        //}
-    }
+            //Create directory always
+            Directory.CreateDirectory(FilePath);
+
+            var i = 0;
+
+            while(i <= model.Images.Length)
+            {
+                var fileName = string.Format("{0}\\image-{1}.jpeg", Path.Combine(FilePath), i);
+
+                _faceRepository.SaveImageToDisk(model.Images[i], fileName);
+
+                i++;
+            }
+
+            //Convert Image to stream
+            var headPoseResult = await _faceRepository.RunHeadGestureOnImageFrame(FilePath);
+
+            //Return Response
+            var response = new LivenessCheckResponse
+            {
+                HeadNodingDetected = headPoseResult.Item1,
+                HeadShakingDetected = headPoseResult.Item2,
+                HeadRollingDetected = headPoseResult.Item3,
+                HasFaceSmile = headPoseResult.Item4
+            };
+
+            return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", response, true));
+        }
+
+            //[HttpGet]
+            //[Route("test")]
+            //public async Task<IActionResult> Test()
+            //{
+            //    var request = new DriverLicenseRequest {
+            //        idNumber = "TTD17607AA02",
+            //        firstname = "Oyekanmi",
+            //        lastname = "Owolabi",
+            //        dob = "02-11-1989"
+            //    };
+
+            //    var result = await _networkService.PostAsync<DriverLicenseResponse, DriverLicenseRequest>("/frsc", AuthType.BASIC, request);
+
+            //    return Ok();
+            //}
+        }
 }

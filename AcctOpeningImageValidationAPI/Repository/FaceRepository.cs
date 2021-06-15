@@ -115,6 +115,26 @@ namespace AcctOpeningImageValidationAPI.Repository
             return memoryStream;
         }
 
+        public async Task<Tuple<bool, bool, bool, bool>> RunHeadGestureOnImageFrame(string[] images)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool SaveImageToDisk (string base64String, string path)
+        {
+            //Check if directory exist
+            if (Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            byte[] imageBytes = Convert.FromBase64String(base64String);
+
+            File.WriteAllBytes(path, imageBytes);
+
+            return true;
+        }
+
         /// <summary>
         /// Help Detect Gesture for Head Pose
         /// </summary>

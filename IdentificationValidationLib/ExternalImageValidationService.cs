@@ -122,7 +122,16 @@ namespace IdentificationValidationLib
             public const string national_id = "national_id";
         }
 
-
+        /// <summary>
+        /// Overload Method 1
+        /// </summary>
+        /// <param name="firstName"></param>
+        /// <param name="middleName"></param>
+        /// <param name="lastName"></param>
+        /// <param name="idNumber"></param>
+        /// <param name="dateOfBirth"></param>
+        /// <param name="docType"></param>
+        /// <returns></returns>
         public async Task<(bool isSuccess, string msg, object data)> ValidateDoc(string firstName, string middleName, string lastName, string idNumber, DateTime dateOfBirth, DocumentType docType)
         {
             string url = GetAppruvURLByDocType(docType);
