@@ -10,11 +10,17 @@ namespace IdentificationValidationLib.Models
     {
         [Required]
         public string [] Images { get; set; }
+
+        [Required]
+        public string UserIdentification { get; set; }
     }
 
     public class FaceRequestForm
     {
         [Required]
         public IFormFile File { get; set; }
+
+        [Required]
+        public string UserIdentification { get; set; }
     }
 }

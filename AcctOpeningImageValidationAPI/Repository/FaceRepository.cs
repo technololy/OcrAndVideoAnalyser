@@ -1,5 +1,8 @@
 ﻿using AcctOpeningImageValidationAPI.Helpers;
 using AcctOpeningImageValidationAPI.Repository.Abstraction;
+using AcctOpeningImageValidationAPI.Repository.Services;
+using AcctOpeningImageValidationAPI.Repository.Services.Implementation;
+using AcctOpeningImageValidationAPI.Repository.Services.Request;
 using IdentificationValidationLib;
 using MediaToolkit;
 using MediaToolkit.Model;
@@ -19,26 +22,25 @@ namespace AcctOpeningImageValidationAPI.Repository
 {
     public class FaceRepository : IFaceRepository
     {
+        /// <summary>
+        /// Properties
+        /// </summary>
         private readonly double _headPitchMinThreshold = -15; //-15
-
         private readonly double _headYawMinThreshold = -20; 
-
         private readonly double _headRollMinThreshold = -20;
-
         private readonly static int activeFrames = 14;
-
         private static IFaceClient client;
-
         private readonly AppSettings _setting;
+        private readonly RestClientService _restClientService;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="options"></param>
-        public FaceRepository(IOptions<AppSettings> options)
+        public FaceRepository(IOptions<AppSettings> options, RestClientService restClientService)
         {
             _setting = options.Value;
-
+            _restClientService = restClientService;
             client = new FaceClient(new ApiKeyServiceClientCredentials(_setting.subscriptionKey)) { Endpoint = _setting.AzureFacialBaseUrl };
         }
         /// <summary>
@@ -46,7 +48,7 @@ namespace AcctOpeningImageValidationAPI.Repository
         /// </summary>
         /// <param name="directory"></param>
         /// <param name="fiileName"></param>
-        public void ExtractFrameFromVideo(string directory, string fiileName)
+        public Tuple<bool, string> ExtractFrameFromVideo(string directory, string fiileName)
         {
             //Initiatlize Medial Took Kit to Extracting image(frame) from video
             var mp4 = new MediaFile { Filename = Path.Combine(directory, fiileName) };
@@ -58,6 +60,10 @@ namespace AcctOpeningImageValidationAPI.Repository
             //Initializing Seek to One
             var i = 0;
 
+            if(mp4.Metadata.Duration.TotalSeconds < 15)
+            {
+                return new Tuple<bool, string>(false, "Face capturing must be 15 seconds long, please try again");
+            }
             //Looping through
             //TODO: This should be limited to 9 Seconds video
             while (i < mp4.Metadata.Duration.Seconds)
@@ -77,6 +83,8 @@ namespace AcctOpeningImageValidationAPI.Repository
                 RotateImage(outputFile.Filename);
                 i++;
             }
+
+            return new Tuple<bool, string>(true, "Video analysis was successful");
         }
 
         /// <summary>
@@ -140,7 +148,7 @@ namespace AcctOpeningImageValidationAPI.Repository
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public async Task<Tuple<bool, bool, bool, bool>> RunHeadGestureOnImageFrame(string filePath)
+        public async Task<Tuple<bool, bool, bool, bool, string, string>> RunHeadGestureOnImageFrame(string filePath, string userIdentification)
         {
             var isSmiled = false;
 
@@ -150,7 +158,7 @@ namespace AcctOpeningImageValidationAPI.Repository
 
             var buffPitch = new List<double>(); var buffYaw = new List<double>(); var buffRoll = new List<double>();
 
-            var files = Directory.GetFiles(filePath); var items = files.Reverse();
+            var files = Directory.GetFiles(filePath); var items = files.Reverse(); var base64Encoded = string.Empty;
 
             foreach (var item in items)
             {
@@ -169,7 +177,7 @@ namespace AcctOpeningImageValidationAPI.Repository
                 // Submit image to API. 
                 var attrs = new List<FaceAttributeType> { FaceAttributeType.HeadPose, FaceAttributeType.Smile };
 
-                //var faces = await client.Face.DetectWithUrlWithHttpMessagesAsync(uploadedContent, returnFaceId: false, returnFaceAttributes: attrs);
+                //var faces = await client.Face.DetectWithUrlWithHttpMessagesAsync(url, returnFaceId: false, returnFaceAttributes: attrs);
                 var faces = await client.Face.DetectWithStreamWithHttpMessagesAsync(stream, returnFaceId: false, returnFaceAttributes: attrs);
 
                 //Check if Face is a Human face
@@ -201,6 +209,7 @@ namespace AcctOpeningImageValidationAPI.Repository
                     {
                         runStepOne = false;
                         stepOneComplete = true;
+                        base64Encoded = Convert.ToBase64String(imageArray);
                     }
                 }
 
@@ -212,6 +221,7 @@ namespace AcctOpeningImageValidationAPI.Repository
                     {
                         runStepTwo = false;
                         stepTwoComplete = true;
+                        base64Encoded = Convert.ToBase64String(imageArray);
                     }
                 }
 
@@ -223,10 +233,20 @@ namespace AcctOpeningImageValidationAPI.Repository
                     {
                         runStepThree = false;
                         stepThreeComplete = true;
+                        base64Encoded = Convert.ToBase64String(imageArray);
                     }
                 }
             }
-            return new Tuple<bool, bool, bool, bool>(stepOneComplete, stepTwoComplete, stepThreeComplete, isSmiled);
+
+            //TODO: Upload Image To Blob Server.
+            var result = await _restClientService.UploadDocument(new DocumentUploadRequest
+            {
+                FolderName = _setting.AzureContentFolderName,
+                Base64String = base64Encoded,
+                FileName = userIdentification
+            });
+            
+            return new Tuple<bool, bool, bool, bool, string, string>(stepOneComplete, stepTwoComplete, stepThreeComplete, isSmiled, base64Encoded, result.Url ?? string.Empty);
         }
 
         /// <summary>

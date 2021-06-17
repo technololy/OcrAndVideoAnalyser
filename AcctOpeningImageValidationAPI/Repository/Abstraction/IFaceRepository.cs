@@ -7,8 +7,8 @@ namespace AcctOpeningImageValidationAPI.Repository.Abstraction
 {
     public interface IFaceRepository
     {
-        void ExtractFrameFromVideo(string directory, string fiileName);
-        Task<Tuple<bool, bool, bool, bool>> RunHeadGestureOnImageFrame(string filePath);
+        Tuple<bool, string> ExtractFrameFromVideo(string directory, string fiileName);
+        Task<Tuple<bool, bool, bool, bool, string, string>> RunHeadGestureOnImageFrame(string filePath, string userIdentification);
         bool SaveImageToDisk(string base64String, string path);
     }
 }

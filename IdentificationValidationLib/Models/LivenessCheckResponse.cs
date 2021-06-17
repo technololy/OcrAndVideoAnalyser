@@ -7,5 +7,7 @@ namespace IdentificationValidationLib.Models
         public bool HeadShakingDetected { get; set; }
         public bool HeadRollingDetected { get; set; }
         public bool HasFaceSmile { get; set; }
+        public string EncodedResult { get; set; }
+        public string FaceImageUrl { get; set; }
     }
 }
