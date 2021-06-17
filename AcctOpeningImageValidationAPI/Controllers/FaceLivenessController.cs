@@ -59,7 +59,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 //Get File Path from the root liveness directory
                 string FilePath = Path.Combine(Directory.GetCurrentDirectory(), _setting.LivenessRootFolder);
 
-                FilePath = Path.Combine(FilePath, model.UserIdentification, DateTime.Now.ToLongTimeString());
+                FilePath = Path.Combine(FilePath, model.UserIdentification, DateTime.Now.ToShortDateString());
 
                 //Check if Directory Not Exists
                 if(!Directory.Exists(FilePath))
