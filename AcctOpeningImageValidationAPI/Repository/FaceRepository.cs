@@ -175,6 +175,15 @@ namespace AcctOpeningImageValidationAPI.Repository
                     continue;
                 }
 
+                base64Encoded = Convert.ToBase64String(imageArray);
+
+                var result = await _restClientService.UploadDocument(new DocumentUploadRequest
+                {
+                    FolderName = _setting.AzureContentFolderName,
+                    Base64String = base64Encoded,
+                    FileName = userIdentification
+                });
+
                 //Analyze Face Land Mark For Eye Blinking
                 AnalyzeFaceLandMark(faces.Body.First().FaceLandmarks, string.Empty, index, faces.Body.First().FaceAttributes?.HeadPose);
             }
@@ -443,8 +452,14 @@ namespace AcctOpeningImageValidationAPI.Repository
                     RightEyeStatus = eyeRightBlinked ? "CLOSED" : "OPENED",
                     LeftEyeStatus = eyeLeftBlinked ? "CLOSED" : "OPENED"
                 });
-                
-                blinkResult.EyeBlinked = eyeLeftBlinked = eyeRightBlinked;
+
+                if (blinkResult.EyeBlinked == false)
+                {
+                    if (eyeLeftBlinked == true || eyeRightBlinked == true)
+                    {
+                        blinkResult.EyeBlinked = true;
+                    }
+                }
             }
 
             return blinkResult;
