@@ -180,12 +180,14 @@ namespace AcctOpeningImageValidationAPI.Repository
                 var result = await _restClientService.UploadDocument(new DocumentUploadRequest
                 {
                     FolderName = _setting.AzureContentFolderName,
-                    Base64String = base64Encoded,
-                    FileName = userIdentification
+                    Base64String = base64Encoded, 
+                    FileName = imageName
                 });
 
+                stream.Flush();  stream.Close();
+
                 //Analyze Face Land Mark For Eye Blinking
-                AnalyzeFaceLandMark(faces.Body.First().FaceLandmarks, string.Empty, index, faces.Body.First().FaceAttributes?.HeadPose);
+                AnalyzeFaceLandMark(faces.Body.First().FaceLandmarks, result.Url, index, faces.Body.First().FaceAttributes?.HeadPose); index++;
             }
 
             return blinkResult;
