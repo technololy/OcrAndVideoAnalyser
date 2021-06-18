@@ -1,6 +1,4 @@
-﻿using AcctOpeningImageValidationAPI.Helpers;
-using AcctOpeningImageValidationAPI.Repository.Abstraction;
-using AcctOpeningImageValidationAPI.Repository.Services;
+﻿using AcctOpeningImageValidationAPI.Repository.Abstraction;
 using AcctOpeningImageValidationAPI.Repository.Services.Implementation;
 using AcctOpeningImageValidationAPI.Repository.Services.Request;
 using IdentificationValidationLib;
@@ -10,6 +8,7 @@ using MediaToolkit.Options;
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 using Microsoft.Extensions.Options;
+using Microsoft.Rest;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -32,6 +31,9 @@ namespace AcctOpeningImageValidationAPI.Repository
         private static IFaceClient client;
         private readonly AppSettings _setting;
         private readonly RestClientService _restClientService;
+        private readonly double _eyeLeftCloseValue = 20;
+        private readonly double _eyeRightCloseValue = 20;
+        public EyeBlinkResult blinkResult = new EyeBlinkResult();
 
         /// <summary>
         /// Constructor
@@ -60,7 +62,7 @@ namespace AcctOpeningImageValidationAPI.Repository
             //Initializing Seek to One
             var i = 0;
 
-            if(mp4.Metadata.Duration.TotalSeconds < 15)
+            if(mp4.Metadata.Duration.TotalSeconds < 1)
             {
                 return new Tuple<bool, string>(false, "Face capturing must be 15 seconds long, please try again");
             }
@@ -143,22 +145,9 @@ namespace AcctOpeningImageValidationAPI.Repository
             return true;
         }
 
-        /// <summary>
-        /// Help Detect Gesture for Head Pose
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        public async Task<Tuple<bool, bool, bool, bool, string, string>> RunHeadGestureOnImageFrame(string filePath, string userIdentification)
+        public async Task<EyeBlinkResult> RunEyeBlinkAlgorithm (string filePath, string userIdentification)
         {
-            var isSmiled = false;
-
-            var headGestureResult = string.Empty; bool runStepOne = true; bool runStepTwo = true; bool runStepThree = true;
-
-            bool stepOneComplete = false; bool stepTwoComplete = false; bool stepThreeComplete = false;
-
-            var buffPitch = new List<double>(); var buffYaw = new List<double>(); var buffRoll = new List<double>();
-
-            var files = Directory.GetFiles(filePath); var items = files.Reverse(); var base64Encoded = string.Empty;
+            var files = Directory.GetFiles(filePath); var items = files.Reverse(); var base64Encoded = string.Empty; var index = 0;
 
             foreach (var item in items)
             {
@@ -178,13 +167,67 @@ namespace AcctOpeningImageValidationAPI.Repository
                 var attrs = new List<FaceAttributeType> { FaceAttributeType.HeadPose, FaceAttributeType.Smile };
 
                 //var faces = await client.Face.DetectWithUrlWithHttpMessagesAsync(url, returnFaceId: false, returnFaceAttributes: attrs);
-                var faces = await client.Face.DetectWithStreamWithHttpMessagesAsync(stream, returnFaceId: false, returnFaceAttributes: attrs);
+                HttpOperationResponse<IList<DetectedFace>> faces = await client.Face.DetectWithStreamWithHttpMessagesAsync(stream, returnFaceId: true, returnFaceAttributes: attrs, returnFaceLandmarks: true);
 
                 //Check if Face is a Human face
                 if (faces.Body.Count <= 0)
                 {
                     continue;
                 }
+
+                //Analyze Face Land Mark For Eye Blinking
+                AnalyzeFaceLandMark(faces.Body.First().FaceLandmarks, string.Empty, index, faces.Body.First().FaceAttributes?.HeadPose);
+            }
+
+            return blinkResult;
+        }
+
+        /// <summary>
+        /// Help Detect Gesture for Head Pose
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public async Task<Tuple<bool, bool, bool, bool, string, string>> RunHeadGestureOnImageFrame(string filePath, string userIdentification)
+        {
+            var isSmiled = false;
+
+            var headGestureResult = string.Empty; bool runStepOne = true; bool runStepTwo = true; bool runStepThree = true;
+
+            bool stepOneComplete = false; bool stepTwoComplete = false; bool stepThreeComplete = false;
+
+            var buffPitch = new List<double>(); var buffYaw = new List<double>(); var buffRoll = new List<double>();
+
+            var files = Directory.GetFiles(filePath); var items = files.Reverse(); var base64Encoded = string.Empty; var index = 0;
+
+            foreach (var item in items)
+            {
+                //Neglect any file ending .mp4
+                if (item.EndsWith("mp4")) { continue; }
+
+                //Extract file name and extension
+                var fileName = item.Split('\\').Last(); var imageName = fileName.Split('.').First();
+
+                // var baseString = GetBaseStringFromImagePath(item);
+                byte[] imageArray = System.IO.File.ReadAllBytes(item);
+
+                //Convert Image From Byte Array To Stream
+                Stream stream = new MemoryStream(imageArray);
+
+                // Submit image to API. 
+                var attrs = new List<FaceAttributeType> { FaceAttributeType.HeadPose, FaceAttributeType.Smile };
+
+                //var faces = await client.Face.DetectWithUrlWithHttpMessagesAsync(url, returnFaceId: false, returnFaceAttributes: attrs);
+                HttpOperationResponse<IList<DetectedFace>> faces = await client.Face.DetectWithStreamWithHttpMessagesAsync(stream, returnFaceId: true, returnFaceAttributes: attrs, returnFaceLandmarks : true);
+
+                
+                //Check if Face is a Human face
+                if (faces.Body.Count <= 0)
+                {
+                    continue;
+                }
+
+                //Analyze Face Land Mark For Eye Blinking
+                var faceLandMark = AnalyzeFaceLandMark(faces.Body.First().FaceLandmarks, string.Empty, index, faces.Body.First().FaceAttributes?.HeadPose);
 
                 //Get Head Pose (For Liveness Algorithm Check) Object
                 var headPose = faces.Body.First().FaceAttributes?.HeadPose;
@@ -236,6 +279,8 @@ namespace AcctOpeningImageValidationAPI.Repository
                         base64Encoded = Convert.ToBase64String(imageArray);
                     }
                 }
+
+                index++;
             }
 
             //TODO: Upload Image To Blob Server.
@@ -330,5 +375,97 @@ namespace AcctOpeningImageValidationAPI.Repository
                 return null;
             }
         }
+
+        /// <summary>
+        /// Eye Blnking Algorithm
+        /// </summary>
+        /// <param name="faceLandMark"></param>
+        /// <returns></returns>
+        public Tuple<bool, bool> AnalyzeFaceLandMark (FaceLandmarks faceLandMark)
+        {
+            if (faceLandMark != null)
+            {
+                int eyeLeftValue, eyeRightValue;
+                bool eyeLeftBlinked = false, eyeRightBlinked = false;
+
+                eyeLeftValue = Convert.ToInt32(faceLandMark.EyeLeftBottom.Y) - Convert.ToInt32(faceLandMark.EyeLeftTop.Y);
+
+                if (eyeLeftValue < _eyeLeftCloseValue)
+                {
+                    eyeLeftBlinked = true;
+                }
+
+                eyeRightValue = Convert.ToInt32(faceLandMark.EyeRightBottom.Y) - Convert.ToInt32(faceLandMark.EyeRightTop.Y);
+
+                if (eyeRightValue < _eyeRightCloseValue)
+                {
+                    eyeRightBlinked = true;
+                }
+                return new Tuple<bool, bool>(eyeLeftBlinked, eyeRightBlinked);
+            }
+            return new Tuple<bool, bool>(false, false);
+        }
+
+        public EyeBlinkResult AnalyzeFaceLandMark(FaceLandmarks faceLandMark, string path, int index, HeadPose headPose)
+        {
+            if (faceLandMark != null)
+            {
+                if(blinkResult.EyeBlinks == null)
+                {
+                    blinkResult.EyeBlinks = new List<EyeBlink>();
+                }
+
+                int eyeLeftValue, eyeRightValue;
+                bool eyeLeftBlinked = false, eyeRightBlinked = false;
+
+                eyeLeftValue = Convert.ToInt32(faceLandMark.EyeLeftBottom.Y) - Convert.ToInt32(faceLandMark.EyeLeftTop.Y);
+
+                if (eyeLeftValue > _eyeLeftCloseValue)
+                {
+                    eyeLeftBlinked = true;
+                }
+
+                eyeRightValue = Convert.ToInt32(faceLandMark.EyeRightBottom.Y) - Convert.ToInt32(faceLandMark.EyeRightTop.Y);
+
+                if (eyeRightValue > _eyeRightCloseValue)
+                {
+                    eyeRightBlinked = true;
+                }
+
+                blinkResult.EyeBlinks.Add(new EyeBlink
+                {
+                    ImageIndex = index,
+                    ImageUrl = path,
+                    HeadPose = headPose,
+                    Left = eyeLeftValue,
+                    Right = eyeRightValue,
+                    EyeStatus = (eyeLeftBlinked == true || eyeRightBlinked == true ) ? "EYE_CLOSED" : "EYE_OPENED",
+                    RightEyeStatus = eyeRightBlinked ? "CLOSED" : "OPENED",
+                    LeftEyeStatus = eyeLeftBlinked ? "CLOSED" : "OPENED"
+                });
+                
+                blinkResult.EyeBlinked = eyeLeftBlinked = eyeRightBlinked;
+            }
+
+            return blinkResult;
+        }
     }
+}
+
+public class EyeBlink
+{
+    public string RightEyeStatus { get; set; }
+    public string LeftEyeStatus { get; set; }
+    public string EyeStatus { get; set; }
+    public string ImageUrl { get; set; }
+    public int ImageIndex { get; set; }
+    public int Left { get; set; }
+    public int Right { get; set; }
+    public HeadPose HeadPose { get; set; }
+}
+
+public class EyeBlinkResult
+{
+    public List<EyeBlink> EyeBlinks { get; set; }
+    public bool EyeBlinked { get; set; }
 }
