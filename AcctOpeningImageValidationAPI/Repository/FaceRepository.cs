@@ -96,7 +96,7 @@ namespace AcctOpeningImageValidationAPI.Repository
         {
             Image image = Image.FromFile(path);
             image.RotateFlip(RotateFlipType.Rotate90FlipY);
-            System.IO.File.Delete(path);
+            File.Delete(path);
             image.Save(path);
         }
 

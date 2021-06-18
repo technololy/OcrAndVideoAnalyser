@@ -169,15 +169,25 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     //Get File Path from the root liveness directory
                     string FilePath = Path.Combine(Directory.GetCurrentDirectory(), _setting.LivenessRootFolder);
 
-                    //Create directory always
-                    Directory.CreateDirectory(FilePath);
+                    FilePath = Path.Combine(FilePath, model.UserIdentification, DateTime.Now.ToShortDateString(), DateTime.Now.Ticks.ToString());
+
+                    //Check if Directory Not Exists
+                    if (!Directory.Exists(FilePath))
+                    {
+                        //Create directory always
+                        Directory.CreateDirectory(FilePath);
+                    }
 
                     //Create Video File
                     System.IO.File.WriteAllBytes(Path.Combine(FilePath, fileName), videoBytes);
 
                     // Extract Frames From Video
-                    _faceRepository.ExtractFrameFromVideo(FilePath, fileName);
+                    var (status, message) = _faceRepository.ExtractFrameFromVideo(FilePath, fileName);
 
+                    if (!status)
+                    {
+                        return new OkObjectResult(HelperLib.ReponseClass.ReponseMethod(message, status));
+                    }
                     //Convert Image to stream
                     var headPoseResult = await _faceRepository.RunHeadGestureOnImageFrame(FilePath, model.UserIdentification);
 
@@ -187,7 +197,9 @@ namespace AcctOpeningImageValidationAPI.Controllers
                         HeadNodingDetected = headPoseResult.Item1,
                         HeadShakingDetected = headPoseResult.Item2,
                         HeadRollingDetected = headPoseResult.Item3,
-                        HasFaceSmile = headPoseResult.Item4
+                        HasFaceSmile = headPoseResult.Item4,
+                        EncodedResult = headPoseResult.Item5,
+                        FaceImageUrl = headPoseResult.Item6
                     };
 
                     return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", response, true));
