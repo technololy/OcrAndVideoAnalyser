@@ -179,7 +179,7 @@ namespace AcctOpeningImageValidationAPI.Repository
 
                 var result = await _restClientService.UploadDocument(new DocumentUploadRequest
                 {
-                    FolderName = _setting.AzureContentFolderName,
+                    FolderName = $"{_setting.AzureContentFolderName}/{userIdentification}",
                     Base64String = base64Encoded, 
                     FileName = imageName
                 });
