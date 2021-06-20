@@ -43,9 +43,19 @@ namespace AcctOpeningImageValidationAPI
                .AddNewtonsoftJson(options =>
                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy("EnableCORS", builder =>
+            //    {
+            //        builder.AllowAnyOrigin()
+            //        .AllowAnyHeader()
+            //        .AllowAnyMethod();
+            //    });
+            //});
+
             services.AddCors(options =>
             {
-                options.AddPolicy("EnableCORS", builder =>
+                options.AddDefaultPolicy(builder =>
                 {
                     builder.AllowAnyOrigin()
                     .AllowAnyHeader()
@@ -103,7 +113,7 @@ namespace AcctOpeningImageValidationAPI
 
             app.UseAuthorization();
 
-            app.UseCors("EnableCORS");
+            app.UseCors();
 
             app.UseEndpoints(endpoints =>
             {

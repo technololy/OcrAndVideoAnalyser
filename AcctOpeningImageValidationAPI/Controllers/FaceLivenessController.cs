@@ -39,6 +39,67 @@ namespace AcctOpeningImageValidationAPI.Controllers
             _hub = hub;
         }
 
+        /// <summary>
+        /// Submit Processing Method For SignalR Possible Implementation
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("liveness/submit-processing")]
+        public IActionResult SubmitProcessing([FromForm] FaceRequestForm model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<LivenessCheckResponse>("All fields are required", null, false));
+                }
+
+                using (var ms = new MemoryStream())
+                {
+                    model.File.CopyTo(ms);
+
+                    //Set File Name
+                    var fileName = $"FormVideo.{_setting.LivenessVideoFormat}";
+
+                    //Convert the images from Base64 to VideoBytes
+                    byte[] videoBytes = ms.ToArray();
+
+                    ms.Flush(); ms.Close();
+
+                    //Get File Path from the root liveness directory
+                    string FilePath = Path.Combine(Directory.GetCurrentDirectory(), _setting.LivenessRootFolder);
+
+                    FilePath = Path.Combine(FilePath, model.UserIdentification, DateTime.Now.ToShortDateString(), DateTime.Now.Ticks.ToString());
+
+                    //Check if Directory Not Exists
+                    if (!Directory.Exists(FilePath))
+                    {
+                        //Create directory always
+                        Directory.CreateDirectory(FilePath);
+                    }
+
+                    //Create Video File
+                    System.IO.File.WriteAllBytes(Path.Combine(FilePath, fileName), videoBytes);
+
+                    // Extract Frames From Video
+                    var (status, message) = _faceRepository.ExtractFrameFromVideo(FilePath, fileName);
+
+                    if (!status)
+                    {
+                        return new OkObjectResult(HelperLib.ReponseClass.ReponseMethod(message, status));
+                    }
+
+                    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethod("Successful", true));
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpPost]
         [Route("signalr/send-message")]
         public async Task<IActionResult> SendSignalR([FromBody] SignalModel model)
