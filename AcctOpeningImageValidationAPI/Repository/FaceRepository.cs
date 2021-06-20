@@ -417,6 +417,14 @@ namespace AcctOpeningImageValidationAPI.Repository
             return new Tuple<bool, bool>(false, false);
         }
 
+        /// <summary>
+        /// Analyze Face Land Mark
+        /// </summary>
+        /// <param name="faceLandMark"></param>
+        /// <param name="path"></param>
+        /// <param name="index"></param>
+        /// <param name="headPose"></param>
+        /// <returns></returns>
         public EyeBlinkResult AnalyzeFaceLandMark(FaceLandmarks faceLandMark, string path, int index, HeadPose headPose)
         {
             if (faceLandMark != null)

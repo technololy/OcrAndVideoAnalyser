@@ -1,11 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using AcctOpeningImageValidationAPI.Models;
 using AcctOpeningImageValidationAPI.Repository.Abstraction;
+using AcctOpeningImageValidationAPI.Services;
 using IdentificationValidationLib;
 using IdentificationValidationLib.Abstractions;
 using IdentificationValidationLib.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 
 namespace AcctOpeningImageValidationAPI.Controllers
@@ -17,6 +20,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// </summary>
         private readonly IFaceRepository _faceRepository;
         private readonly INetworkService _networkService;
+        private readonly IHubContext<NotificationHub> _hub;
 
         /// <summary>
         /// AppSettings | Production or Development
@@ -27,13 +31,27 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// Constructor
         /// </summary>
         /// <param name="options"></param>
-        public FaceLivenessController(IFaceRepository faceRepository, IOptions<AppSettings> options, INetworkService networkService)
+        public FaceLivenessController(IFaceRepository faceRepository, IOptions<AppSettings> options, INetworkService networkService, IHubContext<NotificationHub> hub)
         {
             _faceRepository = faceRepository;
             _setting = options.Value;
             _networkService = networkService;
+            _hub = hub;
         }
 
+        [HttpPost]
+        [Route("signalr/send-message")]
+        public async Task<IActionResult> SendSignalR([FromBody] SignalModel model)
+        {
+            if(!ModelState.IsValid)
+            {
+                return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Please pass the message", false));
+            }
+
+            await _hub.Clients.All.SendAsync("NewItem", "Hello From The Mars!!!");
+
+            return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", true));
+        }
         /// <summary>
         /// This Method Processes The Video File For Liveness Check
         /// </summary>

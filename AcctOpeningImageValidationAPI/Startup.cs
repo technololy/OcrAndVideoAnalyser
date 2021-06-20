@@ -6,6 +6,7 @@ using AcctOpeningImageValidationAPI.Helpers;
 using AcctOpeningImageValidationAPI.Repository;
 using AcctOpeningImageValidationAPI.Repository.Abstraction;
 using AcctOpeningImageValidationAPI.Repository.Services.Implementation;
+using AcctOpeningImageValidationAPI.Services;
 using IdentificationValidationLib;
 using IdentificationValidationLib.Abstractions;
 using Microsoft.AspNetCore.Builder;
@@ -38,6 +39,10 @@ namespace AcctOpeningImageValidationAPI
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
+            services.AddControllers()
+               .AddNewtonsoftJson(options =>
+               options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
             services.AddCors(options =>
             {
                 options.AddPolicy("EnableCORS", builder =>
@@ -47,10 +52,6 @@ namespace AcctOpeningImageValidationAPI
                     .AllowAnyMethod();
                 });
             });
-
-            services.AddControllers()
-               .AddNewtonsoftJson(options =>
-               options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddScoped<IComputerVision, ComputerVision>();
@@ -65,6 +66,7 @@ namespace AcctOpeningImageValidationAPI
             // Register the Swagger generator, defining 1 or more Swagger documents
 
             services.AddSwaggerGen();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -95,17 +97,18 @@ namespace AcctOpeningImageValidationAPI
 
             app.UseRouting();
 
-            app.UseCors("EnableCORS");
-
             app.UseDeveloperExceptionPage();
 
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
 
+            app.UseCors("EnableCORS");
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<NotificationHub>("/hub/messages");
             });
         }
     }
