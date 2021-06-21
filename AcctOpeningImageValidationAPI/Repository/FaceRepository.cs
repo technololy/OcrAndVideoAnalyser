@@ -64,7 +64,7 @@ namespace AcctOpeningImageValidationAPI.Repository
 
             if(mp4.Metadata.Duration.TotalSeconds < 1)
             {
-                return new Tuple<bool, string>(false, "Face capturing must be 15 seconds long, please try again");
+                return new Tuple<bool, string>(false, "Face capturing must be greater than 1 second long, please try again");
             }
             //Looping through
             //TODO: This should be limited to 9 Seconds video
