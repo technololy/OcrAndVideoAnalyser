@@ -474,6 +474,18 @@ namespace AcctOpeningImageValidationAPI.Repository
 
             return blinkResult;
         }
+
+        public async Task RunHeadGestureOnImageFrame(string filePath, string userIdentification, Action<Tuple<bool, bool, bool, bool, string, string>> action)
+        {
+             var result = await RunHeadGestureOnImageFrame(filePath, userIdentification);
+             action(result);
+        }
+
+        public async Task RunEyeBlinkAlgorithm(string filePath, string userIdentification, Action<EyeBlinkResult> action)
+        {
+            var result = await RunEyeBlinkAlgorithm(filePath, userIdentification);
+            action(result);
+        }
     }
 }
 

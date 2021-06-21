@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AcctOpeningImageValidationAPI.Models;
 using AcctOpeningImageValidationAPI.Repository.Abstraction;
 using AcctOpeningImageValidationAPI.Services;
+using FluentScheduler;
 using IdentificationValidationLib;
 using IdentificationValidationLib.Abstractions;
 using IdentificationValidationLib.Models;
@@ -84,6 +85,17 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
                     // Extract Frames From Video
                     var (status, message) = _faceRepository.ExtractFrameFromVideo(FilePath, fileName);
+
+                    //TODO: Hand over to a scheduler or queuing system to handle
+                    Task.Run(() => {
+
+                        _faceRepository.RunEyeBlinkAlgorithm(FilePath, model.UserIdentification, action : async response => {
+                            
+                            var result = Newtonsoft.Json.JsonConvert.SerializeObject(response);
+
+                            await _hub.Clients.All.SendAsync("NewItem", response);
+                        });
+                    });
 
                     if (!status)
                     {

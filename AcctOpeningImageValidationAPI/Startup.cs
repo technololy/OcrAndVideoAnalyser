@@ -7,6 +7,7 @@ using AcctOpeningImageValidationAPI.Repository;
 using AcctOpeningImageValidationAPI.Repository.Abstraction;
 using AcctOpeningImageValidationAPI.Repository.Services.Implementation;
 using AcctOpeningImageValidationAPI.Services;
+using FluentScheduler;
 using IdentificationValidationLib;
 using IdentificationValidationLib.Abstractions;
 using Microsoft.AspNetCore.Builder;
@@ -77,6 +78,7 @@ namespace AcctOpeningImageValidationAPI
 
             services.AddSwaggerGen();
             services.AddSignalR();
+            JobManager.Initialize();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
