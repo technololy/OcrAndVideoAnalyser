@@ -93,7 +93,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                             
                             var result = Newtonsoft.Json.JsonConvert.SerializeObject(response);
 
-                            await _hub.Clients.All.SendAsync("NewItem", response);
+                            await _hub.Clients.All.SendAsync(_setting.SignalrEventName, response);
                         });
                     });
 

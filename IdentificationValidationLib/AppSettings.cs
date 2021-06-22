@@ -23,6 +23,7 @@ namespace IdentificationValidationLib
 
         public string LivenessVideoFormat { get; set; }
         public VerifyMeConfig VerifyMeConfig { get; set; }
+        public string SignalrEventName { get; set; }
     }
 
     public class VerifyMeConfig
