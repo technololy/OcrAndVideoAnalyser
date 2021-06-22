@@ -64,7 +64,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("liveness/submit-processing")]
-        public IActionResult SubmitProcessing([FromForm] FaceRequestForm model)
+        public async Task<IActionResult> SubmitProcessing([FromForm] FaceRequestForm model)
         {
             try
             {
@@ -109,12 +109,18 @@ namespace AcctOpeningImageValidationAPI.Controllers
                         Name = model.UserIdentification,
                         Description = $"Extraction Message : {message} | Extraction Status : {status}"
                     });
+
                     _context.SaveChanges();
 
+                    await _hub.Clients.All.SendAsync(_setting.SignalrEventName, "Hello, testing after video is done");
+
                     //TODO: Hand over to a scheduler or queuing system to handle
-                    Task.Run(() => {
+                    _ = Task.Run(() => {
 
                         _faceRepository.RunEyeBlinkAlgorithm(FilePath, model.UserIdentification, action : async response => {
+                            
+                            await _hub.Clients.All.SendAsync(_setting.SignalrEventName, "Hello, testing after video is done");
+
                             _context.RequestLog.Add(new RequestLogs
                             {
                                 Email = model.UserIdentification,
@@ -122,6 +128,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
                                 Name = model.UserIdentification,
                                 Description = $"==== Call Back From Video Analysis || Result Below : ====="
                             });
+
+                            _context.SaveChanges();
 
                             var result = Newtonsoft.Json.JsonConvert.SerializeObject(response);
 
@@ -132,6 +140,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
                                 Name = model.UserIdentification,
                                 Description = $"${result}"
                             });
+
+                            _context.SaveChanges();
 
                             await _hub.Clients.All.SendAsync(_setting.SignalrEventName, response);
 
