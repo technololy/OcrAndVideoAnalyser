@@ -64,7 +64,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("liveness/submit-processing")]
-        public async Task<IActionResult> SubmitProcessing([FromForm] FaceRequestForm model)
+        public IActionResult SubmitProcessing([FromForm] FaceRequestForm model)
         {
             try
             {
@@ -100,10 +100,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     //Create Video File
                     System.IO.File.WriteAllBytes(Path.Combine(FilePath, fileName), videoBytes);
 
-                    await _hub.Clients.All.SendAsync(_setting.SignalrEventName, "Hello, testing after video is done");
-
                     //TODO: Hand over to a scheduler or queuing system to handle
-                    _ = Task.Run(() => {
+                    Task.Run(() => {
                         // Extract Frames From Video
                         var (status, message) = _faceRepository.ExtractFrameFromVideo(FilePath, fileName);
 
