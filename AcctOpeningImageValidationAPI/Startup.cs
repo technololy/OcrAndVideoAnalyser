@@ -12,6 +12,7 @@ using IdentificationValidationLib;
 using IdentificationValidationLib.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -75,6 +76,13 @@ namespace AcctOpeningImageValidationAPI
             services.AddScoped<INetworkService, NetworkService>();
             services.AddScoped<IVerifyMeService, VerifyMeService>();
             // Register the Swagger generator, defining 1 or more Swagger documents
+
+            services.Configure<FormOptions>(options =>
+            {
+                options.ValueLengthLimit = 1000000000;
+                options.MultipartBodyLengthLimit = 10000000000; // if don't set default value is: 128 MB
+                options.MultipartHeadersLengthLimit = 1000000000;
+            });
 
             services.AddSwaggerGen();
             services.AddSignalR();

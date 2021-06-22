@@ -97,6 +97,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
                         Directory.CreateDirectory(FilePath);
                     }
 
+
+
                     //Create Video File
                     System.IO.File.WriteAllBytes(Path.Combine(FilePath, fileName), videoBytes);
 
