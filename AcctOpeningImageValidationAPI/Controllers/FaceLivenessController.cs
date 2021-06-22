@@ -100,22 +100,22 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     //Create Video File
                     System.IO.File.WriteAllBytes(Path.Combine(FilePath, fileName), videoBytes);
 
-                    // Extract Frames From Video
-                    var (status, message) = _faceRepository.ExtractFrameFromVideo(FilePath, fileName);
-
-                    _context.RequestLog.Add(new RequestLogs { 
-                        Email = model.UserIdentification,
-                        FileName = fileName,
-                        Name = model.UserIdentification,
-                        Description = $"Extraction Message : {message} | Extraction Status : {status}"
-                    });
-
-                    _context.SaveChanges();
-
                     await _hub.Clients.All.SendAsync(_setting.SignalrEventName, "Hello, testing after video is done");
 
                     //TODO: Hand over to a scheduler or queuing system to handle
                     _ = Task.Run(() => {
+                        // Extract Frames From Video
+                        var (status, message) = _faceRepository.ExtractFrameFromVideo(FilePath, fileName);
+
+                        _context.RequestLog.Add(new RequestLogs
+                        {
+                            Email = model.UserIdentification,
+                            FileName = fileName,
+                            Name = model.UserIdentification,
+                            Description = $"Extraction Message : {message} | Extraction Status : {status}"
+                        });
+
+                        _context.SaveChanges();
 
                         _faceRepository.RunEyeBlinkAlgorithm(FilePath, model.UserIdentification, action : async response => {
                             
@@ -155,12 +155,12 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
                             _context.SaveChanges();
                         });
-                    });
 
-                    if (!status)
-                    {
-                        return new OkObjectResult(HelperLib.ReponseClass.ReponseMethod(message, status));
-                    }
+                        //if (!status)
+                        //{
+                        //    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethod(message, status));
+                        //}
+                    });
 
                     return new OkObjectResult(HelperLib.ReponseClass.ReponseMethod("Successful", true));
                 }
