@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using AcctOpeningImageValidationAPI.Models;
 using AcctOpeningImageValidationAPI.Repository.Abstraction;
@@ -22,6 +23,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         private readonly IFaceRepository _faceRepository;
         private readonly INetworkService _networkService;
         private readonly IHubContext<NotificationHub> _hub;
+        private readonly SterlingOnebankIDCardsContext _context;
 
         /// <summary>
         /// AppSettings | Production or Development
@@ -32,14 +34,29 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// Constructor
         /// </summary>
         /// <param name="options"></param>
-        public FaceLivenessController(IFaceRepository faceRepository, IOptions<AppSettings> options, INetworkService networkService, IHubContext<NotificationHub> hub)
+        public FaceLivenessController(IFaceRepository faceRepository, 
+                                      IOptions<AppSettings> options, 
+                                      INetworkService networkService,
+                                      SterlingOnebankIDCardsContext context,
+                                      IHubContext<NotificationHub> hub)
         {
             _faceRepository = faceRepository;
             _setting = options.Value;
             _networkService = networkService;
             _hub = hub;
+            _context = context;
         }
 
+        /// <summary>
+        /// Provide logs
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("liveness/logs")]
+        public IActionResult GetLogs ()
+        {
+            return Ok(_context.RequestLog.ToList().OrderByDescending(x => x.Id));
+        }
         /// <summary>
         /// Submit Processing Method For SignalR Possible Implementation
         /// </summary>
@@ -86,14 +103,47 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     // Extract Frames From Video
                     var (status, message) = _faceRepository.ExtractFrameFromVideo(FilePath, fileName);
 
+                    _context.RequestLog.Add(new RequestLogs { 
+                        Email = model.UserIdentification,
+                        FileName = fileName,
+                        Name = model.UserIdentification,
+                        Description = $"Extraction Message : {message} | Extraction Status : {status}"
+                    });
+                    _context.SaveChanges();
+
                     //TODO: Hand over to a scheduler or queuing system to handle
                     Task.Run(() => {
 
                         _faceRepository.RunEyeBlinkAlgorithm(FilePath, model.UserIdentification, action : async response => {
-                            
+                            _context.RequestLog.Add(new RequestLogs
+                            {
+                                Email = model.UserIdentification,
+                                FileName = fileName,
+                                Name = model.UserIdentification,
+                                Description = $"==== Call Back From Video Analysis || Result Below : ====="
+                            });
+
                             var result = Newtonsoft.Json.JsonConvert.SerializeObject(response);
 
+                            _context.RequestLog.Add(new RequestLogs
+                            {
+                                Email = model.UserIdentification,
+                                FileName = fileName,
+                                Name = model.UserIdentification,
+                                Description = $"${result}"
+                            });
+
                             await _hub.Clients.All.SendAsync(_setting.SignalrEventName, response);
+
+                            _context.RequestLog.Add(new RequestLogs
+                            {
+                                Email = model.UserIdentification,
+                                FileName = fileName,
+                                Name = model.UserIdentification,
+                                Description = $"==== After Sending Notification ====="
+                            });
+
+                            _context.SaveChanges();
                         });
                     });
 
