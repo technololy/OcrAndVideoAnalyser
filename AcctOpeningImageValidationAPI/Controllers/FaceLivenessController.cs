@@ -9,6 +9,7 @@ using FluentScheduler;
 using IdentificationValidationLib;
 using IdentificationValidationLib.Abstractions;
 using IdentificationValidationLib.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
@@ -34,8 +35,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// Constructor
         /// </summary>
         /// <param name="options"></param>
-        public FaceLivenessController(IFaceRepository faceRepository, 
-                                      IOptions<AppSettings> options, 
+        public FaceLivenessController(IFaceRepository faceRepository,
+                                      IOptions<AppSettings> options,
                                       INetworkService networkService,
                                       SterlingOnebankIDCardsContext context,
                                       IHubContext<NotificationHub> hub)
@@ -53,7 +54,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("liveness/logs")]
-        public IActionResult GetLogs ()
+        public IActionResult GetLogs()
         {
             return Ok(_context.RequestLog.ToList().OrderByDescending(x => x.Id));
         }
@@ -103,7 +104,8 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     System.IO.File.WriteAllBytes(Path.Combine(FilePath, fileName), videoBytes);
 
                     //TODO: Hand over to a scheduler or queuing system to handle
-                    Task.Run(() => {
+                    Task.Run(() =>
+                    {
                         // Extract Frames From Video
                         var (status, message) = _faceRepository.ExtractFrameFromVideo(FilePath, fileName);
 
@@ -117,8 +119,9 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
                         _context.SaveChanges();
 
-                        _faceRepository.RunEyeBlinkAlgorithm(FilePath, model.UserIdentification, action : async response => {
-                            
+                        _faceRepository.RunEyeBlinkAlgorithm(FilePath, model.UserIdentification, action: async response =>
+                        {
+
                             await _hub.Clients.All.SendAsync(_setting.SignalrEventName, "Hello, testing after video is done");
 
                             _context.RequestLog.Add(new RequestLogs
@@ -176,7 +179,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         [Route("signalr/send-message")]
         public async Task<IActionResult> SendSignalR([FromBody] SignalModel model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Please pass the message", false));
             }
@@ -196,7 +199,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         {
             try
             {
-                if(!ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
                     return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<LivenessCheckResponse>("All fields are required", null, false));
                 }
@@ -213,7 +216,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 FilePath = Path.Combine(FilePath, model.UserIdentification, DateTime.Now.ToShortDateString(), DateTime.Now.Ticks.ToString());
 
                 //Check if Directory Not Exists
-                if(!Directory.Exists(FilePath))
+                if (!Directory.Exists(FilePath))
                 {
                     //Create directory always
                     Directory.CreateDirectory(FilePath);
@@ -225,7 +228,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 // Extract Frames From Video
                 var (status, message) = _faceRepository.ExtractFrameFromVideo(FilePath, fileName);
 
-                if(!status)
+                if (!status)
                 {
                     return new OkObjectResult(HelperLib.ReponseClass.ReponseMethod(message, status));
                 }
@@ -254,10 +257,51 @@ namespace AcctOpeningImageValidationAPI.Controllers
         }
 
         [HttpPost]
-        [Route("liveness/multiple-images")]
-        public async Task<IActionResult> ProcessVideoImages ([FromBody] FaceRequestImages model)
+        [Route("liveness/multiple-form-images")]
+        public async Task<IActionResult> ProcessVideoImages([FromForm] MultipleFormRequest model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            //Get File Path from the root liveness directory
+            string FilePath = Path.Combine(Directory.GetCurrentDirectory(), _setting.LivenessRootFolder);
+
+            //Create directory always
+            Directory.CreateDirectory(FilePath);
+
+            var i = 0; var shortDate = DateTime.Now.ToShortDateString(); var tick = DateTime.Now.Ticks.ToString();
+
+            while (i < model.Files.Length)
+            {
+                SaveFormFile(model.UserIdentification, model.Files[i], shortDate, tick, i);
+                i++;
+            }
+
+            //Combine the Path finally
+            FilePath = Path.Combine(FilePath, model.UserIdentification, shortDate, tick);
+
+            //Convert Image to stream
+            var headPoseResult = await _faceRepository.RunHeadGestureOnImageFrame(FilePath, model.UserIdentification);
+
+            //Return Response
+            var response = new LivenessCheckResponse
+            {
+                HeadNodingDetected = headPoseResult.Item1,
+                HeadShakingDetected = headPoseResult.Item2,
+                HeadRollingDetected = headPoseResult.Item3,
+                HasFaceSmile = headPoseResult.Item4
+            };
+
+            return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", response, true));
+        }
+
+        [HttpPost]
+        [Route("liveness/multiple-images")]
+        public async Task<IActionResult> ProcessVideoImages([FromBody] FaceRequestImages model)
+        {
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
@@ -270,7 +314,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
             var i = 0;
 
-            while(i <= model.Images.Length)
+            while (i <= model.Images.Length)
             {
                 var fileName = string.Format("{0}\\image-{1}.jpeg", Path.Combine(FilePath), i);
 
@@ -305,10 +349,10 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<LivenessCheckResponse>("All fields are required", null, false));
                 }
 
-                using(var ms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
                     model.File.CopyTo(ms);
-                    
+
                     //Set File Name
                     var fileName = $"FormVideo.{_setting.LivenessVideoFormat}";
 
@@ -355,7 +399,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
                     return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", response, true));
                 }
-              
+
             }
             catch (Exception ex)
             {
@@ -366,7 +410,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         [HttpPost]
         [Route("liveness/blink/form")]
-        public async Task<IActionResult> ProcessBlinkAlgorithm ([FromForm] FaceRequestForm model)
+        public async Task<IActionResult> ProcessBlinkAlgorithm([FromForm] FaceRequestForm model)
         {
             try
             {
@@ -421,6 +465,39 @@ namespace AcctOpeningImageValidationAPI.Controllers
             {
                 Console.WriteLine(ex.Message);
                 return BadRequest(ex.Message);
+            }
+        }
+
+        private string SaveFormFile (string UserIdentification, IFormFile File, string shortDate, string tick, int index)
+        {
+            using (var ms = new MemoryStream())
+            {
+                File.CopyTo(ms);
+
+                string FilePath = Path.Combine(Directory.GetCurrentDirectory(), _setting.LivenessRootFolder);
+
+                //Get File Path from the root liveness directory
+                FilePath = Path.Combine(FilePath, UserIdentification, shortDate, tick);//DateTime.Now.ToShortDateString() DateTime.Now.Ticks.ToString()
+
+                //Set File Name
+                var fileName = string.Format("{0}\\image-{1}.jpeg", FilePath, index);
+
+                //Convert the images from Base64 to VideoBytes
+                byte[] videoBytes = ms.ToArray();
+
+                ms.Flush(); ms.Close();
+
+                //Check if Directory Not Exists
+                if (!Directory.Exists(FilePath))
+                {
+                    //Create directory always
+                    Directory.CreateDirectory(FilePath);
+                }
+
+                //Create Video File
+                System.IO.File.WriteAllBytes(fileName, videoBytes);
+
+                return fileName;
             }
         }
     }
