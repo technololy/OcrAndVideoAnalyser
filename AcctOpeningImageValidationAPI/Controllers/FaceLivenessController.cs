@@ -267,6 +267,11 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
             try
             {
+                if(model.Files.Length == 0)
+                {
+                    return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<LivenessCheckResponse>("No image being passed, please send image", null, false));
+                }
+
                 //Get File Path from the root liveness directory
                 string FilePath = Path.Combine(Directory.GetCurrentDirectory(), _setting.LivenessRootFolder);
 
