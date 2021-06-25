@@ -262,39 +262,45 @@ namespace AcctOpeningImageValidationAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<LivenessCheckResponse>("All fields are required", null, false));
             }
 
-            //Get File Path from the root liveness directory
-            string FilePath = Path.Combine(Directory.GetCurrentDirectory(), _setting.LivenessRootFolder);
-
-            //Create directory always
-            Directory.CreateDirectory(FilePath);
-
-            var i = 0; var shortDate = DateTime.Now.ToShortDateString(); var tick = DateTime.Now.Ticks.ToString();
-
-            while (i < model.Files.Length)
+            try
             {
-                SaveFormFile(model.UserIdentification, model.Files[i], shortDate, tick, i);
-                i++;
+                //Get File Path from the root liveness directory
+                string FilePath = Path.Combine(Directory.GetCurrentDirectory(), _setting.LivenessRootFolder);
+
+                //Create directory always
+                Directory.CreateDirectory(FilePath);
+
+                var i = 0; var shortDate = DateTime.Now.ToShortDateString(); var tick = DateTime.Now.Ticks.ToString();
+
+                while (i < model.Files.Length)
+                {
+                    SaveFormFile(model.UserIdentification, model.Files[i], shortDate, tick, i);
+                    i++;
+                }
+
+                //Combine the Path finally
+                FilePath = Path.Combine(FilePath, model.UserIdentification, shortDate, tick);
+
+                //Convert Image to stream
+                var headPoseResult = await _faceRepository.RunHeadGestureOnImageFrame(FilePath, model.UserIdentification);
+
+                //Return Response
+                var response = new LivenessCheckResponse
+                {
+                    HeadNodingDetected = headPoseResult.Item1,
+                    HeadShakingDetected = headPoseResult.Item2,
+                    HeadRollingDetected = headPoseResult.Item3,
+                    HasFaceSmile = headPoseResult.Item4
+                };
+
+                return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", response, true));
+            } catch(Exception e)
+            {
+                return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric<LivenessCheckResponse>(e.Message, null, false));
             }
-
-            //Combine the Path finally
-            FilePath = Path.Combine(FilePath, model.UserIdentification, shortDate, tick);
-
-            //Convert Image to stream
-            var headPoseResult = await _faceRepository.RunHeadGestureOnImageFrame(FilePath, model.UserIdentification);
-
-            //Return Response
-            var response = new LivenessCheckResponse
-            {
-                HeadNodingDetected = headPoseResult.Item1,
-                HeadShakingDetected = headPoseResult.Item2,
-                HeadRollingDetected = headPoseResult.Item3,
-                HasFaceSmile = headPoseResult.Item4
-            };
-
-            return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", response, true));
         }
 
         [HttpPost]
