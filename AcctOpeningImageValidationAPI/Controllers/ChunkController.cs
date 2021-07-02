@@ -14,10 +14,8 @@ namespace XFUploadFile.Server.Controllers
     {
         private readonly ILogger<ChunkController> _logger;
         private readonly IWebHostEnvironment _environment;
-        private
-
-        public ChunkController(ILogger<ChunkController> logger,
-            IWebHostEnvironment environment)
+        
+        public ChunkController(ILogger<ChunkController> logger,IWebHostEnvironment environment)
         {
             _logger = logger;
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
