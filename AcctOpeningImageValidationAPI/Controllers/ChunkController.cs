@@ -79,8 +79,8 @@ namespace XFUploadFile.Server.Controllers
             if (!Directory.Exists(filePath))
                 Directory.CreateDirectory(filePath); //Create the temp upload directory if it doesn't exist yet.
 
-            fileName = fileName.Substring(0, fileName.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase)); //Remove the extension.
-            var tempFileName = $"{fileName} {Guid.NewGuid()}{Path.GetExtension(fileName)}"; //Build the temp filename.
+            //fileName = fileName.Substring(0, fileName.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase)); //Remove the extension.
+            var tempFileName = $"{fileName}{Guid.NewGuid()}{Path.GetExtension(fileName)}"; //Build the temp filename.
 
             try
             {
