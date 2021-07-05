@@ -437,8 +437,7 @@ namespace AcctOpeningImageValidationAPI.Repository
                     blinkResult.EyeBlinks = new List<EyeBlink>();
                 }
 
-                int eyeLeftValue, eyeRightValue;
-                bool eyeLeftBlinked = false, eyeRightBlinked = false;
+                int eyeLeftValue, eyeRightValue; bool eyeLeftBlinked = false, eyeRightBlinked = false;
 
                 eyeLeftValue = Convert.ToInt32(faceLandMark.EyeLeftBottom.Y) - Convert.ToInt32(faceLandMark.EyeLeftTop.Y);
 
