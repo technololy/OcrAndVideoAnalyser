@@ -182,15 +182,25 @@ namespace XFUploadFile.Server.Controllers
 
                     fileInfo.MoveTo(newFile.FullName); //Move the completed file to the main upload directory.
 
-                    //TODO: Run Facial Recognition Algorithm
-                    var faceGestureResults = await _faceRepository.RunEyeBlinkAlgorithm(newFile.FullName, userIdentification);
+                    (var success, var message) = _faceRepository.ExtractFrameFromVideo(chunkPath, fileHandle);
 
-                    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", faceGestureResults, true));
+                    if (success)
+                    {
+                        //TODO: Run Facial Recognition Algorithm
+                        EyeBlinkResult faceGestureResults = await _faceRepository.RunEyeBlinkAlgorithm(chunkPath, userIdentification);
+
+                        return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", faceGestureResults, true));
+
+                    } else {
+
+                        return BadRequest(HelperLib.ReponseClass.ReponseMethod("Unsucessful", false));
+                    }
                 }
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error");
+
                 return new StatusCodeResult(500);
             }
             return Ok();

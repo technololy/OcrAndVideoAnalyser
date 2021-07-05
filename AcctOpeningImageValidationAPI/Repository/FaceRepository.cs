@@ -147,7 +147,10 @@ namespace AcctOpeningImageValidationAPI.Repository
 
         public async Task<EyeBlinkResult> RunEyeBlinkAlgorithm (string filePath, string userIdentification)
         {
-            var files = Directory.GetFiles(filePath); var items = files.Reverse(); var base64Encoded = string.Empty; var index = 0;
+            var files = Directory.GetFiles(filePath); 
+            var items = files.Reverse(); 
+            var base64Encoded = string.Empty; 
+            var index = 0;
 
             foreach (var item in items)
             {
@@ -504,5 +507,5 @@ public class EyeBlink
 public class EyeBlinkResult
 {
     public List<EyeBlink> EyeBlinks { get; set; }
-    public bool EyeBlinked { get; set; }
+    public bool IsHuman { get; set; }
 }

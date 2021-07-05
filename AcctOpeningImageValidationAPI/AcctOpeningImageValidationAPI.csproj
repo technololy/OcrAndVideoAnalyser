@@ -49,6 +49,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="user\" />
     <Folder Include="Repository\Abstraction\" />
     <Folder Include="Helpers\" />
     <Folder Include="Repository\Services\" />
