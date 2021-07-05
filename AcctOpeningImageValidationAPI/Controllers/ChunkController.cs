@@ -165,7 +165,15 @@ namespace XFUploadFile.Server.Controllers
                     if (fileInfo.Length != fileSize)
                         return Conflict(); //The local file does not have the same size as the file that was uploaded. This could indicate the upload was not completed properly.
 
-                    var newFile = new FileInfo(Path.Combine(_environment.ContentRootPath, userIdentification, "chunks", fileHandle));
+                    var chunkPath = Path.Combine(_environment.ContentRootPath, userIdentification, "chunks");
+
+                    if(!Directory.Exists(chunkPath))
+                    {
+                        Directory.CreateDirectory(chunkPath);
+                    }
+
+                    var newFile = new FileInfo(Path.Combine(chunkPath, fileHandle));
+
                     if (newFile.Exists)
                         newFile.Delete(); //Delete a file with the same name if it already exists, effectively overwriting it.
 
