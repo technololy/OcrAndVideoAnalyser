@@ -201,7 +201,7 @@ namespace XFUploadFile.Server.Controllers
             {
                 _logger.LogError(e, "Error");
 
-                return new StatusCodeResult(500);
+                return BadRequest(HelperLib.ReponseClass.ReponseMethod("Unsucessful", false));
             }
             return Ok();
         }

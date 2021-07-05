@@ -466,11 +466,11 @@ namespace AcctOpeningImageValidationAPI.Repository
                     LeftEyeStatus = eyeLeftBlinked ? "CLOSED" : "OPENED"
                 });
 
-                if (blinkResult.EyeBlinked == false)
+                if (blinkResult.IsHuman == false)
                 {
                     if (eyeLeftBlinked == true || eyeRightBlinked == true)
                     {
-                        blinkResult.EyeBlinked = true;
+                        blinkResult.IsHuman = true;
                     }
                 }
             }
