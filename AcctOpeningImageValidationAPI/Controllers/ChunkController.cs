@@ -107,29 +107,34 @@ namespace XFUploadFile.Server.Controllers
         [Route("UploadChunk")]
         public IActionResult UploadChunk(MediaChunk mediaChunk)
         {
-            var path = Path.Combine(_environment.ContentRootPath, mediaChunk.UserIdentification, "temp", mediaChunk.FileHandle);
-            var fileInfo = new FileInfo(path);
-            var start = Convert.ToInt64(mediaChunk.StartAt);
-
-            if (!fileInfo.Exists)
-                return NotFound(); //Temp file not found, maybe BeginFileUpload was not called?
-
-            if (fileInfo.Length != start)
-                return BadRequest(); //The temp file is not the same length as the starting position of the next chunk, Maybe they are sent out of order?
-
             try
             {
-                using var fs = new FileStream(path, FileMode.Append);
+                var path = Path.Combine(_environment.ContentRootPath, mediaChunk.UserIdentification, "temp", mediaChunk.FileHandle);
+                var fileInfo = new FileInfo(path);
+                var start = Convert.ToInt64(mediaChunk.StartAt);
 
-                var bytes = Convert.FromBase64String(mediaChunk.Data);
-                fs.Write(bytes, 0, bytes.Length);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error");
-                return new StatusCodeResult(500);
-            }
-            return Ok();
+                if (!fileInfo.Exists)
+                    return NotFound(); //Temp file not found, maybe BeginFileUpload was not called?
+
+                if (fileInfo.Length != start)
+                    return BadRequest(); //The temp file is not the same length as the starting position of the next chunk, Maybe they are sent out of order?
+
+                try
+                {
+                    using var fs = new FileStream(path, FileMode.Append);
+
+                    var bytes = Convert.FromBase64String(mediaChunk.Data);
+                    fs.Write(bytes, 0, bytes.Length);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Error");
+                    return new StatusCodeResult(500);
+                }
+
+                return Ok();
+
+            }catch(Exception e) { return new StatusCodeResult(500);  }
         }
 
         /// <summary>
