@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using AcctOpeningImageValidationAPI.Models;
+using AcctOpeningImageValidationAPI.Repository.Abstraction;
 using IdentificationValidationLib;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -17,11 +18,13 @@ namespace XFUploadFile.Server.Controllers
         private readonly ILogger<ChunkController> _logger;
         private readonly IWebHostEnvironment _environment;
         private readonly AppSettings _setting;
+        private readonly IFaceRepository _faceRepository;
         
-        public ChunkController(ILogger<ChunkController> logger,IWebHostEnvironment environment, IOptions<AppSettings> options)
+        public ChunkController(ILogger<ChunkController> logger,IWebHostEnvironment environment, IOptions<AppSettings> options, IFaceRepository faceRepository)
         {
             _setting = options.Value;
             _logger = logger;
+            _faceRepository = faceRepository;
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
         }
 
@@ -150,7 +153,7 @@ namespace XFUploadFile.Server.Controllers
         /// <returns>Code Ok if the upload was successfully ended. Code 404 if the file handle was not found. Or code 500 if the file could not be moved or deleted.</returns>
         [HttpGet]
         [Route("EndFileUpload")]
-        public IActionResult EndFileUpload(string fileHandle, string userIdentification, bool quitUpload, long fileSize)
+        public async Task<IActionResult> EndFileUpload(string fileHandle, string userIdentification, bool quitUpload, long fileSize)
         {
             var fileInfo = new FileInfo(Path.Combine(_environment.ContentRootPath, userIdentification, "temp", fileHandle));
             if (!fileInfo.Exists)
@@ -178,6 +181,11 @@ namespace XFUploadFile.Server.Controllers
                         newFile.Delete(); //Delete a file with the same name if it already exists, effectively overwriting it.
 
                     fileInfo.MoveTo(newFile.FullName); //Move the completed file to the main upload directory.
+
+                    //TODO: Run Facial Recognition Algorithm
+                    var faceGestureResults = await _faceRepository.RunEyeBlinkAlgorithm(newFile.FullName, userIdentification);
+
+                    return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", faceGestureResults, true));
                 }
             }
             catch (Exception e)
