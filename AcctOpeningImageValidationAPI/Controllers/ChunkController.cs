@@ -2,9 +2,11 @@
 using System.IO;
 using System.Threading.Tasks;
 using AcctOpeningImageValidationAPI.Models;
+using IdentificationValidationLib;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace XFUploadFile.Server.Controllers
 {
@@ -14,9 +16,11 @@ namespace XFUploadFile.Server.Controllers
     {
         private readonly ILogger<ChunkController> _logger;
         private readonly IWebHostEnvironment _environment;
+        private readonly AppSettings _setting;
         
-        public ChunkController(ILogger<ChunkController> logger,IWebHostEnvironment environment)
+        public ChunkController(ILogger<ChunkController> logger,IWebHostEnvironment environment, IOptions<AppSettings> options)
         {
+            _setting = options.Value;
             _logger = logger;
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
         }
@@ -80,7 +84,7 @@ namespace XFUploadFile.Server.Controllers
                 Directory.CreateDirectory(filePath); //Create the temp upload directory if it doesn't exist yet.
 
             //fileName = fileName.Substring(0, fileName.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase)); //Remove the extension.
-            var tempFileName = $"{fileName}{Guid.NewGuid()}{Path.GetExtension(fileName)}"; //Build the temp filename.
+            var tempFileName = $"{fileName}{Guid.NewGuid()}{_setting.LivenessVideoFormat}"; //Build the temp filename. //{Path.GetExtension(fileName)}
 
             try
             {
