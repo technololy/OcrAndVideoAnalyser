@@ -233,7 +233,6 @@ namespace AcctOpeningImageValidationAPI.Repository
                 //var faces = await client.Face.DetectWithUrlWithHttpMessagesAsync(url, returnFaceId: false, returnFaceAttributes: attrs);
                 HttpOperationResponse<IList<DetectedFace>> faces = await client.Face.DetectWithStreamWithHttpMessagesAsync(stream, returnFaceId: true, returnFaceAttributes: attrs, returnFaceLandmarks : true);
 
-                
                 //Check if Face is a Human face
                 if (faces.Body.Count <= 0)
                 {

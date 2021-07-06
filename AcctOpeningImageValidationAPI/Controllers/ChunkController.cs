@@ -190,7 +190,29 @@ namespace XFUploadFile.Server.Controllers
                         EyeBlinkResult faceGestureResults = await _faceRepository.RunEyeBlinkAlgorithm(chunkPath, userIdentification);
 
                         //TODO : Delete Folder
-                        Directory.Delete(chunkPath); Directory.Delete(Path.Combine(_environment.ContentRootPath, userIdentification, "temp"));
+                        var chunkFiles = Directory.GetFiles(chunkPath);
+
+                        var tempFiles = Directory.GetFiles(Path.Combine(_environment.ContentRootPath, userIdentification, "temp"));
+
+                        foreach (var file in chunkFiles)
+                        {
+                            if(System.IO.File.Exists(file))
+                            {
+                                System.IO.File.Delete(file);
+                            }
+                        }
+
+                        Directory.Delete(chunkPath);
+
+                        foreach (var tempFile in tempFiles)
+                        {
+                            if (System.IO.File.Exists(tempFile))
+                            {
+                                System.IO.File.Delete(tempFile);
+                            }
+                        }
+
+                        Directory.Delete(Path.Combine(_environment.ContentRootPath, userIdentification, "temp"));
 
                         return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", faceGestureResults, true));
 
