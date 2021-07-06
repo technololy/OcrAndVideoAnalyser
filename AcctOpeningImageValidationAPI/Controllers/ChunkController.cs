@@ -189,6 +189,9 @@ namespace XFUploadFile.Server.Controllers
                         //TODO: Run Facial Recognition Algorithm
                         EyeBlinkResult faceGestureResults = await _faceRepository.RunEyeBlinkAlgorithm(chunkPath, userIdentification);
 
+                        //TODO : Delete Folder
+                        Directory.Delete(chunkPath); Directory.Delete(Path.Combine(_environment.ContentRootPath, userIdentification, "temp"));
+
                         return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", faceGestureResults, true));
 
                     } else {
