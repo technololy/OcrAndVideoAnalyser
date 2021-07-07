@@ -19,13 +19,14 @@ namespace XFUploadFile.Server.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly AppSettings _setting;
         private readonly IFaceRepository _faceRepository;
-        
-        public ChunkController(ILogger<ChunkController> logger,IWebHostEnvironment environment, IOptions<AppSettings> options, IFaceRepository faceRepository)
+        private readonly SterlingOnebankIDCardsContext _context;
+        public ChunkController(ILogger<ChunkController> logger,IWebHostEnvironment environment, IOptions<AppSettings> options, IFaceRepository faceRepository, SterlingOnebankIDCardsContext context)
         {
             _setting = options.Value;
             _logger = logger;
             _faceRepository = faceRepository;
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
+            _context = context;
         }
 
         [HttpPost]
@@ -224,8 +225,9 @@ namespace XFUploadFile.Server.Controllers
             }
             catch (Exception e)
             {
+                _context.RequestLog.Add(new RequestLogs { Description = $"Message : {e.Message}    |   StackTrace  : {e.StackTrace} " });
+                _context.SaveChanges();
                 _logger.LogError(e, "Error");
-
                 return BadRequest(HelperLib.ReponseClass.ReponseMethod("Unsucessful", false));
             }
             return Ok();
