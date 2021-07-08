@@ -3,9 +3,11 @@ using System.IO;
 using System.Threading.Tasks;
 using AcctOpeningImageValidationAPI.Models;
 using AcctOpeningImageValidationAPI.Repository.Abstraction;
+using AcctOpeningImageValidationAPI.Services;
 using IdentificationValidationLib;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -20,13 +22,15 @@ namespace XFUploadFile.Server.Controllers
         private readonly AppSettings _setting;
         private readonly IFaceRepository _faceRepository;
         private readonly SterlingOnebankIDCardsContext _context;
-        public ChunkController(ILogger<ChunkController> logger,IWebHostEnvironment environment, IOptions<AppSettings> options, IFaceRepository faceRepository, SterlingOnebankIDCardsContext context)
+        private readonly IHubContext<NotificationHub> _hub;
+        public ChunkController(ILogger<ChunkController> logger,IWebHostEnvironment environment, IOptions<AppSettings> options, IFaceRepository faceRepository, SterlingOnebankIDCardsContext context, IHubContext<NotificationHub> hub)
         {
             _setting = options.Value;
             _logger = logger;
             _faceRepository = faceRepository;
             _environment = environment ?? throw new ArgumentNullException(nameof(environment));
             _context = context;
+            _hub = hub;
         }
 
         [HttpPost]
@@ -183,44 +187,58 @@ namespace XFUploadFile.Server.Controllers
 
                     fileInfo.MoveTo(newFile.FullName); //Move the completed file to the main upload directory.
 
-                    (var success, var message) = _faceRepository.ExtractFrameFromVideo(chunkPath, fileHandle);
+                    _ = Task.Run(async () =>
+                      {
+                          (var success, var message) = _faceRepository.ExtractFrameFromVideo(chunkPath, fileHandle);
 
-                    if (success)
-                    {
-                        //TODO: Run Facial Recognition Algorithm
-                        EyeBlinkResult faceGestureResults = await _faceRepository.RunEyeBlinkAlgorithm(chunkPath, userIdentification);
+                          if (success)
+                          {
+                            //TODO: Run Facial Recognition Algorithm
+                            EyeBlinkResult faceGestureResults = await _faceRepository.RunEyeBlinkAlgorithm(chunkPath, userIdentification);
 
-                        //TODO : Delete Folder
-                        var chunkFiles = Directory.GetFiles(chunkPath);
+                            //TODO : Delete Folder
+                            var chunkFiles = Directory.GetFiles(chunkPath);
 
-                        var tempFiles = Directory.GetFiles(Path.Combine(_environment.ContentRootPath, userIdentification, "temp"));
+                              var tempFiles = Directory.GetFiles(Path.Combine(_environment.ContentRootPath, userIdentification, "temp"));
 
-                        foreach (var file in chunkFiles)
-                        {
-                            if(System.IO.File.Exists(file))
-                            {
-                                System.IO.File.Delete(file);
-                            }
-                        }
+                              foreach (var file in chunkFiles)
+                              {
+                                  if (System.IO.File.Exists(file))
+                                  {
+                                      System.IO.File.Delete(file);
+                                  }
+                              }
 
-                        Directory.Delete(chunkPath);
+                              Directory.Delete(chunkPath);
 
-                        foreach (var tempFile in tempFiles)
-                        {
-                            if (System.IO.File.Exists(tempFile))
-                            {
-                                System.IO.File.Delete(tempFile);
-                            }
-                        }
+                              foreach (var tempFile in tempFiles)
+                              {
+                                  if (System.IO.File.Exists(tempFile))
+                                  {
+                                      System.IO.File.Delete(tempFile);
+                                  }
+                              }
 
-                        Directory.Delete(Path.Combine(_environment.ContentRootPath, userIdentification, "temp"));
+                              Directory.Delete(Path.Combine(_environment.ContentRootPath, userIdentification, "temp"));
 
-                        return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", faceGestureResults, true));
+                              var dataResponse = HelperLib.ReponseClass.ReponseMethodGeneric("Successful", faceGestureResults, true);
 
-                    } else {
+                              var result = Newtonsoft.Json.JsonConvert.SerializeObject(dataResponse);
 
-                        return BadRequest(HelperLib.ReponseClass.ReponseMethod("Unsucessful", false));
-                    }
+                              await _hub.Clients.All.SendAsync(_setting.SignalrEventName, result);
+                          }
+                          else
+                          {
+
+                              var dataResponse = HelperLib.ReponseClass.ReponseMethod("Unsucessful", false);
+
+                              var result = Newtonsoft.Json.JsonConvert.SerializeObject(dataResponse);
+
+                              await _hub.Clients.All.SendAsync(_setting.SignalrEventName, result);
+                          }
+                      });
+
+                    return Ok(HelperLib.ReponseClass.ReponseMethod("Successful", true));
                 }
             }
             catch (Exception e)
