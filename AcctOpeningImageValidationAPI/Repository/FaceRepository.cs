@@ -5,6 +5,7 @@ using IdentificationValidationLib;
 using MediaToolkit;
 using MediaToolkit.Model;
 using MediaToolkit.Options;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 using Microsoft.Extensions.Options;
@@ -51,9 +52,9 @@ namespace AcctOpeningImageValidationAPI.Repository
         /// </summary>
         /// <param name="faceId"></param>
         /// <returns></returns>
-        public async Task CreateFaceList (string largeFaceListId)
+        public async Task CreateFaceList()
         {
-            await client.LargeFaceList.CreateAsync(largeFaceListId, name: _setting.FaceListId);
+            await client.LargeFaceList.CreateAsync(_setting.FaceListId, name: _setting.FaceListName);
         }
 
         /// <summary>
@@ -62,8 +63,10 @@ namespace AcctOpeningImageValidationAPI.Repository
         /// <param name="stream"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public async Task<PersistedFace> AddFaceToFaceList(Stream stream, string name)
+        public async Task<PersistedFace> AddFaceToFaceList(IFormFile File, string name)
         {
+            var stream = ConvertImageToStreamFromIFormFile(File);
+
             PersistedFace faceResult = await client.LargeFaceList.AddFaceFromStreamAsync(_setting.FaceListId, stream, name);
 
             return faceResult;
@@ -149,6 +152,22 @@ namespace AcctOpeningImageValidationAPI.Repository
             return ConvertImageFromImageToStream(Image.FromStream(ms));
         }
 
+        public Stream ConvertImageToStreamFromIFormFile(IFormFile File)
+        {
+            using (var ms = new MemoryStream())
+            {
+                //Copy to Memory stream reference
+                File.CopyTo(ms);
+
+                //Convert To Image, from MemoryStream to Stream
+                var result =  ConvertImageFromImageToStream(Image.FromStream(ms));
+
+                //Release memory, flush and close
+                ms.Flush(); ms.Close();
+
+                return result;
+            }
+        }
         /// <summary>
         /// Convert Image From Image To Stream
         /// </summary>

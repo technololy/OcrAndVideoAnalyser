@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,8 +18,8 @@ namespace AcctOpeningImageValidationAPI.Repository.Abstraction
         Tuple<bool, bool> AnalyzeFaceLandMark(FaceLandmarks faceLandMark);
         Task<EyeBlinkResult> RunEyeBlinkAlgorithm(string filePath, string userIdentification);
         Task RunEyeBlinkAlgorithm(string filePath, string userIdentification, Action<EyeBlinkResult> action);
-        Task CreateFaceList(string faceId);
-        Task<PersistedFace> AddFaceToFaceList(Stream stream, string name);
+        Task CreateFaceList();
+        Task<PersistedFace> AddFaceToFaceList(IFormFile file, string name);
         Task<PersistedFace> VerifyFaceToFaceList(Guid persistedFaceId);
     }
 }

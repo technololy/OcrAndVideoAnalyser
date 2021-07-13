@@ -80,6 +80,16 @@ namespace AcctOpeningImageValidationAPI.Repository.Response
         }
 
         /// <summary>
+        /// Method overload for Ok-Data only
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static ResponseViewModel<T> Ok(T data)
+        {
+            return new ResponseViewModel<T>(true, ResponseMessageViewModel.OK, data);
+        }
+
+        /// <summary>
         /// Ok - Success Method With Data
         /// </summary>
         /// <param name="message"></param>
@@ -88,6 +98,16 @@ namespace AcctOpeningImageValidationAPI.Repository.Response
         public static ResponseViewModel<T> Ok(string message, T data)
         {
             return new ResponseViewModel<T>(true, message, data);
+        }
+
+        /// <summary>
+        /// Unsuccessful without message, default-message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static ResponseViewModel<T> Failed()
+        {
+            return new ResponseViewModel<T>(false, ResponseMessageViewModel.UNSUCCESSFUL);
         }
 
         /// <summary>

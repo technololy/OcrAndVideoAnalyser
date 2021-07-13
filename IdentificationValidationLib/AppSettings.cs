@@ -16,6 +16,7 @@ namespace IdentificationValidationLib
         public VerifyMeConfig VerifyMeConfig { get; set; }
         public string SignalrEventName { get; set; }
         public string FaceListId { get; set; }
+        public string FaceListName { get; set; }
     }
 
     public class VerifyMeConfig
