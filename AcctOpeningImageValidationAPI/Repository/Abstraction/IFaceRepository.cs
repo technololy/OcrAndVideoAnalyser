@@ -16,5 +16,6 @@ namespace AcctOpeningImageValidationAPI.Repository.Abstraction
         Tuple<bool, bool> AnalyzeFaceLandMark(FaceLandmarks faceLandMark);
         Task<EyeBlinkResult> RunEyeBlinkAlgorithm(string filePath, string userIdentification);
         Task RunEyeBlinkAlgorithm(string filePath, string userIdentification, Action<EyeBlinkResult> action);
+        Task CreateFaceList(string faceId);
     }
 }

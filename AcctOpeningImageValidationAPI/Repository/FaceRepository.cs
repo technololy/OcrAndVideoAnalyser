@@ -45,6 +45,42 @@ namespace AcctOpeningImageValidationAPI.Repository
             _restClientService = restClientService;
             client = new FaceClient(new ApiKeyServiceClientCredentials(_setting.subscriptionKey)) { Endpoint = _setting.AzureFacialBaseUrl };
         }
+
+        /// <summary>
+        /// Create Face List For Later Verification
+        /// </summary>
+        /// <param name="faceId"></param>
+        /// <returns></returns>
+        public async Task CreateFaceList (string largeFaceListId)
+        {
+            await client.LargeFaceList.CreateAsync(largeFaceListId, name: _setting.FaceListId);
+        }
+
+        /// <summary>
+        /// Add Face To Face List
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public async Task<PersistedFace> AddFaceToFaceList(Stream stream, string name)
+        {
+            PersistedFace faceResult = await client.LargeFaceList.AddFaceFromStreamAsync(_setting.FaceListId, stream, name);
+
+            return faceResult;
+        }
+
+        /// <summary>
+        /// Verify Face To Face List
+        /// </summary>
+        /// <param name="persistedFaceId"></param>
+        /// <returns></returns>
+        public async Task<PersistedFace> VerifyFaceToFaceList(Guid persistedFaceId)
+        {
+            var result = await client.LargeFaceList.GetFaceAsync(_setting.FaceListId, persistedFaceId);
+
+            return result;
+        }
+
         /// <summary>
         /// Extraction of video frame is being done here
         /// </summary>
