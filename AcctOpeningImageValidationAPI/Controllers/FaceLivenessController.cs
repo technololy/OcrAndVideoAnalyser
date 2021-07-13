@@ -184,7 +184,16 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Please pass the message", false));
             }
 
-            await _hub.Clients.All.SendAsync("NewItem", "Hello From The Mars!!!");
+            //var dataResponse = HelperLib.ReponseClass.ReponseMethodGeneric("Successful", new EyeBlinkResult(), true);
+
+            //var result = Newtonsoft.Json.JsonConvert.SerializeObject(dataResponse);
+
+            // await _hub.Clients.All.SendAsync(_setting.SignalrEventName, result);
+
+            _ = Task.Run(async () =>
+            {
+                await _hub.Clients.All.SendAsync(_setting.SignalrEventName, "Hello, this is coming from Mars!!!");
+            });
 
             return new OkObjectResult(HelperLib.ReponseClass.ReponseMethodGeneric("Successful", true));
         }

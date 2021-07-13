@@ -226,9 +226,7 @@ namespace XFUploadFile.Server.Controllers
                               var result = Newtonsoft.Json.JsonConvert.SerializeObject(dataResponse);
 
                               await _hub.Clients.All.SendAsync(_setting.SignalrEventName, result);
-                          }
-                          else
-                          {
+                          } else {
 
                               var dataResponse = HelperLib.ReponseClass.ReponseMethod("Unsucessful", false);
 
