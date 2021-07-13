@@ -39,7 +39,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         [HttpPost]
         [Route("face-list/create-face")]
-        public async Task<IActionResult> AddFace([FromBody] FaceListRequest model)
+        public async Task<IActionResult> AddFace([FromForm] FaceListRequest model)
         {
             try
             {
@@ -58,13 +58,13 @@ namespace AcctOpeningImageValidationAPI.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("face-list/verify-face")]
-        public async Task<IActionResult> VerifyFace(string guid)
+        public async Task<IActionResult> VerifyFace(string guid, string name)
         {
             try
             {
-                var result = await _faceRepository.VerifyFaceToFaceList(new Guid(guid));
+                var result = await _faceRepository.VerifyFaceToFaceList(new Guid(guid), name);
 
                 return Ok(result);
             }

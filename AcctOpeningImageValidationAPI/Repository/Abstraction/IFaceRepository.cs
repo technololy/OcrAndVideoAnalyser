@@ -20,6 +20,6 @@ namespace AcctOpeningImageValidationAPI.Repository.Abstraction
         Task RunEyeBlinkAlgorithm(string filePath, string userIdentification, Action<EyeBlinkResult> action);
         Task CreateFaceList();
         Task<PersistedFace> AddFaceToFaceList(IFormFile file, string name);
-        Task<PersistedFace> VerifyFaceToFaceList(Guid persistedFaceId);
+        Task<PersistedFace> VerifyFaceToFaceList(Guid persistedFaceId, string name);
     }
 }

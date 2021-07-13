@@ -54,7 +54,7 @@ namespace AcctOpeningImageValidationAPI.Repository
         /// <returns></returns>
         public async Task CreateFaceList()
         {
-            await client.LargeFaceList.CreateAsync(_setting.FaceListId, name: _setting.FaceListName);
+            await client.PersonGroup.CreateAsync(_setting.FaceListId, "SterlingBankGroup");
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace AcctOpeningImageValidationAPI.Repository
         {
             var stream = ConvertImageToStreamFromIFormFile(File);
 
-            PersistedFace faceResult = await client.LargeFaceList.AddFaceFromStreamAsync(_setting.FaceListId, stream, name);
+            PersistedFace faceResult = await client.PersonGroupPerson.AddFaceFromStreamAsync(_setting.FaceListId, new Guid(name), stream);
 
             return faceResult;
         }
@@ -77,9 +77,9 @@ namespace AcctOpeningImageValidationAPI.Repository
         /// </summary>
         /// <param name="persistedFaceId"></param>
         /// <returns></returns>
-        public async Task<PersistedFace> VerifyFaceToFaceList(Guid persistedFaceId)
+        public async Task<PersistedFace> VerifyFaceToFaceList(Guid persistedFaceId, string name)
         {
-            var result = await client.LargeFaceList.GetFaceAsync(_setting.FaceListId, persistedFaceId);
+            var result = await client.PersonGroupPerson.GetFaceAsync(_setting.FaceListId, new Guid(name), persistedFaceId);
 
             return result;
         }
