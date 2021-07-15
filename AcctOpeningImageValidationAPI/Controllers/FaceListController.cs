@@ -1,12 +1,9 @@
 ﻿using AcctOpeningImageValidationAPI.Models;
 using AcctOpeningImageValidationAPI.Repository.Abstraction;
 using AcctOpeningImageValidationAPI.Repository.Response;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AcctOpeningImageValidationAPI.Controllers

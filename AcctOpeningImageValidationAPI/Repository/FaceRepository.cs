@@ -163,7 +163,7 @@ namespace AcctOpeningImageValidationAPI.Repository
                 var result =  ConvertImageFromImageToStream(Image.FromStream(ms));
 
                 //Release memory, flush and close
-                ms.Flush(); ms.Close();
+                //ms.Flush(); ms.Close();
 
                 return result;
             }

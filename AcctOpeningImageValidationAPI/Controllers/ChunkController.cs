@@ -81,7 +81,7 @@ namespace XFUploadFile.Server.Controllers
         /// <returns>The created file handle when the file was successfully allocated. Or an error if a file with that name is already being uploaded.</returns>
         [HttpGet]
         [Route("BeginFileUpload")]
-        public IActionResult BeginFileUpload([FromQuery] string fileName, [FromQuery] string userIdentification)
+        public async Task<IActionResult> BeginFileUpload([FromQuery] string fileName, [FromQuery] string userIdentification)
         {
             if (string.IsNullOrEmpty(fileName))
                 return BadRequest("The fileName that was specified was null.");
@@ -99,6 +99,7 @@ namespace XFUploadFile.Server.Controllers
                 //Create a new empty file that will be filled later chunk by chunk.
                 var fs = new FileStream(Path.Combine(filePath, tempFileName), FileMode.CreateNew);
                 fs.Close();
+                await _hub.Clients.All.SendAsync(_setting.SignalrEventName, "BeginFileUpload");
             }
             catch (Exception e)
             {
@@ -117,7 +118,7 @@ namespace XFUploadFile.Server.Controllers
         /// <returns>Returns the Ok code if the chunk was uploaded and appended successfully. Or an error when it failed.</returns>
         [HttpPost]
         [Route("UploadChunk")]
-        public IActionResult UploadChunk(MediaChunk mediaChunk)
+        public async Task<IActionResult> UploadChunk(MediaChunk mediaChunk)
         {
             try
             {
@@ -137,6 +138,8 @@ namespace XFUploadFile.Server.Controllers
 
                     var bytes = Convert.FromBase64String(mediaChunk.Data);
                     fs.Write(bytes, 0, bytes.Length);
+
+                    await _hub.Clients.All.SendAsync(_setting.SignalrEventName, "UploadChunk");
                 }
                 catch (Exception e)
                 {
@@ -193,11 +196,11 @@ namespace XFUploadFile.Server.Controllers
 
                           if (success)
                           {
-                            //TODO: Run Facial Recognition Algorithm
-                            EyeBlinkResult faceGestureResults = await _faceRepository.RunEyeBlinkAlgorithm(chunkPath, userIdentification);
+                              //TODO: Run Facial Recognition Algorithm
+                              EyeBlinkResult faceGestureResults = await _faceRepository.RunEyeBlinkAlgorithm(chunkPath, userIdentification);
 
-                            //TODO : Delete Folder
-                            var chunkFiles = Directory.GetFiles(chunkPath);
+                              //TODO : Delete Folder
+                              var chunkFiles = Directory.GetFiles(chunkPath);
 
                               var tempFiles = Directory.GetFiles(Path.Combine(_environment.ContentRootPath, userIdentification, "temp"));
 
@@ -245,7 +248,9 @@ namespace XFUploadFile.Server.Controllers
                 _context.SaveChanges();
                 _logger.LogError(e, "Error");
                 return BadRequest(HelperLib.ReponseClass.ReponseMethod("Unsucessful", false));
+
             }
+
             return Ok();
         }
     }

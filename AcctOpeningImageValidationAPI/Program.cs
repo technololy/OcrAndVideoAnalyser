@@ -23,7 +23,7 @@ namespace AcctOpeningImageValidationAPI
             catch (Exception ex)
             {
                 logger.Error(ex, "Error in init");
-                throw;
+                //throw;
             }
             finally
             {
