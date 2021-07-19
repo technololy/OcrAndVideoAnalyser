@@ -99,7 +99,6 @@ namespace XFUploadFile.Server.Controllers
                 //Create a new empty file that will be filled later chunk by chunk.
                 var fs = new FileStream(Path.Combine(filePath, tempFileName), FileMode.CreateNew);
                 fs.Close();
-                await _hub.Clients.All.SendAsync(_setting.SignalrEventName, "BeginFileUpload");
             }
             catch (Exception e)
             {
@@ -138,8 +137,6 @@ namespace XFUploadFile.Server.Controllers
 
                     var bytes = Convert.FromBase64String(mediaChunk.Data);
                     fs.Write(bytes, 0, bytes.Length);
-
-                    await _hub.Clients.All.SendAsync(_setting.SignalrEventName, "UploadChunk");
                 }
                 catch (Exception e)
                 {

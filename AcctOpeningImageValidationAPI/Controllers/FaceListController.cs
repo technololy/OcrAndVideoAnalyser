@@ -45,7 +45,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     return BadRequest(ResponseViewModel<PersistedFace>.Failed("All fields are required"));
                 }
 
-                var result = await _faceRepository.AddFaceToFaceList(model.File, model.Name);
+                var result = await _faceRepository.AddFaceToFaceList(model.File, Guid.NewGuid().ToString());
 
                 return Ok(ResponseViewModel<PersistedFace>.Ok(result));
 

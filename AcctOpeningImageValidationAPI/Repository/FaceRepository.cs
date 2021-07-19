@@ -65,7 +65,7 @@ namespace AcctOpeningImageValidationAPI.Repository
         /// <returns></returns>
         public async Task<PersistedFace> AddFaceToFaceList(IFormFile File, string name)
         {
-            var stream = ConvertImageToStreamFromIFormFile(File);
+            Stream stream = ConvertImageToStreamFromIFormFile(File);
 
             PersistedFace faceResult = await client.PersonGroupPerson.AddFaceFromStreamAsync(_setting.FaceListId, new Guid(name), stream);
 

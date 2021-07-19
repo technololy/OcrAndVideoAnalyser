@@ -409,17 +409,17 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     var faceAttributes = result.faces.FirstOrDefault().FaceAttributes;
                     Models.FacialValidation facialValidation = new Models.FacialValidation()
                     {
-                        FacialHair = faceAttributes.FacialHair.ToString(),
-                        Hair = faceAttributes.Hair.ToString(),
-                        Accessories = faceAttributes.Accessories.FirstOrDefault().ToString(),
-                        Age = faceAttributes.Age.ToString(),
-                        Gender = faceAttributes.Gender.Value.ToString(),
-                        Emotion = faceAttributes.Emotion.ToString(),
-                        Smile = faceAttributes.Smile.Value.ToString(),
-                        Occlusion = faceAttributes.Occlusion.ToString(),
+                        FacialHair = faceAttributes.FacialHair != null ? faceAttributes.FacialHair.ToString() : null,
+                        Hair = faceAttributes.Hair != null ? faceAttributes.Hair.ToString() : null,
+                        Accessories = faceAttributes.Accessories != null ? faceAttributes.Accessories.FirstOrDefault().ToString() : null,
+                        Age = faceAttributes.Age != null ? faceAttributes.Age.ToString() : null,
+                        Gender = faceAttributes.Gender != null ? faceAttributes.Gender.Value.ToString() : null,
+                        Emotion = faceAttributes.Emotion != null ? faceAttributes.Emotion.ToString() : null,
+                        Smile = faceAttributes.Smile != null ? faceAttributes.Smile.Value.ToString() : null,
+                        Occlusion = faceAttributes.Occlusion != null ? faceAttributes.Occlusion.ToString() : null,
                     };
                     await context.FacialValidations.AddAsync(facialValidation);
-                    await context.SaveChangesAsync();
+                    //await context.SaveChangesAsync();
                     //return new OkObjectResult(result.faces);
                     return new OkObjectResult("success");
 

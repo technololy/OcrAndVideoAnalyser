@@ -7,7 +7,5 @@ namespace AcctOpeningImageValidationAPI.Models
     {
         [Required]
         public IFormFile File { get; set; }
-        [Required]
-        public string Name { get; set; }
     }
 }
