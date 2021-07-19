@@ -505,7 +505,6 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 {
                     return new UnprocessableEntityObjectResult(HelperLib.ReponseClass.ReponseMethod("Face not seen", false));
                     // return new UnprocessableEntityObjectResult(result.faces);
-
                 }
             }
             catch (Exception ex)
