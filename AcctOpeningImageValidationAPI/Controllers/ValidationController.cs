@@ -485,14 +485,14 @@ namespace AcctOpeningImageValidationAPI.Controllers
                     var faceAttributes = result.faces.FirstOrDefault().FaceAttributes;
                     Models.FacialValidation facialValidation = new Models.FacialValidation()
                     {
-                        FacialHair = faceAttributes.FacialHair?.Beard.ToString(),
-                        Hair = faceAttributes.Hair?.HairColor?.FirstOrDefault().Confidence.ToString(),
-                        Accessories = faceAttributes.Accessories?.FirstOrDefault().Confidence.ToString(),
-                        Age = faceAttributes.Age?.ToString(),
-                        Gender = faceAttributes.Gender.Value.ToString(),
+                        FacialHair = faceAttributes.FacialHair != null ? faceAttributes.FacialHair?.Beard.ToString() : null,
+                        Hair = faceAttributes.Hair != null ? faceAttributes.Hair?.HairColor?.FirstOrDefault().Confidence.ToString() : null,
+                        Accessories = faceAttributes.Accessories != null ? faceAttributes.Accessories?.FirstOrDefault().Confidence.ToString() : null,
+                        Age = faceAttributes.Age != null ? faceAttributes.Age?.ToString() : null,
+                        Gender = faceAttributes.Gender != null ? faceAttributes.Gender.Value.ToString() : null,
                         Emotion = $"Neutral {faceAttributes.Emotion?.Neutral.ToString()}, Sadness {faceAttributes.Emotion?.Sadness.ToString()}",
-                        Smile = faceAttributes.Smile.Value.ToString(),
-                        Occlusion = faceAttributes.Occlusion?.ToString(),
+                        Smile = faceAttributes.Smile != null ? faceAttributes.Smile.Value.ToString() : null,
+                        Occlusion = faceAttributes.Occlusion != null ? faceAttributes.Occlusion?.ToString() : null,
                         OCRUsageId = ocrUsage.Id
                     };
                     await context.FacialValidations.AddAsync(facialValidation);

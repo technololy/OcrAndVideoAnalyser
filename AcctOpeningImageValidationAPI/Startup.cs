@@ -123,7 +123,10 @@ namespace AcctOpeningImageValidationAPI
 
             app.UseAuthorization();
 
-            context.Database.Migrate();
+            if (!env.IsDevelopment())
+            {
+                context.Database.Migrate();
+            }
 
             app.UseCors();
 
