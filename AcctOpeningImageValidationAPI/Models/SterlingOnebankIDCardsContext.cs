@@ -96,16 +96,8 @@ namespace AcctOpeningImageValidationAPI.Models
                 .HasColumnType("datetime")
                 .HasDefaultValueSql("(getdate())");
 
-
-
-
             });
-
-
-
         }
-
-
     }
 
 
@@ -179,8 +171,8 @@ namespace AcctOpeningImageValidationAPI.Models
         public string Gender { get; set; }
         public string Occlusion { get; set; }
         public DateTime? DateInserted { get; set; }
-        public int OCRUsageId { get; set; }
-        public OCRUsage OCRUsage { get; set; }
+        //public int OCRUsageId { get; set; }
+        //public OCRUsage OCRUsage { get; set; }
 
     }
 

@@ -30,7 +30,7 @@ namespace ImageValidationBlazorServer.Models
             public object firstIssueState { get; set; }
             public object delim { get; set; }
             public string gender { get; set; }
-            public DateTime dateInserted { get; set; }
+           // public object dateInserted { get; set; }
         }
 
         public class Root
