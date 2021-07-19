@@ -447,6 +447,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
         public async Task<IActionResult> ValidateStaticFaceImage([FromBody] ValidateInputModel validate)
         {
+            var ocrUsage = OCRUsage.Empty;
             context.RequestLog.Add(new RequestLogs { Email = validate.Email, Description = validate.Base64Encoded.Substring(0, 10), FileName = "Face Image validation" });
             context.SaveChanges();
 
@@ -459,7 +460,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
             try
             {
-                _ocrRepository.ValidateUsage(ImageURL.Url);
+                ocrUsage = _ocrRepository.ValidateUsage(validate.Email);
             }
             catch (MaximumOCRUsageException e)
             {
@@ -492,6 +493,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                         Emotion = $"Neutral {faceAttributes.Emotion?.Neutral.ToString()}, Sadness {faceAttributes.Emotion?.Sadness.ToString()}",
                         Smile = faceAttributes.Smile.Value.ToString(),
                         Occlusion = faceAttributes.Occlusion?.ToString(),
+                        OCRUsageId = ocrUsage.Id
                     };
                     await context.FacialValidations.AddAsync(facialValidation);
                     await context.SaveChangesAsync();
