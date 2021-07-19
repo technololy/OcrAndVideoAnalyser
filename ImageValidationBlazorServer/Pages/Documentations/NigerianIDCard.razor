@@ -1,5 +1,6 @@
 ﻿@page "/docs/card/validate"
 @layout DocumentLayout
+@using Newtonsoft.Json 
 @inject IFileReaderService fileReader;
 @inject IHttpClientFactory ClientFactory
 @inject IToastService toastService
@@ -203,6 +204,15 @@
             }
             else
             {
+                var jsonResult = JsonConvert.DeserializeObject<Models.ResponseClass.Root>(result.returnedStringContent);
+
+                if(jsonResult != null) {
+                    documentData = jsonResult.data;
+                    showIdDetails = true;
+                    showDetails = false;
+                    toastService.ShowSuccess("Successfully done");
+                }
+
                 System.Diagnostics.Debug.WriteLine(result.failedObj?.Message ?? "Error");
                 // AlertMessage = result.returnedStringContent;
                 toastService.ShowError(result.returnedStringContent);

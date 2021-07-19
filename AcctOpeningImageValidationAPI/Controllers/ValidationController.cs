@@ -137,7 +137,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
             {
                 OCRUsage ocrUsage = OCRUsage.Empty;
                 context.RequestLog.Add(new RequestLogs { Email = validate.Email, Description = validate.Base64Encoded.Substring(0, 10), FileName = "Image validation" });
-                context.SaveChanges();
+                //context.SaveChanges();
 
                 var result = await _restClientService.UploadDocument(new DocumentUploadRequest
                 {
