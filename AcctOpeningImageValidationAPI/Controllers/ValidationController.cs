@@ -490,7 +490,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                         Accessories = faceAttributes.Accessories != null ? faceAttributes.Accessories?.FirstOrDefault().Confidence.ToString() : null,
                         Age = faceAttributes.Age != null ? faceAttributes.Age?.ToString() : null,
                         Gender = faceAttributes.Gender != null ? faceAttributes.Gender.Value.ToString() : null,
-                        Emotion = $"Neutral {faceAttributes.Emotion?.Neutral.ToString()}, Sadness {faceAttributes.Emotion?.Sadness.ToString()}",
+                        //Emotion = $"Neutral {faceAttributes.Emotion?.Neutral.ToString()}, Sadness {faceAttributes.Emotion?.Sadness.ToString()}",
                         Smile = faceAttributes.Smile != null ? faceAttributes.Smile.Value.ToString() : null,
                         Occlusion = faceAttributes.Occlusion != null ? faceAttributes.Occlusion?.ToString() : null,
                         OCRUsageId = ocrUsage.Id
