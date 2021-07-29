@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,10 +14,19 @@ namespace AcctOpeningImageValidationAPI.Controllers
     [Route("[controller]")]
     public class UtilityController : ControllerBase
     {
+        private readonly ILogger<UtilityController> _logger;
+
+        public UtilityController(ILogger<UtilityController> logger)
+        {
+            _logger = logger;
+        }
+
         [HttpPost]
         [Route("convert-image-base64")]
         public IActionResult ConvertImageToBase64([FromForm] ImageFile imageFile)
         {
+            _logger.LogInformation("Hello, Sample Logging!");
+
            if(!ModelState.IsValid)
            {
                return BadRequest();

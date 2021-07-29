@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AcctOpeningImageValidationAPI.Helpers;
+using AcctOpeningImageValidationAPI.Logger;
 using AcctOpeningImageValidationAPI.Repository;
 using AcctOpeningImageValidationAPI.Repository.Abstraction;
 using AcctOpeningImageValidationAPI.Repository.Services.Implementation;
@@ -90,8 +91,10 @@ namespace AcctOpeningImageValidationAPI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, Models.SterlingOnebankIDCardsContext context)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, Models.SterlingOnebankIDCardsContext context, ILoggerFactory loggerFactory)
         {
+
+            loggerFactory.AddLog4Net();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
