@@ -483,7 +483,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 if (result.IsSuccess)
                 {
                     var faceAttributes = result.faces.FirstOrDefault().FaceAttributes;
-                    Models.FacialValidation facialValidation = new Models.FacialValidation()
+                    Models.FacialValidation facialValidation = new Models.FacialValidation
                     {
                         FacialHair = faceAttributes.FacialHair != null ? faceAttributes.FacialHair?.Beard.ToString() : null,
                         Hair = faceAttributes.Hair != null ? faceAttributes.Hair?.HairColor?.FirstOrDefault().Confidence.ToString() : null,

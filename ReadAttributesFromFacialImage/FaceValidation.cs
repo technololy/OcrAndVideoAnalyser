@@ -80,7 +80,7 @@ namespace ReadAttributesFromFacialImage
 
                 faceClient.Endpoint = faceEndpoint;
                 //imageUrl = "https://sbnk2storage.blob.core.windows.net/k2container/OneBank/14864679/0074721460/Passport.jpg";
-                IList<DetectedFace> faces = await faceClient.Face.DetectWithUrlAsync(imageUrl, true, true, faceAttributes);
+                IList<DetectedFace> faces = await faceClient.Face.DetectWithUrlAsync(imageUrl, true, true, faceAttributes, recognitionModel : "recognition_04");
                 if (faces != null && faces.Count > 0)
                 {
                     Console.WriteLine($"performing facial validation result is {Newtonsoft.Json.JsonConvert.SerializeObject(faces)}");
