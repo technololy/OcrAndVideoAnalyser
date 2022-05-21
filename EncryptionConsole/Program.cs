@@ -14,7 +14,7 @@ namespace EncryptionConsole
             var request = new Request();
             var videoRequest = new VideoFileRequest { VideoFile = "base64" };
 
-            request.Body = Encryption.Encryption.Encrypt(JsonConvert.SerializeObject(videoRequest), "STERLING-CLIENT-001", "ed8fb6c1-2bcf-4163-a7ec-f28973acf538").Result;
+            request.Body = Encryption.Encryption.Encrypt(JsonConvert.SerializeObject(videoRequest), "IconFlux-CLIENT-001", "ed8fb6c1-2bcf-4163-a7ec-f28973acf538").Result;
 
             HttpClient httpClient = new HttpClient();
             var apiCallUrl = "";

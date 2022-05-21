@@ -33,7 +33,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         private readonly IComputerVision computerVision;
         private readonly IExternalImageValidationService externalImageValidationService;
         private readonly IFaceValidation faceValidation;
-        private readonly Models.SterlingOnebankIDCardsContext context;
+        private readonly Models.IconFluxOnebankIDCardsContext context;
         private IConfiguration Configuration { get; set; }
         private readonly IOCRRepository _ocrRepository;
         private readonly RestClientService _restClientService;
@@ -43,7 +43,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
             IComputerVision _computerVision,
             IExternalImageValidationService externalImageValidationService,
             ReadAttributesFromFacialImage.IFaceValidation faceValidation,
-            Models.SterlingOnebankIDCardsContext _context,
+            Models.IconFluxOnebankIDCardsContext _context,
             RestClientService restClientService,
             IOptions<AppSettings> option,
             IOCRRepository ocrRepository)
@@ -751,12 +751,12 @@ namespace AcctOpeningImageValidationAPI.Controllers
 
             var connString = Configuration.GetConnectionString("OneBankConn");
             //connString = "";
-            connString = "Server=10.0.41.101;Initial Catalog=SterlingMobile;Integrated Security=False;User ID=sa;Password=tylent;MultipleActiveResultSets=True;pooling=true;Max Pool Size=200;";
+            connString = "Server=10.0.41.101;Initial Catalog=IconFluxMobile;Integrated Security=False;User ID=sa;Password=tylent;MultipleActiveResultSets=True;pooling=true;Max Pool Size=200;";
 
             try
             {
                 SqlDataClientLib.Class1 c = new SqlDataClientLib.Class1();
-                var getuserid = $"select userid FROM [SterlingMobile].[dbo].[User] where UserName = @username";
+                var getuserid = $"select userid FROM [IconFluxMobile].[dbo].[User] where UserName = @username";
                 var id = c.ReturnSingle(connString, getuserid, name);
                 if (string.IsNullOrEmpty(id))
                 {
@@ -765,13 +765,13 @@ namespace AcctOpeningImageValidationAPI.Controllers
                 }
 
 
-                var query = $"delete  from [SterlingMobile].[dbo].userdeviceinfo where UserId =@param;";
+                var query = $"delete  from [IconFluxMobile].[dbo].userdeviceinfo where UserId =@param;";
                 var num = c.ExecuteDbAction(connString, query, id);
 
-                var query2 = $"delete  from [SterlingMobile].[dbo].Beneficiary where UserId =@param;";
+                var query2 = $"delete  from [IconFluxMobile].[dbo].Beneficiary where UserId =@param;";
                 var num2 = c.ExecuteDbAction(connString, query2, id);
 
-                var query3 = $"delete  from [SterlingMobile].[dbo].[User] where username =@param;";
+                var query3 = $"delete  from [IconFluxMobile].[dbo].[User] where username =@param;";
                 var num3 = c.ExecuteDbAction(connString, query3, name);
                 //return new OkObjectResult(result.faces);
                 if (num > 0 && num3 > 0)

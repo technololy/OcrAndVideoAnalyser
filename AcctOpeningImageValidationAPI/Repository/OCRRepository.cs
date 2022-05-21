@@ -24,7 +24,7 @@ namespace AcctOpeningImageValidationAPI.Repository
         /// </summary>
         /// <param name="context"></param>
         /// <param name="options"></param>
-        public OCRRepository(SterlingOnebankIDCardsContext context, IOptions<AppSettings> options) : base(context)
+        public OCRRepository(IconFluxOnebankIDCardsContext context, IOptions<AppSettings> options) : base(context)
         {
             _settings = options.Value; 
         }

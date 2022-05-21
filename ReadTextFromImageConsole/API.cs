@@ -25,7 +25,7 @@ namespace ReadTextFromImageConsole
             client = new HttpClient();
      
           
-            var username = @"sterlingbank\k2_admin";
+            var username = @"IconFluxbank\k2_admin";
             var password = "K2processing";
 
              var byteArray = Encoding.ASCII.GetBytes($"{username}:{password}");

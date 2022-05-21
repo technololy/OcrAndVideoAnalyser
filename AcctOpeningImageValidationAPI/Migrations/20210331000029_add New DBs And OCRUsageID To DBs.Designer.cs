@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AcctOpeningImageValidationAPI.Migrations
 {
-    [DbContext(typeof(SterlingOnebankIDCardsContext))]
+    [DbContext(typeof(IconFluxOnebankIDCardsContext))]
     [Migration("20210331000029_add New DBs And OCRUsageID To DBs")]
     partial class addNewDBsAndOCRUsageIDToDBs
     {

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AcctOpeningImageValidationAPI.Migrations
 {
-    [DbContext(typeof(SterlingOnebankIDCardsContext))]
+    [DbContext(typeof(IconFluxOnebankIDCardsContext))]
     [Migration("20210312135850_newColumnToScannedDetailedTable")]
     partial class newColumnToScannedDetailedTable
     {

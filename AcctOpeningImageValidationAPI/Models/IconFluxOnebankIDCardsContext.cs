@@ -4,19 +4,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AcctOpeningImageValidationAPI.Models
 {
-    public class SterlingOnebankIDCardsContext : DbContext
+    public class IconFluxOnebankIDCardsContext : DbContext
     {
-        public SterlingOnebankIDCardsContext()
+        public IconFluxOnebankIDCardsContext()
         {
         }
-        public SterlingOnebankIDCardsContext(DbContextOptions<SterlingOnebankIDCardsContext> options)
+        public IconFluxOnebankIDCardsContext(DbContextOptions<IconFluxOnebankIDCardsContext> options)
           : base(options)
         {
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseSqlServer(@"Server=localhost;Database=SterlingOnebankIDCards;Persist Security Info=False;User ID=sa;Password=reallyStrongPwd123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;ConnectRetryCount=0");
-            //optionsBuilder.UseSqlServer(@"Server=10.0.41.101;Database=SterlingOnebankIDCards;Persist Security Info=False;User ID=sa;Password=tylent;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;ConnectRetryCount=0");
+            //optionsBuilder.UseSqlServer(@"Server=localhost;Database=IconFluxOnebankIDCards;Persist Security Info=False;User ID=sa;Password=reallyStrongPwd123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;ConnectRetryCount=0");
+            //optionsBuilder.UseSqlServer(@"Server=10.0.41.101;Database=IconFluxOnebankIDCards;Persist Security Info=False;User ID=sa;Password=tylent;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;ConnectRetryCount=0");
         }
         public DbSet<AppruvResponse> AppruvResponses { get; set; }
         public DbSet<OCRResponse> OCRResponses { get; set; }

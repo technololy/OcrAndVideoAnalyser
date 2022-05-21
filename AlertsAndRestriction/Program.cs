@@ -100,7 +100,7 @@ namespace AlertsAndRestriction
                 fileName = "",
                 fromEmail = "",
                 recieverFirstName = recepientName,
-                addressesToCopy = "ololade.oyebanji@sterling.ng"
+                addressesToCopy = "ololade.oyebanji@IconFlux.ng"
             };
             var resp = pI.PostAny<dynamic>(model, $"{acctOpenBaseURL}/api/User/SendMailAttachment").Result;
             if (resp.isSuccess)

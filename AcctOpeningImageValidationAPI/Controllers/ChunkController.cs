@@ -21,9 +21,9 @@ namespace XFUploadFile.Server.Controllers
         private readonly IWebHostEnvironment _environment;
         private readonly AppSettings _setting;
         private readonly IFaceRepository _faceRepository;
-        private readonly SterlingOnebankIDCardsContext _context;
+        private readonly IconFluxOnebankIDCardsContext _context;
         private readonly IHubContext<NotificationHub> _hub;
-        public ChunkController(ILogger<ChunkController> logger,IWebHostEnvironment environment, IOptions<AppSettings> options, IFaceRepository faceRepository, SterlingOnebankIDCardsContext context, IHubContext<NotificationHub> hub)
+        public ChunkController(ILogger<ChunkController> logger,IWebHostEnvironment environment, IOptions<AppSettings> options, IFaceRepository faceRepository, IconFluxOnebankIDCardsContext context, IHubContext<NotificationHub> hub)
         {
             _setting = options.Value;
             _logger = logger;

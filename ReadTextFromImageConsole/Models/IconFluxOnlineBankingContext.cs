@@ -5,13 +5,13 @@ using Microsoft.Extensions.Configuration;
 
 namespace ReadTextFromImageConsole.Models
 {
-    public partial class SterlingOnlineBankingContext : DbContext
+    public partial class IconFluxOnlineBankingContext : DbContext
     {
-        public SterlingOnlineBankingContext()
+        public IconFluxOnlineBankingContext()
         {
         }
 
-        public SterlingOnlineBankingContext(DbContextOptions<SterlingOnlineBankingContext> options)
+        public IconFluxOnlineBankingContext(DbContextOptions<IconFluxOnlineBankingContext> options)
             : base(options)
         {
         }
@@ -28,7 +28,7 @@ namespace ReadTextFromImageConsole.Models
         public virtual DbSet<OnebankMobile> OnebankMobile { get; set; }
         public virtual DbSet<Product> Product { get; set; }
         public virtual DbSet<ProductCategory> ProductCategory { get; set; }
-        public virtual DbSet<SterlingBranchNew> SterlingBranchNew { get; set; }
+        public virtual DbSet<IconFluxBranchNew> IconFluxBranchNew { get; set; }
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<UserNuban> UserNuban { get; set; }
 
@@ -36,9 +36,9 @@ namespace ReadTextFromImageConsole.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                var conString = Program.config.GetConnectionString("SterlingOnlineBankingDbContext");
+                var conString = Program.config.GetConnectionString("IconFluxOnlineBankingDbContext");
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=10.0.41.101;Database=SterlingOnlineBanking;user id=sa;password=tylent;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;");
+                optionsBuilder.UseSqlServer("Server=10.0.41.101;Database=IconFluxOnlineBanking;user id=sa;password=tylent;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;");
                 optionsBuilder.UseSqlServer(conString);
             }
         }

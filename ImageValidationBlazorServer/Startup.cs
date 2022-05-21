@@ -34,7 +34,7 @@ namespace ImageValidationBlazorServer
             services.AddFileReaderService();
             services.AddHttpClient("FacialrecogAPI", c =>
             {
-                c.BaseAddress = new Uri("https://pass.sterling.ng/FacialrecogAPI/");
+                c.BaseAddress = new Uri("https://pass.IconFlux.ng/FacialrecogAPI/");
 
                 c.DefaultRequestHeaders.Add("Accept", "application/json");
 

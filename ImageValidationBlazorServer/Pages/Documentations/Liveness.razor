@@ -62,7 +62,7 @@
         StateHasChanged();
 
         IdentificationValidationLib.API apiCalls = new IdentificationValidationLib.API();
-        var endPoint = "https://pass.sterling.ng/FacialrecogAPI/liveness";
+        var endPoint = "https://pass.IconFlux.ng/FacialrecogAPI/liveness";
 
         string encodedResult = base64EncodedString.Replace("data:video/mp4;base64,", string.Empty);
         request.VideoFile = encodedResult;

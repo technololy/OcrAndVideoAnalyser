@@ -24,7 +24,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         private readonly IFaceRepository _faceRepository;
         private readonly INetworkService _networkService;
         private readonly IHubContext<NotificationHub> _hub;
-        private readonly SterlingOnebankIDCardsContext _context;
+        private readonly IconFluxOnebankIDCardsContext _context;
 
         /// <summary>
         /// AppSettings | Production or Development
@@ -38,7 +38,7 @@ namespace AcctOpeningImageValidationAPI.Controllers
         public FaceLivenessController(IFaceRepository faceRepository,
                                       IOptions<AppSettings> options,
                                       INetworkService networkService,
-                                      SterlingOnebankIDCardsContext context,
+                                      IconFluxOnebankIDCardsContext context,
                                       IHubContext<NotificationHub> hub)
         {
             _faceRepository = faceRepository;

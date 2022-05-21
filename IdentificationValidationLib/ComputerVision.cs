@@ -153,7 +153,7 @@ namespace IdentificationValidationLib
 
 
             //static string imageFilePath = @"damilola_oyebanji_international_passport.jpg";
-            //            string imageFilePath2 = "voters_card_sterling_customer.png";
+            //            string imageFilePath2 = "voters_card_IconFlux_customer.png";
             //            imageFilePath2 = @"lolades_drivers_license.jpg";
             //            //static string imageFilePath = @"Identification.jpg";
             //#if DEBUG

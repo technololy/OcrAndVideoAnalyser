@@ -36,8 +36,8 @@ namespace AcctOpeningImageValidationAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connection = Configuration.GetConnectionString("SterlingOnebankIDCards");
-            services.AddDbContext<Models.SterlingOnebankIDCardsContext>(options => options.UseSqlServer(connection));
+            var connection = Configuration.GetConnectionString("IconFluxOnebankIDCards");
+            services.AddDbContext<Models.IconFluxOnebankIDCardsContext>(options => options.UseSqlServer(connection));
 
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
@@ -91,7 +91,7 @@ namespace AcctOpeningImageValidationAPI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, Models.SterlingOnebankIDCardsContext context, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, Models.IconFluxOnebankIDCardsContext context, ILoggerFactory loggerFactory)
         {
 
             loggerFactory.AddLog4Net();

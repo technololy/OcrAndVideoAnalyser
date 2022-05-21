@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ReadTextFromImageConsole.Models
 {
-    public partial class SterlingBranchNew
+    public partial class IconFluxBranchNew
     {
         public long Id { get; set; }
         public string BranchCode { get; set; }

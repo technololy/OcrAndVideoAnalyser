@@ -54,7 +54,7 @@ namespace AcctOpeningImageValidationAPI.Repository
         /// <returns></returns>
         public async Task CreateFaceList()
         {
-            await client.PersonGroup.CreateAsync(_setting.FaceListId, "SterlingBankGroup");
+            await client.PersonGroup.CreateAsync(_setting.FaceListId, "IconFluxBankGroup");
         }
 
         /// <summary>

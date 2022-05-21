@@ -49,7 +49,7 @@ function onStart(instance, callback)  {
     function callApi (data) {
         $.ajax({
             type: "POST",
-            url: "https://pass.sterling.ng/FacialrecogAPI/liveness",
+            url: "https://pass.IconFlux.ng/FacialrecogAPI/liveness",
             data: JSON.stringify(data),
             contentType: "application/json; charset=utf-8",
             dataType : "json",
@@ -99,7 +99,7 @@ function onStart(instance, callback)  {
 
                     //callApi({
                     //    videoFile: base64EncodedString,
-                    //    userIdentification: "sterling-00000001"
+                    //    userIdentification: "IconFlux-00000001"
                     //});
                     instance.invokeMethodAsync('WebCameraCallBack', base64String);
                 }

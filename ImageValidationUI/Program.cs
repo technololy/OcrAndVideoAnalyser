@@ -25,7 +25,7 @@ namespace ImageValidationUI
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services.AddHttpClient("FacialrecogAPI", client =>
-    client.BaseAddress = new Uri("https://pass.sterling.ng/FacialrecogAPI/"));
+    client.BaseAddress = new Uri("https://pass.IconFlux.ng/FacialrecogAPI/"));
 
             await builder.Build().RunAsync();
         }

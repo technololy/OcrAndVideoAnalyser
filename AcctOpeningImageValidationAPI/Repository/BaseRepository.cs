@@ -13,14 +13,14 @@ namespace AcctOpeningImageValidationAPI.Repository
     /// <typeparam name="T"></typeparam>
     public class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
     {
-        protected readonly SterlingOnebankIDCardsContext _context;
+        protected readonly IconFluxOnebankIDCardsContext _context;
         /// <summary>
         /// Constructor, This Constructor Sub-Method Parent Constructor To
         /// Initialize Application DbContext
         /// Also This Generic Method, Extends The Basic CRUD Stubs To Other Repository
         /// </summary>
         /// <param name="context"></param>
-        public BaseRepository(SterlingOnebankIDCardsContext context)
+        public BaseRepository(IconFluxOnebankIDCardsContext context)
         {
             _context = context;
         }

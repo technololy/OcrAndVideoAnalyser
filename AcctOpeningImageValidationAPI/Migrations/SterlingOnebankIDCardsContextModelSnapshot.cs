@@ -8,8 +8,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AcctOpeningImageValidationAPI.Migrations
 {
-    [DbContext(typeof(SterlingOnebankIDCardsContext))]
-    partial class SterlingOnebankIDCardsContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(IconFluxOnebankIDCardsContext))]
+    partial class IconFluxOnebankIDCardsContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
